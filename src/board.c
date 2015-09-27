@@ -14,18 +14,42 @@ int parse_fen(char *fen) {
   file = 1;
   while((rank >= 1) && *fen) {
     switch (*fen) {
-      case 'p': piece = B_PAWN; break;
-      case 'r': piece = B_ROOK; break;
-      case 'n': piece = B_KNIGHT; break;
-      case 'b': piece = B_BISHOP; break;
-      case 'k': piece = B_KING; break;
-      case 'q': piece = B_QUEEN; break;
-      case 'P': piece = W_PAWN; break;
-      case 'R': piece = W_ROOK; break;
-      case 'N': piece = W_KNIGHT; break;
-      case 'B': piece = W_BISHOP; break;
-      case 'K': piece = W_KING; break;
-      case 'Q': piece = W_QUEEN; break;
+      case 'p': piece = B_PAWN; 
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank)));
+                break;
+      case 'r': piece = B_ROOK;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'n': piece = B_KNIGHT;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'b': piece = B_BISHOP;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'k': piece = B_KING;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'q': piece = B_QUEEN;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'P': piece = W_PAWN;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'R': piece = W_ROOK;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'N': piece = W_KNIGHT;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'B': piece = W_BISHOP;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'K': piece = W_KING; 
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
+      case 'Q': piece = W_QUEEN;
+                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                break;
 
       case '1':
       case '2':
@@ -81,7 +105,7 @@ int parse_fen(char *fen) {
   //check that we didn't somehow screw up castle permissions
   assert((board.castle_perm >= 0b0000) && (board.castle_perm <= 0b1111));
 
-  if(*fen != '-') {
+  if (*fen != '-') {
     file = fen[0] - 'a';
     file = fen[1] - '1';
 
@@ -133,6 +157,10 @@ void print_board() {
   }
   printf("  +---+---+---+---+---+---+---+---+\n");
   printf("    a   b   c   d   e   f   g   h  \n");
+
+  printf("side:%c, castle_perm:%i, ep:%i, fifty_move:%i\n",
+      (board.side)?'W':'B', board.castle_perm, board.ep_sq,
+      board.fifty_move_count);
 
 }
 
