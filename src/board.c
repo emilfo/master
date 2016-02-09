@@ -6,49 +6,48 @@ void init() {
 }
 
 int parse_fen(char *fen) {
-  int i, file, rank, piece;
+  int file, rank, piece;
   reset_board();
 
-  i = 0;
   rank = 8;
   file = 1;
   while((rank >= 1) && *fen) {
     switch (*fen) {
       case 'p': piece = B_PAWN; 
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank)));
+                board.b_pawns |= (1ULL << (FRtoSQ(file, rank)));
                 break;
       case 'r': piece = B_ROOK;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.b_rooks |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'n': piece = B_KNIGHT;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.b_knights |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'b': piece = B_BISHOP;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.b_bishops |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'k': piece = B_KING;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.b_king |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'q': piece = B_QUEEN;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.b_queens |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'P': piece = W_PAWN;
                 board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'R': piece = W_ROOK;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.w_rooks |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'N': piece = W_KNIGHT;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.w_knights |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'B': piece = W_BISHOP;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.w_bishops |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'K': piece = W_KING; 
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.w_king |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
       case 'Q': piece = W_QUEEN;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                board.w_queens |= (1ULL << (FRtoSQ(file, rank))); 
                 break;
 
       case '1':
@@ -77,7 +76,6 @@ int parse_fen(char *fen) {
 
     if (piece != EMPTY) {
       board.sq[FRtoSQ(file, rank)] = piece;
-      printf("%d, on sq %d %d/%d\n", piece, FRtoSQ(file, rank), file,rank);
       file += 1;
     }
 
@@ -151,17 +149,111 @@ void print_board() {
   for (rank = 8; rank >= 1; rank--) {
     printf("  +---+---+---+---+---+---+---+---+\n%d |", rank);
     for (file = 1; file <= 8; file++) {
-      printf(" %d |", board.sq[FRtoSQ(file, rank)]);
+      printf("%2c |", PIECE_NAME[board.sq[FRtoSQ(file, rank)]]);
     }
     printf("\n");
   }
   printf("  +---+---+---+---+---+---+---+---+\n");
   printf("    a   b   c   d   e   f   g   h  \n");
 
-  printf("side:%c, castle_perm:%i, ep:%i, fifty_move:%i\n",
-      (board.side)?'W':'B', board.castle_perm, board.ep_sq,
+  printf("side:%c, castle_perm:%d, ep:%i, fifty_move:%i\n",
+      (board.side)?'B':'W', board.castle_perm, board.ep_sq,
       board.fifty_move_count);
-
 }
 
+void debug_board() {
+    int i;
+
+    for (i = A1; i <= H8; i++) {
+        if (board.sq[i] == B_PAWN) {
+            assert((1ULL << i) & board.b_pawns);
+        } else {
+            assert(!((1ULL << i) & board.b_pawns));
+        }
+
+        if (board.sq[i] == B_ROOK) {
+            assert((1ULL << i) & board.b_rooks);
+        } else {
+            assert(!((1ULL << i) & board.b_rooks));
+        }
+
+        if (board.sq[i] == B_KNIGHT) {
+            assert((1ULL << i) & board.b_knights);
+        } else {
+            assert(!((1ULL << i) & board.b_knights));
+        }
+
+        if (board.sq[i] == B_BISHOP) {
+            assert((1ULL << i) & board.b_bishops);
+        } else {
+            assert(!((1ULL << i) & board.b_bishops));
+        }
+
+        if (board.sq[i] == B_QUEEN) {
+            assert((1ULL << i) & board.b_queens);
+        } else {
+            assert(!((1ULL << i) & board.b_queens));
+        }
+
+        if (board.sq[i] == B_KING) {
+            assert((1ULL << i) & board.b_king);
+        } else {
+            assert(!((1ULL << i) & board.b_king));
+        }
+
+        if (board.sq[i] == W_PAWN) {
+            assert((1ULL << i) & board.w_pawns);
+        } else {
+            assert(!((1ULL << i) & board.w_pawns));
+        }
+
+
+        if (board.sq[i] == W_ROOK) {
+            assert((1ULL << i) & board.w_rooks);
+        } else {
+            assert(!((1ULL << i) & board.w_rooks));
+        }
+
+        if (board.sq[i] == W_KNIGHT) {
+            assert((1ULL << i) & board.w_knights);
+        } else {
+            assert(!((1ULL << i) & board.w_knights));
+        }
+
+        if (board.sq[i] == W_BISHOP) {
+            assert((1ULL << i) & board.w_bishops);
+        } else {
+            assert(!((1ULL << i) & board.w_bishops));
+        }
+
+        if (board.sq[i] == W_QUEEN) {
+            assert((1ULL << i) & board.w_queens);
+        } else {
+            assert(!((1ULL << i) & board.w_queens));
+        }
+
+        if (board.sq[i] == W_KING) {
+            assert((1ULL << i) & board.w_king);
+        } else {
+            assert(!((1ULL << i) & board.w_king));
+        }
+    }
+}
+
+void print_bitboard(BIT_BOARD *bboard) {
+    int i;
+
+    for (i = 7; i >= 0; i--) {
+        print_bitboard_rank(bboard->rank[i]);
+    }
+}
+
+void print_bitboard_rank(uint8_t rank) {
+    int i;
+    for (i = 0; i < 8; i++) {
+        printf("%d ", (1 << i && rank)? 1 : 0);
+    }
+
+    printf("\n");
+}
 

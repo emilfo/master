@@ -18,10 +18,18 @@ typedef struct {
   uint8_t sq[64];
 } S_BOARD;
 
+typedef struct {
+    uint8_t rank[8];
+} BIT_BOARD;
+    
+
 void init();
 int parse_fen(char* fen);
 void reset_board();
 void print_board();
+void debug_board();
+void print_bitboard_rank(uint8_t rank);
+void print_bitboard(BIT_BOARD  *bboard);
 
 
 #endif

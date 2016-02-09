@@ -2,11 +2,25 @@
 #define GLOBALS_H
 
 #include <assert.h>
+#include <stdbool.h>
 #include "board.h"
 
 #define FRtoSQ(file, rank) (8*(rank-1)) + (file-1)
 
 S_BOARD board;
+uint32_t move;
+
+/* move
+ * 0000 0000 0000 0000 0000 0011 1111 -> From 0x3F
+ * 0000 0000 0000 0000 1111 1100 0000 -> To >> 6, 0x3F
+ * 0000 0000 0000 1111 0000 0000 0000 -> Captured >> 12, 0xF
+ * 0000 0000 1111 0000 0000 0000 0000 -> Promoted >> 16, 0xF
+ */
+#define from_sq(move) (move) & (0b111111)
+#define to_sq(file, rank) (move >> 6) & (0b111111)
+#define cap(file, rank) (move >> 12) & (0b1111)
+#define prom(file, rank) (move >> 16) & (0b1111)
+
 
 const enum { WKCA=0b0001, WQCA=0b0010, BKCA=0b0100, BQCA=0b1000 } CASTLE_PERM;
 
@@ -14,6 +28,11 @@ const enum { EMPTY,
   W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING,
   B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING
 } PIECES;
+
+const static char PIECE_NAME[13] = { ' ',
+    'P', 'N', 'B', 'R', 'Q', 'K',
+    'p', 'n', 'b', 'r', 'q', 'k'
+};
 
 const enum { WHITE, BLACK } SIDE;
 
