@@ -1,22 +1,23 @@
 CC = gcc
 CFLAGS = -Wall
-LDFLAGS =
+LDFLAGS = -lm
 
-SOURCES = main.c board.c
+SOURCES = main.c board.c data.c bitops.c movegen.c uci.c
+DEPS = globals.h board.h data.h bitops.h movegen.h
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = chess
 
 all: $(SOURCES) $(EXECUTABLE)
 
-%.o: %.c
+%.o: %.c $(DEPS)
 		$(CC) $< $(CFLAGS) -c -o $@
 
 
 $(EXECUTABLE): $(OBJECTS)
 		$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-.c.o:
-		$(CC) $< $(CFLAGS) -c -o $@
+#.c.o:
+#		$(CC) $< $(CFLAGS) -c -o $@
 
 
 clean:

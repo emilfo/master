@@ -1,8 +1,90 @@
 #include <stdio.h>
 #include "globals.h"
+#include "data.h"
+
+const int files[64] = {
+    1, 2, 3, 4, 5, 6, 7, 8,
+    1, 2, 3, 4, 5, 6, 7, 8,
+    1, 2, 3, 4, 5, 6, 7, 8,
+    1, 2, 3, 4, 5, 6, 7, 8,
+    1, 2, 3, 4, 5, 6, 7, 8,
+    1, 2, 3, 4, 5, 6, 7, 8,
+    1, 2, 3, 4, 5, 6, 7, 8,
+    1, 2, 3, 4, 5, 6, 7, 8,
+};
+
+const int ranks[64] = {
+    1, 1, 1, 1, 1, 1, 1, 1,
+    2, 2, 2, 2, 2, 2, 2, 2,
+    3, 3, 3, 3, 3, 3, 3, 3,
+    4, 4, 4, 4, 4, 4, 4, 4,
+    5, 5, 5, 5, 5, 5, 5, 5,
+    6, 6, 6, 6, 6, 6, 6, 6,
+    7, 7, 7, 7, 7, 7, 7, 7,
+    8, 8, 8, 8, 8, 8, 8, 8,
+};
+
+const u64 _DIAGA8H1MAGICS[15] = {
+    0x0,
+    0x0,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x0080808080808080,
+    0x0040404040404040,
+    0x0020202020202020,
+    0x0010101010101010,
+    0x0008080808080808,
+    0x0,
+    0x0
+};
+const u64 _DIAGA1H8MAGICS[15] = {
+    0x0,
+    0x0,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x0101010101010100,
+    0x8080808080808000,
+    0x4040404040400000,
+    0x2020202020000000,
+    0x1010101000000000,
+    0x0808080000000000,
+    0x0,
+    0x0
+};
+
+const u64 _FILEMAGICS[8] = {
+    0x8040201008040200,
+    0x4020100804020100,
+    0x2010080402010080,
+    0x1008040201008040,
+    0x0804020100804020,
+    0x0402010080402010,
+    0x0201008040201008,
+    0x0100804020100804
+};
+
+// Move generator shift for ranks:
+const int RANKSHIFT[64] = {
+        1,  1,  1,  1,  1,  1,  1,  1,
+        9,  9,  9,  9,  9,  9,  9,  9,
+       17, 17, 17, 17, 17, 17, 17, 17,  
+       25, 25, 25, 25, 25, 25, 25, 25,
+       33, 33, 33, 33, 33, 33, 33, 33,
+       41, 41, 41, 41, 41, 41, 41, 41,
+       49, 49, 49, 49, 49, 49, 49, 49,
+       57, 57, 57, 57, 57, 57, 57, 57
+};
 
 void init() {
-  parse_fen(START_FEN);
+    init_data();
+    parse_fen(TEST_FEN);
 }
 
 int parse_fen(char *fen) {
@@ -82,6 +164,14 @@ int parse_fen(char *fen) {
     fen++;
   }
 
+  board.w_pieces = board.w_king | board.w_queens | board.w_rooks 
+                   | board.w_bishops | board.w_knights | board.w_pawns; 
+
+  board.b_pieces = board.b_king | board.b_queens | board.b_rooks 
+                   | board.b_bishops | board.b_knights | board.b_pawns; 
+
+  board.all_pieces = board.b_pieces | board.w_pieces;
+
   //debugging added to be certain the FEN board is correctly traversed
   assert(*fen == 'w' || *fen == 'b');
 
@@ -146,6 +236,7 @@ void reset_board() {
 
 void print_board() {
   int file, rank;
+
   for (rank = 8; rank >= 1; rank--) {
     printf("  +---+---+---+---+---+---+---+---+\n%d |", rank);
     for (file = 1; file <= 8; file++) {
@@ -153,6 +244,7 @@ void print_board() {
     }
     printf("\n");
   }
+
   printf("  +---+---+---+---+---+---+---+---+\n");
   printf("    a   b   c   d   e   f   g   h  \n");
 
@@ -161,83 +253,109 @@ void print_board() {
       board.fifty_move_count);
 }
 
-void debug_board() {
+/* This is a help mehtod only used in debugging */
+int debug_board() {
     int i;
 
     for (i = A1; i <= H8; i++) {
         if (board.sq[i] == B_PAWN) {
             assert((1ULL << i) & board.b_pawns);
+            assert((1ULL << i) & board.b_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.b_pawns));
         }
 
         if (board.sq[i] == B_ROOK) {
             assert((1ULL << i) & board.b_rooks);
+            assert((1ULL << i) & board.b_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.b_rooks));
         }
 
         if (board.sq[i] == B_KNIGHT) {
             assert((1ULL << i) & board.b_knights);
+            assert((1ULL << i) & board.b_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.b_knights));
         }
 
         if (board.sq[i] == B_BISHOP) {
             assert((1ULL << i) & board.b_bishops);
+            assert((1ULL << i) & board.b_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.b_bishops));
         }
 
         if (board.sq[i] == B_QUEEN) {
             assert((1ULL << i) & board.b_queens);
+            assert((1ULL << i) & board.b_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.b_queens));
         }
 
         if (board.sq[i] == B_KING) {
             assert((1ULL << i) & board.b_king);
+            assert((1ULL << i) & board.b_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.b_king));
         }
 
         if (board.sq[i] == W_PAWN) {
             assert((1ULL << i) & board.w_pawns);
+            assert((1ULL << i) & board.w_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.w_pawns));
         }
 
-
         if (board.sq[i] == W_ROOK) {
             assert((1ULL << i) & board.w_rooks);
+            assert((1ULL << i) & board.w_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.w_rooks));
         }
 
         if (board.sq[i] == W_KNIGHT) {
             assert((1ULL << i) & board.w_knights);
+            assert((1ULL << i) & board.w_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.w_knights));
         }
 
         if (board.sq[i] == W_BISHOP) {
             assert((1ULL << i) & board.w_bishops);
+            assert((1ULL << i) & board.w_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.w_bishops));
         }
 
         if (board.sq[i] == W_QUEEN) {
             assert((1ULL << i) & board.w_queens);
+            assert((1ULL << i) & board.w_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.w_queens));
         }
 
         if (board.sq[i] == W_KING) {
             assert((1ULL << i) & board.w_king);
+            assert((1ULL << i) & board.w_pieces);
+            assert((1ULL << i) & board.all_pieces);
         } else {
             assert(!((1ULL << i) & board.w_king));
         }
     }
+
+    return 1;
 }
 
 void print_bitboard(BIT_BOARD *bboard) {
@@ -251,7 +369,7 @@ void print_bitboard(BIT_BOARD *bboard) {
 void print_bitboard_rank(uint8_t rank) {
     int i;
     for (i = 0; i < 8; i++) {
-        printf("%d ", (1 << i && rank)? 1 : 0);
+        printf("%d ", ((1 << i) & rank)? 1 : 0);
     }
 
     printf("\n");
