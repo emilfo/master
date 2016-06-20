@@ -584,9 +584,14 @@ int debug_board() {
         } else {
             assert(!((1ULL << i) & board.w_king));
         }
+
+        if(board.ep_sq != EMPTY) {
+            assert((ranks[board.ep_sq] == 6 && board.side == WHITE) ||
+                   (ranks[board.ep_sq] == 2 && board.side == BLACK));
+        }
     }
 
-    return 1;
+    return true;
 }
 
 void print_bitboard(BIT_BOARD *bboard) {
