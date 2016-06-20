@@ -22,13 +22,13 @@ void init_ms1btable() {
     int i;
     for (i = 0; i < 256; i++) {
         MS1BTABLE[i] = (
-        (i >= 128)? 7 :
-        (i >= 64) ? 6 :
-        (i >= 32) ? 5 :
-        (i >= 16) ? 4 :
-        (i >= 8)  ? 3 :
-        (i >= 4)  ? 2 :
-        (i >= 2)  ? 1 : 0);
+                (i >= 128)? 7 :
+                (i >= 64) ? 6 :
+                (i >= 32) ? 5 :
+                (i >= 16) ? 4 :
+                (i >= 8)  ? 3 :
+                (i >= 4)  ? 2 :
+                (i >= 2)  ? 1 : 0);
     }
 }
 
@@ -81,7 +81,7 @@ void init_bitboard_mask() {
                     DIAGA8H1_MASK[index] |= (1LL << B_INDEX(diaga8h1 +sq-9, 9-sq));
                 }
             }
-                
+
             diaga1h8 = file - rank;
             DIAGA1H8_MAGIC[index] = _DIAGA8H1MAGICS[diaga1h8 + 7];
 
@@ -104,7 +104,7 @@ void init_bitboard_mask() {
     unsigned char state_6bit, state_8bit, attack_8bit;
     int slide;
 
-//    unsigned char CHARBITSET[64];
+    //    unsigned char CHARBITSET[64];
 
     for (sq = 0; sq <= 7; sq++) {
 
@@ -449,7 +449,7 @@ void init_attack_bitmaps() {
     //MASK_BD[BLACK] = (1LL << B8) | (1LL << C8) | (1LL << D8);
     //MASK_CE[WHITE] = (1LL << C1) | (1LL << D1) | (1LL << E8);
     //MASK_CE[BLACK] = (1LL << C8) | (1LL << D8) | (1LL << E8);
-    
+
     OO_MASK[WHITE] = (1LL << F1) | (1LL << G1);
     OO_MASK[BLACK] = (1LL << F8) | (1LL << G8);
     OOO_MASK[WHITE] = (1LL << B1) | (1LL << C1) | (1LL << D1);

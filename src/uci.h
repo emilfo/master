@@ -1,3 +1,6 @@
+#ifndef UCI_H
+#define UCI_H
+
 const static char* PIECE_STR[13] = { " ",
     "P", "N", "B", "R", "Q", "K",
     "P", "N", "B", "R", "Q", "K"
@@ -24,3 +27,5 @@ const static char* SQ_STR[64] = {
   "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
   "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
 };
+
+#endif /* UCI_H */

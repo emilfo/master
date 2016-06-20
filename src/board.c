@@ -2,29 +2,29 @@
 #include "globals.h"
 #include "data.h"
 
-const int files[64] = {
-    1, 2, 3, 4, 5, 6, 7, 8,
-    1, 2, 3, 4, 5, 6, 7, 8,
-    1, 2, 3, 4, 5, 6, 7, 8,
-    1, 2, 3, 4, 5, 6, 7, 8,
-    1, 2, 3, 4, 5, 6, 7, 8,
-    1, 2, 3, 4, 5, 6, 7, 8,
-    1, 2, 3, 4, 5, 6, 7, 8,
-    1, 2, 3, 4, 5, 6, 7, 8,
-};
+//files[] = {
+//    1, 2, 3, 4, 5, 6, 7, 8,
+//    1, 2, 3, 4, 5, 6, 7, 8,
+//    1, 2, 3, 4, 5, 6, 7, 8,
+//    1, 2, 3, 4, 5, 6, 7, 8,
+//    1, 2, 3, 4, 5, 6, 7, 8,
+//    1, 2, 3, 4, 5, 6, 7, 8,
+//    1, 2, 3, 4, 5, 6, 7, 8,
+//    1, 2, 3, 4, 5, 6, 7, 8,
+//};
+//
+//ranks[] = {
+//    1, 1, 1, 1, 1, 1, 1, 1,
+//    2, 2, 2, 2, 2, 2, 2, 2,
+//    3, 3, 3, 3, 3, 3, 3, 3,
+//    4, 4, 4, 4, 4, 4, 4, 4,
+//    5, 5, 5, 5, 5, 5, 5, 5,
+//    6, 6, 6, 6, 6, 6, 6, 6,
+//    7, 7, 7, 7, 7, 7, 7, 7,
+//    8, 8, 8, 8, 8, 8, 8, 8,
+//};
 
-const int ranks[64] = {
-    1, 1, 1, 1, 1, 1, 1, 1,
-    2, 2, 2, 2, 2, 2, 2, 2,
-    3, 3, 3, 3, 3, 3, 3, 3,
-    4, 4, 4, 4, 4, 4, 4, 4,
-    5, 5, 5, 5, 5, 5, 5, 5,
-    6, 6, 6, 6, 6, 6, 6, 6,
-    7, 7, 7, 7, 7, 7, 7, 7,
-    8, 8, 8, 8, 8, 8, 8, 8,
-};
-
-const u64 _DIAGA8H1MAGICS[15] = {
+const u64 _DIAGA8H1MAGICS[] = {
     0x0,
     0x0,
     0x0101010101010100,
@@ -41,7 +41,7 @@ const u64 _DIAGA8H1MAGICS[15] = {
     0x0,
     0x0
 };
-const u64 _DIAGA1H8MAGICS[15] = {
+const u64 _DIAGA1H8MAGICS[] = {
     0x0,
     0x0,
     0x0101010101010100,
@@ -59,7 +59,7 @@ const u64 _DIAGA1H8MAGICS[15] = {
     0x0
 };
 
-const u64 _FILEMAGICS[8] = {
+const u64 _FILEMAGICS[] = {
     0x8040201008040200,
     0x4020100804020100,
     0x2010080402010080,
@@ -71,15 +71,15 @@ const u64 _FILEMAGICS[8] = {
 };
 
 // Move generator shift for ranks:
-const int RANKSHIFT[64] = {
-        1,  1,  1,  1,  1,  1,  1,  1,
-        9,  9,  9,  9,  9,  9,  9,  9,
-       17, 17, 17, 17, 17, 17, 17, 17,  
-       25, 25, 25, 25, 25, 25, 25, 25,
-       33, 33, 33, 33, 33, 33, 33, 33,
-       41, 41, 41, 41, 41, 41, 41, 41,
-       49, 49, 49, 49, 49, 49, 49, 49,
-       57, 57, 57, 57, 57, 57, 57, 57
+const int RANKSHIFT[] = {
+    1,  1,  1,  1,  1,  1,  1,  1,
+    9,  9,  9,  9,  9,  9,  9,  9,
+    17, 17, 17, 17, 17, 17, 17, 17,  
+    25, 25, 25, 25, 25, 25, 25, 25,
+    33, 33, 33, 33, 33, 33, 33, 33,
+    41, 41, 41, 41, 41, 41, 41, 41,
+    49, 49, 49, 49, 49, 49, 49, 49,
+    57, 57, 57, 57, 57, 57, 57, 57
 };
 
 void init() {
@@ -88,169 +88,400 @@ void init() {
 }
 
 int parse_fen(char *fen) {
-  int file, rank, piece;
-  reset_board();
+    int file, rank, piece;
+    reset_board();
 
-  rank = 8;
-  file = 1;
-  while((rank >= 1) && *fen) {
-    switch (*fen) {
-      case 'p': piece = B_PAWN; 
-                board.b_pawns |= (1ULL << (FRtoSQ(file, rank)));
-                break;
-      case 'r': piece = B_ROOK;
-                board.b_rooks |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'n': piece = B_KNIGHT;
-                board.b_knights |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'b': piece = B_BISHOP;
-                board.b_bishops |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'k': piece = B_KING;
-                board.b_king |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'q': piece = B_QUEEN;
-                board.b_queens |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'P': piece = W_PAWN;
-                board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'R': piece = W_ROOK;
-                board.w_rooks |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'N': piece = W_KNIGHT;
-                board.w_knights |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'B': piece = W_BISHOP;
-                board.w_bishops |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'K': piece = W_KING; 
-                board.w_king |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
-      case 'Q': piece = W_QUEEN;
-                board.w_queens |= (1ULL << (FRtoSQ(file, rank))); 
-                break;
+    rank = 8;
+    file = 1;
+    while((rank >= 1) && *fen) {
+        switch (*fen) {
+            case 'p': piece = B_PAWN; 
+                      board.b_pawns |= (1ULL << (FRtoSQ(file, rank)));
+                      break;
+            case 'r': piece = B_ROOK;
+                      board.b_rooks |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'n': piece = B_KNIGHT;
+                      board.b_knights |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'b': piece = B_BISHOP;
+                      board.b_bishops |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'k': piece = B_KING;
+                      board.b_king |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'q': piece = B_QUEEN;
+                      board.b_queens |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'P': piece = W_PAWN;
+                      board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'R': piece = W_ROOK;
+                      board.w_rooks |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'N': piece = W_KNIGHT;
+                      board.w_knights |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'B': piece = W_BISHOP;
+                      board.w_bishops |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'K': piece = W_KING; 
+                      board.w_king |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
+            case 'Q': piece = W_QUEEN;
+                      board.w_queens |= (1ULL << (FRtoSQ(file, rank))); 
+                      break;
 
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-                piece = EMPTY;
-                file += *fen - '0';
-                break;
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+                      piece = EMPTY;
+                      file += *fen - '0';
+                      break;
 
-      case '/':
-      case ' ':
-                rank--;
-                file = 1;
-                fen++;
-                continue;              
+            case '/':
+            case ' ':
+                      rank--;
+                      file = 1;
+                      fen++;
+                      continue;              
 
-      default:
-                printf("FEN error \n");
-                return -1;
-    }   
+            default:
+                      printf("FEN error \n");
+                      return -1;
+        }   
 
-    if (piece != EMPTY) {
-      board.sq[FRtoSQ(file, rank)] = piece;
-      file += 1;
+        if (piece != EMPTY) {
+            board.sq[FRtoSQ(file, rank)] = piece;
+            file += 1;
+        }
+
+        fen++;
     }
 
-    fen++;
-  }
+    board.w_pieces = board.w_king | board.w_queens | board.w_rooks 
+        | board.w_bishops | board.w_knights | board.w_pawns; 
 
-  board.w_pieces = board.w_king | board.w_queens | board.w_rooks 
-                   | board.w_bishops | board.w_knights | board.w_pawns; 
+    board.b_pieces = board.b_king | board.b_queens | board.b_rooks 
+        | board.b_bishops | board.b_knights | board.b_pawns; 
 
-  board.b_pieces = board.b_king | board.b_queens | board.b_rooks 
-                   | board.b_bishops | board.b_knights | board.b_pawns; 
+    board.all_pieces = board.b_pieces | board.w_pieces;
 
-  board.all_pieces = board.b_pieces | board.w_pieces;
+    //debugging added to be certain the FEN board is correctly traversed
+    assert(*fen == 'w' || *fen == 'b');
 
-  //debugging added to be certain the FEN board is correctly traversed
-  assert(*fen == 'w' || *fen == 'b');
+    board.side = (*fen == 'w')? WHITE : BLACK;
+    fen += 2;
 
-  board.side = (*fen == 'w')? WHITE : BLACK;
-  fen += 2;
-
-  while (*fen != ' ') {
-    switch (*fen) {
-      case 'K': board.castle_perm |= WKCA; break;
-      case 'Q': board.castle_perm |= WQCA; break;
-      case 'k': board.castle_perm |= BKCA; break;
-      case 'q': board.castle_perm |= BQCA; break;
-      default: break;
+    while (*fen != ' ') {
+        switch (*fen) {
+            case 'K': board.castle_perm |= WKCA; break;
+            case 'Q': board.castle_perm |= WQCA; break;
+            case 'k': board.castle_perm |= BKCA; break;
+            case 'q': board.castle_perm |= BQCA; break;
+            default: break;
+        }
+        fen++;
     }
     fen++;
-  }
-  fen++;
 
-  //check that we didn't somehow screw up castle permissions
-  assert((board.castle_perm >= 0b0000) && (board.castle_perm <= 0b1111));
+    //check that we didn't somehow screw up castle permissions
+    assert((board.castle_perm >= 0b0000) && (board.castle_perm <= 0b1111));
 
-  if (*fen != '-') {
-    file = fen[0] - 'a';
-    file = fen[1] - '1';
+    if (*fen != '-') {
+        file = fen[0] - 'a';
+        file = fen[1] - '1';
 
-    assert(board.side == WHITE || (rank == 6 && (file >= 1 && file <= 8)));
-    assert(board.side == BLACK || (rank == 3 && (file >= 1 && file <= 8)));
+        assert(board.side == WHITE || (rank == 6 && (file >= 1 && file <= 8)));
+        assert(board.side == BLACK || (rank == 3 && (file >= 1 && file <= 8)));
 
-    board.ep_sq = FRtoSQ(file, rank);
-  }
+        board.ep_sq = FRtoSQ(file, rank);
+    }
 
-  return 0;
+    return 0;
 }
 
 void reset_board() {
-  int i;
+    int i;
 
-  board.w_king = 0ULL;
-  board.w_queens = 0ULL;
-  board.w_rooks = 0ULL;
-  board.w_bishops = 0ULL;
-  board.w_knights = 0ULL;
-  board.w_pawns = 0ULL;
+    board.w_king = 0ULL;
+    board.w_queens = 0ULL;
+    board.w_rooks = 0ULL;
+    board.w_bishops = 0ULL;
+    board.w_knights = 0ULL;
+    board.w_pawns = 0ULL;
 
-  board.b_king = 0ULL;
-  board.b_queens = 0ULL;
-  board.b_rooks = 0ULL;
-  board.b_bishops = 0ULL;
-  board.b_knights = 0ULL;
-  board.b_pawns = 0ULL;
+    board.b_king = 0ULL;
+    board.b_queens = 0ULL;
+    board.b_rooks = 0ULL;
+    board.b_bishops = 0ULL;
+    board.b_knights = 0ULL;
+    board.b_pawns = 0ULL;
 
-  board.side = 0;
-  board.castle_perm = 0;
+    board.side = 0;
+    board.castle_perm = 0;
 
-  board.ep_sq = 0;
-  board.fifty_move_count = 0;
+    board.ep_sq = 0;
+    board.fifty_move_count = 0;
 
-  for (i = 0; i < 64; i++) {
-    board.sq[i] = 0;
-  }
+    for (i = 0; i < 64; i++) {
+        board.sq[i] = 0;
+    }
+}
+
+int make_move(int move, S_BOARD b)
+{
+    int from = mv_from(move);
+    int to = mv_to(move);
+    int piece = mv_piece(move);
+    int cap = mv_cap(move);
+    int prom = mv_prom(move);
+    //int ep = mv_ep(move);
+    //int castle = mv_castle(move);
+
+    assert(to >= 0 && to <=63);
+    assert(from >= 0 && from <=63);
+    assert(piece >= 1 && from <=12);
+    assert(cap >= 0 && cap <=12);
+    assert(prom >= 0 && prom <=12);
+
+    //save state
+    b.ply++;
+    b.prev[b.ply].move = move;
+    b.prev[b.ply].castle_perm = b.castle_perm;
+    b.prev[b.ply].ep_sq = b.ep_sq;
+    b.prev[b.ply].fifty_move_count = b.fifty_move_count;
+    //TODO: Hashkey
+
+    if (mv_castle(move)) {
+        //TODO: check kingchecks here? Move into own function?
+        if (b.side) { //BLACK
+            if(to == C8) {
+                remove_piece(b, B_ROOK, A8);
+                add_piece(b, B_ROOK, D8);
+            } else {
+                remove_piece(b, B_ROOK, H8);
+                add_piece(b, B_ROOK, F8);
+            }
+        } else { //WHITE
+            if(to == C1) {
+                remove_piece(b, W_ROOK, A1);
+                add_piece(b, W_ROOK, D1);
+            } else {
+                remove_piece(b, W_ROOK, H1);
+                add_piece(b, W_ROOK, F1);
+            }
+        }
+
+    } 
+
+    else if (mv_ep(move)) {
+        if (b.side) { //BLACK
+            remove_piece(b, W_PAWN, to + 8);
+        } else { //WHITE
+            remove_piece(b, B_PAWN, to - 8);
+        }
+    }
+
+    else if (cap) { 
+        b.fifty_move_count = 0;
+        remove_piece(b, cap, to); 
+    }
+
+    if (piece == W_PAWN || piece == B_PAWN) {
+        b.fifty_move_count = 0;
+    }
+
+    remove_piece(b, piece, from);
+
+    if (prom) { 
+        piece =  prom;
+    }
+
+    add_piece(b, piece, to);
+
+    return (1);
+}
+
+void unmake_move(S_BOARD b)
+{
+    int move = b.prev[b.ply].move;
+    int from = mv_from(move);
+    int to = mv_to(move);
+    int piece = mv_piece(move);
+    int cap = mv_cap(move);
+    int prom = mv_prom(move);
+    //int ep = mv_ep(move);
+    //int castle = mv_castle(move);
+
+    b.castle_perm =b.prev[b.ply].castle_perm;
+    b.ep_sq = b.prev[b.ply].ep_sq;
+    b.fifty_move_count = b.prev[b.ply].fifty_move_count;
+    b.ply--;
+
+    if (prom) { 
+        remove_piece(b, prom, to);
+    } else {
+        remove_piece(b, piece, to);
+    }
+
+    add_piece(b, piece, from);
+
+    if (mv_castle(move)) {
+        if (b.side) { //BLACK
+            if(to == C8) {
+                remove_piece(b, B_ROOK, D8);
+                add_piece(b, B_ROOK, A8);
+            } else {
+                remove_piece(b, B_ROOK, F8);
+                add_piece(b, B_ROOK, H8);
+            }
+        } else { //WHITE
+            if(to == C1) {
+                remove_piece(b, W_ROOK, D1);
+                add_piece(b, W_ROOK, A1);
+            } else {
+                remove_piece(b, W_ROOK, F1);
+                add_piece(b, W_ROOK, H1);
+            }
+        }
+
+    } 
+
+    else if (mv_ep(move)) {
+        if (b.side) { //BLACK
+            add_piece(b, W_PAWN, to + 8);
+        } else { //WHITE
+            add_piece(b, B_PAWN, to - 8);
+        }
+    } 
+
+    else if (cap) { 
+        add_piece(b, cap, to); 
+    }
+}
+
+void remove_piece(S_BOARD b, int piece, int sq) {
+    assert(sq >= 0 && sq <=63);
+    //TODO: assert piece
+
+    board.sq[sq] = EMPTY;
+
+    if (piece == B_PAWN) {
+        board.b_pawns |= (0LL << sq);
+        board.b_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    } else if (piece == B_KNIGHT) {
+        board.b_knights |= (0LL << sq);
+        board.b_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    } else if (piece == B_BISHOP) {
+        board.b_bishops |= (0LL << sq);
+        board.b_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    } else if (piece == B_ROOK) {
+        board.b_rooks |= (0LL << sq);
+        board.b_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    } else if (piece == B_QUEEN) {
+        board.b_queens |= (0LL << sq);
+        board.b_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    } else if (piece == W_PAWN) {
+        board.w_pawns |= (0LL << sq);
+        board.w_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    } else if (piece == W_KNIGHT) {
+        board.w_knights |= (0LL << sq);
+        board.w_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    } else if (piece == W_BISHOP) {
+        board.w_bishops |= (0LL << sq);
+        board.w_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    } else if (piece == W_ROOK) {
+        board.w_rooks |= (0LL << sq);
+        board.w_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    } else if (piece == W_QUEEN) {
+        board.w_queens |= (0LL << sq);
+        board.w_pieces |= (0LL << sq);
+        board.all_pieces |= (0LL << sq);
+    }
+
+}
+
+void add_piece(S_BOARD b, int piece, int sq) {
+    assert(sq >= 0 && sq <=63);
+    //TODO: assert piece
+
+    board.sq[sq] = piece;
+
+    if (piece == B_PAWN) {
+        board.b_pawns |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == B_KNIGHT) {
+        board.b_knights |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == B_BISHOP) {
+        board.b_bishops |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == B_ROOK) {
+        board.b_rooks |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == B_QUEEN) {
+        board.b_queens |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_PAWN) {
+        board.w_pawns |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_KNIGHT) {
+        board.w_knights |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_BISHOP) {
+        board.w_bishops |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_ROOK) {
+        board.w_rooks |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_QUEEN) {
+        board.w_queens |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    }
 }
 
 void print_board() {
-  int file, rank;
+    int file, rank;
 
-  for (rank = 8; rank >= 1; rank--) {
-    printf("  +---+---+---+---+---+---+---+---+\n%d |", rank);
-    for (file = 1; file <= 8; file++) {
-      printf("%2c |", PIECE_NAME[board.sq[FRtoSQ(file, rank)]]);
+    for (rank = 8; rank >= 1; rank--) {
+        printf("  +---+---+---+---+---+---+---+---+\n%d |", rank);
+        for (file = 1; file <= 8; file++) {
+            printf("%2c |", PIECE_NAME[board.sq[FRtoSQ(file, rank)]]);
+        }
+        printf("\n");
     }
-    printf("\n");
-  }
 
-  printf("  +---+---+---+---+---+---+---+---+\n");
-  printf("    a   b   c   d   e   f   g   h  \n");
+    printf("  +---+---+---+---+---+---+---+---+\n");
+    printf("    a   b   c   d   e   f   g   h  \n");
 
-  printf("side:%c, castle_perm:%d, ep:%i, fifty_move:%i\n",
-      (board.side)?'B':'W', board.castle_perm, board.ep_sq,
-      board.fifty_move_count);
+    printf("side:%c, castle_perm:%d, ep:%i, fifty_move:%i\n",
+            (board.side)?'B':'W', board.castle_perm, board.ep_sq,
+            board.fifty_move_count);
 }
 
 /* This is a help mehtod only used in debugging */
@@ -374,4 +605,3 @@ void print_bitboard_rank(uint8_t rank) {
 
     printf("\n");
 }
-
