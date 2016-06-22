@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "globals.h"
 #include "data.h"
+#include "hash.h"
 
 //files[] = {
 //    1, 2, 3, 4, 5, 6, 7, 8,
@@ -84,7 +85,7 @@ const int RANKSHIFT[] = {
 
 void init() {
     init_data();
-    parse_fen(TEST_FEN);
+    parse_fen(CASTLE2);
 }
 
 int parse_fen(char *fen) {
@@ -194,14 +195,17 @@ int parse_fen(char *fen) {
     assert((board.castle_perm >= 0b0000) && (board.castle_perm <= 0b1111));
 
     if (*fen != '-') {
-        file = fen[0] - 'a';
-        file = fen[1] - '1';
+        file = fen[0] - 'a' + 1;
+        rank = fen[1] - '1' + 1;
 
-        assert(board.side == WHITE || (rank == 6 && (file >= 1 && file <= 8)));
-        assert(board.side == BLACK || (rank == 3 && (file >= 1 && file <= 8)));
+        assert(board.side == WHITE || (rank == 3 && (file >= 1 && file <= 8)));
+        assert(board.side == BLACK || (rank == 6 && (file >= 1 && file <= 8)));
 
         board.ep_sq = FRtoSQ(file, rank);
     }
+
+    //TODO this here?
+    board.hash_key = generate_hash(&board);
 
     return 0;
 }
@@ -587,7 +591,7 @@ int debug_board() {
 
         if(board.ep_sq != EMPTY) {
             assert((ranks[board.ep_sq] == 6 && board.side == WHITE) ||
-                   (ranks[board.ep_sq] == 2 && board.side == BLACK));
+                   (ranks[board.ep_sq] == 3 && board.side == BLACK));
         }
     }
 

@@ -3,8 +3,10 @@
 
 #include <assert.h>
 #include <stdbool.h>
+
 #include "board.h"
 #include "bitops.h"
+#include "debug.h"
 
 #define PROG_VERSION "Chess 0.1, by Emil F Ostensen"
 #define FRtoSQ(file, rank) ((8*(rank-1)) + (file-1))
@@ -13,7 +15,8 @@
 
 S_BOARD board;
 
-/* uint32_tmove
+
+/* uint32_t move
  * 0000 0000 0000 0000 0000 0011 1111 -> From, 0x3F
  * 0000 0000 0000 0000 1111 1100 0000 -> To, 0x3F << 6
  * 0000 0000 0000 1111 0000 0000 0000 -> Piece, 0xF << 12
@@ -29,7 +32,6 @@ S_BOARD board;
 #define mv_prom(m) ((m >> 20) & (0b1111))
 #define mv_ep(m) ((m >> 25) & (0b1))
 #define mv_castle(m) ((m >> 26) & (0b1))
-
 
 const enum { WKCA=0b0001, WQCA=0b0010, BKCA=0b0100, BQCA=0b1000 } CASTLE_PERM;
 

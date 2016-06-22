@@ -83,7 +83,7 @@ void init_bitboard_mask() {
             }
 
             diaga1h8 = file - rank;
-            DIAGA1H8_MAGIC[index] = _DIAGA8H1MAGICS[diaga1h8 + 7];
+            DIAGA1H8_MAGIC[index] = _DIAGA1H8MAGICS[diaga1h8 + 7];
 
             DIAGA1H8_MASK[index] = 0x0;
             if (diaga1h8 > -1) {
@@ -398,7 +398,7 @@ void init_attack_bitmaps() {
 
                     diaga8h1 = files[sq] + ranks[sq];
                     if (diaga8h1 < 10) {
-                        file = attackbit -1;
+                        file = attackbit + 1;
                         rank = diaga8h1 - file;
                     } else {
                         rank = 8 - attackbit;
@@ -454,10 +454,15 @@ void init_attack_bitmaps() {
     OO_MASK[BLACK] = (1LL << F8) | (1LL << G8);
     OOO_MASK[WHITE] = (1LL << B1) | (1LL << C1) | (1LL << D1);
     OOO_MASK[BLACK] = (1LL << B8) | (1LL << C8) | (1LL << D8);
-    OO_ATTACK_MASK[WHITE] = (1LL << E1) |(1LL << F1) | (1LL << G1);
-    OO_ATTACK_MASK[BLACK] = (1LL << E8) |(1LL << F8) | (1LL << G8);
-    OOO_ATTACK_MASK[WHITE] = (1LL << E1) |(1LL << B1) | (1LL << C1) | (1LL << D1);
-    OOO_ATTACK_MASK[BLACK] = (1LL << E8) |(1LL << B8) | (1LL << C8) | (1LL << D8);
+
+    /* To check if king is in check/will be in check in the move, we don't
+     * bother checking where king ends up, as this will be checked when
+     * generating the move, either way
+     */
+    OO_ATTACK_MASK[WHITE] = (1LL << E1) | (1LL << F1);
+    OO_ATTACK_MASK[BLACK] = (1LL << E8) | (1LL << F8);
+    OOO_ATTACK_MASK[WHITE] = (1LL << E1) | (1LL << D1);
+    OOO_ATTACK_MASK[BLACK] = (1LL << E8) | (1LL << D8);
 }
 
 int valid_file_rank(int file, int rank) {

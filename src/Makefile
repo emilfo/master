@@ -1,9 +1,9 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -g
 LDFLAGS = -lm
 
-SOURCES = main.c board.c data.c bitops.c movegen.c uci.c hash.c
-DEPS = globals.h board.h data.h bitops.h movegen.h hash.h
+SOURCES = main.c board.c data.c bitops.c movegen.c uci.c hash.c debug.c io.c
+DEPS = globals.h board.h data.h bitops.h movegen.h hash.h debug.h
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = chess
 
