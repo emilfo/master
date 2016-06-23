@@ -33,6 +33,7 @@
 
 # vim files
 *.swp
+*.vim
 
 #executable
 chess
