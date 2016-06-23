@@ -32,6 +32,7 @@ S_BOARD board;
 #define mv_prom(m) ((m >> 20) & (0b1111))
 #define mv_ep(m) ((m >> 25) & (0b1))
 #define mv_castle(m) ((m >> 26) & (0b1))
+#define mv_pawn_double(m) ((m >> 27) & (0b1))
 
 const enum { WKCA=0b0001, WQCA=0b0010, BKCA=0b0100, BQCA=0b1000 } CASTLE_PERM;
 

@@ -16,6 +16,8 @@ int main() {
 
     print_movelist(&list[0]);
 
+    make_move(list[0].moves[0].move, &board);
+
 
 
     printf("\n\"You know somethin', Utivich? I think this just might be my masterpiece.\"\n- Lt. Aldo Raine\n");
