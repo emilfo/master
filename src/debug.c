@@ -12,7 +12,12 @@ int valid_side(const int side)
 
 int valid_piece(const int pce) 
 {
-    return (pce >= 0 && pce < 15);
+    return (pce >= 1 && pce <= 12);
+}
+
+int valid_piece_or_empty(const int pce) 
+{
+    return (pce >= 0 && pce <= 12);
 }
 
 int valid_bool(const int val)

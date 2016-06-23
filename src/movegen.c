@@ -590,8 +590,8 @@ static void add_move(S_MOVELIST *list, int from, int to, int piece, int capture,
     assert(valid_sq(from));
     assert(valid_sq(to));
     assert(valid_piece(piece));
-    assert(valid_piece(capture));
-    assert(valid_piece(promoted));
+    assert(valid_piece_or_empty(capture));
+    assert(valid_piece_or_empty(promoted));
     assert(valid_bool(ep));
     assert(valid_bool(castling));
 

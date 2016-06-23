@@ -3,27 +3,7 @@
 #include "data.h"
 #include "hash.h"
 
-//files[] = {
-//    1, 2, 3, 4, 5, 6, 7, 8,
-//    1, 2, 3, 4, 5, 6, 7, 8,
-//    1, 2, 3, 4, 5, 6, 7, 8,
-//    1, 2, 3, 4, 5, 6, 7, 8,
-//    1, 2, 3, 4, 5, 6, 7, 8,
-//    1, 2, 3, 4, 5, 6, 7, 8,
-//    1, 2, 3, 4, 5, 6, 7, 8,
-//    1, 2, 3, 4, 5, 6, 7, 8,
-//};
-//
-//ranks[] = {
-//    1, 1, 1, 1, 1, 1, 1, 1,
-//    2, 2, 2, 2, 2, 2, 2, 2,
-//    3, 3, 3, 3, 3, 3, 3, 3,
-//    4, 4, 4, 4, 4, 4, 4, 4,
-//    5, 5, 5, 5, 5, 5, 5, 5,
-//    6, 6, 6, 6, 6, 6, 6, 6,
-//    7, 7, 7, 7, 7, 7, 7, 7,
-//    8, 8, 8, 8, 8, 8, 8, 8,
-//};
+#define HASH_B(b, val) (b->hash_key ^= val)
 
 const u64 _DIAGA8H1MAGICS[] = {
     0x0,
@@ -82,6 +62,20 @@ const int RANKSHIFT[] = {
     49, 49, 49, 49, 49, 49, 49, 49,
     57, 57, 57, 57, 57, 57, 57, 57
 };
+
+const uint8_t castle_update[64] = {
+    13, 15, 15, 15, 12, 15, 15, 14,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+     7,  15, 15, 15, 3, 15, 15, 11
+};
+
+static void add_piece(S_BOARD *b, int piece, int sq);
+static void remove_piece(S_BOARD *b, int piece, int sq);
 
 void init() {
     init_data();
@@ -238,7 +232,7 @@ void reset_board() {
     }
 }
 
-int make_move(int move, S_BOARD b)
+int make_move(int move, S_BOARD *b)
 {
     int from = mv_from(move);
     int to = mv_to(move);
@@ -248,23 +242,24 @@ int make_move(int move, S_BOARD b)
     //int ep = mv_ep(move);
     //int castle = mv_castle(move);
 
-    assert(to >= 0 && to <=63);
-    assert(from >= 0 && from <=63);
-    assert(piece >= 1 && from <=12);
-    assert(cap >= 0 && cap <=12);
-    assert(prom >= 0 && prom <=12);
+    assert(valid_sq(to));
+    assert(valid_sq(from));
+    assert(valid_piece(piece));
+    assert(valid_piece_or_empty(cap));
+    assert(valid_piece_or_empty(prom));
 
     //save state
-    b.ply++;
-    b.prev[b.ply].move = move;
-    b.prev[b.ply].castle_perm = b.castle_perm;
-    b.prev[b.ply].ep_sq = b.ep_sq;
-    b.prev[b.ply].fifty_move_count = b.fifty_move_count;
+    b->ply++;
+    b->prev[b->ply].move = move;
+    b->prev[b->ply].castle_perm = b->castle_perm;
+    b->prev[b->ply].ep_sq = b->ep_sq;
+    b->prev[b->ply].fifty_move_count = b->fifty_move_count;
     //TODO: Hashkey
+
 
     if (mv_castle(move)) {
         //TODO: check kingchecks here? Move into own function?
-        if (b.side) { //BLACK
+        if (b->side) { //BLACK
             if(to == C8) {
                 remove_piece(b, B_ROOK, A8);
                 add_piece(b, B_ROOK, D8);
@@ -285,7 +280,7 @@ int make_move(int move, S_BOARD b)
     } 
 
     else if (mv_ep(move)) {
-        if (b.side) { //BLACK
+        if (b->side) { //BLACK
             remove_piece(b, W_PAWN, to + 8);
         } else { //WHITE
             remove_piece(b, B_PAWN, to - 8);
@@ -293,12 +288,12 @@ int make_move(int move, S_BOARD b)
     }
 
     else if (cap) { 
-        b.fifty_move_count = 0;
+        b->fifty_move_count = 0;
         remove_piece(b, cap, to); 
     }
 
     if (piece == W_PAWN || piece == B_PAWN) {
-        b.fifty_move_count = 0;
+        b->fifty_move_count = 0;
     }
 
     remove_piece(b, piece, from);
@@ -309,12 +304,14 @@ int make_move(int move, S_BOARD b)
 
     add_piece(b, piece, to);
 
+    b->castle_perm &= castle_update[from];
+
     return (1);
 }
 
-void unmake_move(S_BOARD b)
+void unmake_move(S_BOARD *b)
 {
-    int move = b.prev[b.ply].move;
+    int move = b->prev[b->ply].move;
     int from = mv_from(move);
     int to = mv_to(move);
     int piece = mv_piece(move);
@@ -323,10 +320,10 @@ void unmake_move(S_BOARD b)
     //int ep = mv_ep(move);
     //int castle = mv_castle(move);
 
-    b.castle_perm =b.prev[b.ply].castle_perm;
-    b.ep_sq = b.prev[b.ply].ep_sq;
-    b.fifty_move_count = b.prev[b.ply].fifty_move_count;
-    b.ply--;
+    b->castle_perm =b->prev[b->ply].castle_perm;
+    b->ep_sq = b->prev[b->ply].ep_sq;
+    b->fifty_move_count = b->prev[b->ply].fifty_move_count;
+    b->ply--;
 
     if (prom) { 
         remove_piece(b, prom, to);
@@ -337,7 +334,7 @@ void unmake_move(S_BOARD b)
     add_piece(b, piece, from);
 
     if (mv_castle(move)) {
-        if (b.side) { //BLACK
+        if (b->side) { //BLACK
             if(to == C8) {
                 remove_piece(b, B_ROOK, D8);
                 add_piece(b, B_ROOK, A8);
@@ -358,7 +355,7 @@ void unmake_move(S_BOARD b)
     } 
 
     else if (mv_ep(move)) {
-        if (b.side) { //BLACK
+        if (b->side) { //BLACK
             add_piece(b, W_PAWN, to + 8);
         } else { //WHITE
             add_piece(b, B_PAWN, to - 8);
@@ -370,11 +367,62 @@ void unmake_move(S_BOARD b)
     }
 }
 
-void remove_piece(S_BOARD b, int piece, int sq) {
-    assert(sq >= 0 && sq <=63);
-    //TODO: assert piece
+static void add_piece(S_BOARD *b, int piece, int sq) {
+    assert(valid_sq(sq));
+    assert(valid_piece(piece));
+
+    board.sq[sq] = piece;
+    HASH_B(b, pce_key[piece][sq]);
+
+    if (piece == B_PAWN) {
+        board.b_pawns |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == B_KNIGHT) {
+        board.b_knights |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == B_BISHOP) {
+        board.b_bishops |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == B_ROOK) {
+        board.b_rooks |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == B_QUEEN) {
+        board.b_queens |= (1LL << sq);
+        board.b_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_PAWN) {
+        board.w_pawns |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_KNIGHT) {
+        board.w_knights |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_BISHOP) {
+        board.w_bishops |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_ROOK) {
+        board.w_rooks |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    } else if (piece == W_QUEEN) {
+        board.w_queens |= (1LL << sq);
+        board.w_pieces |= (1LL << sq);
+        board.all_pieces |= (1LL << sq);
+    }
+}
+
+static void remove_piece(S_BOARD *b, int piece, int sq) {
+    assert(valid_sq(sq));
+    assert(valid_piece(piece));
 
     board.sq[sq] = EMPTY;
+    HASH_B(b, pce_key[piece][sq]);
 
     if (piece == B_PAWN) {
         board.b_pawns |= (0LL << sq);
@@ -418,55 +466,6 @@ void remove_piece(S_BOARD b, int piece, int sq) {
         board.all_pieces |= (0LL << sq);
     }
 
-}
-
-void add_piece(S_BOARD b, int piece, int sq) {
-    assert(sq >= 0 && sq <=63);
-    //TODO: assert piece
-
-    board.sq[sq] = piece;
-
-    if (piece == B_PAWN) {
-        board.b_pawns |= (1LL << sq);
-        board.b_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    } else if (piece == B_KNIGHT) {
-        board.b_knights |= (1LL << sq);
-        board.b_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    } else if (piece == B_BISHOP) {
-        board.b_bishops |= (1LL << sq);
-        board.b_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    } else if (piece == B_ROOK) {
-        board.b_rooks |= (1LL << sq);
-        board.b_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    } else if (piece == B_QUEEN) {
-        board.b_queens |= (1LL << sq);
-        board.b_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    } else if (piece == W_PAWN) {
-        board.w_pawns |= (1LL << sq);
-        board.w_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    } else if (piece == W_KNIGHT) {
-        board.w_knights |= (1LL << sq);
-        board.w_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    } else if (piece == W_BISHOP) {
-        board.w_bishops |= (1LL << sq);
-        board.w_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    } else if (piece == W_ROOK) {
-        board.w_rooks |= (1LL << sq);
-        board.w_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    } else if (piece == W_QUEEN) {
-        board.w_queens |= (1LL << sq);
-        board.w_pieces |= (1LL << sq);
-        board.all_pieces |= (1LL << sq);
-    }
 }
 
 void print_board() {

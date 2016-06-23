@@ -23,6 +23,7 @@ typedef uint64_t u64;
 #define CASTLE1 "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
 #define CASTLE2 "3rk2r/8/8/8/8/8/6p1/R3K2R w KQk - 0 1"
 
+
 typedef struct {
     int move;
     uint8_t castle_perm, ep_sq, fifty_move_count;
@@ -98,10 +99,8 @@ extern const int RANKSHIFT[];
 void init();
 int parse_fen(char* fen);
 void reset_board();
-int make_move(int move, S_BOARD b);
-void unmake_move(S_BOARD b);
-void remove_piece(S_BOARD b, int piece, int sq);
-void add_piece(S_BOARD b, int piece, int sq);
+int make_move(int move, S_BOARD *b);
+void unmake_move(S_BOARD *b);
 void print_board();
 int debug_board();
 void print_bitboard_rank(uint8_t rank);
