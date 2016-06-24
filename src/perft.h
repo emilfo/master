@@ -1,6 +1,7 @@
 #ifndef PERFT_H
 #define PERFT_H
 
-void test_from_file(const char *filename, int divide);
+void perft_from_file(const char *filename, int divide);
+void perft_fen(char *FEN, int divide);
 
 #endif /* PERFT_H */

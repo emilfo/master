@@ -10,7 +10,24 @@
 static int perft(S_BOARD *b, int depth);
 static int perft_divide(S_BOARD *b, int depth);
 
-void test_from_file(const char *filename, int divide) {
+void perft_fen(char *FEN, int divide) {
+    int node_cnt = 0;
+    int depth = 1;
+
+    parse_fen(FEN);
+
+    printf("TESTING THIS BOARD:\n");
+    print_board();
+
+    if (divide) {
+        node_cnt = perft_divide(&board, depth);
+    } else {
+        node_cnt = perft(&board, depth);
+    }
+    printf("total node count=%d\n\n", node_cnt);
+}
+
+void perft_from_file(const char *filename, int divide) {
     FILE *fp = fopen(filename, "r");
 
     char buf[1024];
