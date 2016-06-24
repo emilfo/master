@@ -21,7 +21,7 @@ typedef uint64_t u64;
 #define BISHOPS "6k1/1b6/4n3/8/1n4B1/1B3N2/1N6/2b3K1 b - - 0 1 "
 #define BISHOPSB "6K1/1B6/4N3/8/1N4b1/1b3n2/1n6/2B3k1 b - - 0 1 "
 #define CASTLE1 "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
-#define CASTLE2 "3rk2r/8/8/8/8/8/6p1/R3K2R w KQk - 0 1"
+#define CASTLE2 "3rk2r/8/8/8/8/8/6p1/R3K2R b KQk - 0 1"
 
 
 typedef struct {
@@ -99,10 +99,10 @@ extern const int RANKSHIFT[];
 void init();
 int parse_fen(char* fen);
 void reset_board();
-int make_move(int move, S_BOARD *b);
+int make_move(S_BOARD *b, int);
 void unmake_move(S_BOARD *b);
 void print_board();
-int debug_board();
+int debug_board(S_BOARD *b);
 void print_bitboard_rank(uint8_t rank);
 void print_bitboard(BIT_BOARD  *bboard);
 

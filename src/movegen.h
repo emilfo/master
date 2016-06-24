@@ -17,12 +17,12 @@ typedef struct {
 } S_MOVELIST;
 
 //Struct used for pretty printing only
-typedef struct {
-    uint32_t moves[MAX_MOVES];
-    uint8_t index;
-} S_MOVE_LIST;
+//typedef struct {
+//    uint32_t moves[MAX_MOVES];
+//    uint8_t index;
+//} S_MOVE_LIST;
 
-//static int sq_attacked(S_BOARD b, u64 target_bb, int from_side); 
+int sq_attacked(S_BOARD b, u64 target_bb, int from_side); 
 
 void generate_all_moves(S_BOARD b, S_MOVELIST *list); 
 

@@ -31,7 +31,6 @@ static void generate_black_queen_moves(S_BOARD b, S_MOVELIST *list, u64 targets_
 static void generate_white_queen_moves(S_BOARD b, S_MOVELIST *list, u64 targets_bb);
 static void generate_black_king_moves(S_BOARD b, S_MOVELIST *list, u64 targets_bb);
 static void generate_white_king_moves(S_BOARD b, S_MOVELIST *list, u64 targets_bb);
-static int sq_attacked(S_BOARD b, u64 target_bb, int from_side);
 static void add_move(S_MOVELIST *list, int from, int to, int piece, int capture, int promoted, int ep, int castling);
 
 
@@ -56,13 +55,13 @@ static void add_move(S_MOVELIST *list, int from, int to, int piece, int capture,
 
 void generate_all_moves(S_BOARD b, S_MOVELIST *list) 
 {
-    uint8_t opponent_side;
+    //uint8_t opponent_side;
     //uint32_t to, from, capture;
     //u64 cur_pce_bb, cur_move_bb;
     u64 targets_bb, free_sq_bb;
 
     list->index = 0;
-    opponent_side = !(b.side);
+    //opponent_side = !(b.side);
     free_sq_bb = ~(b.all_pieces);
 
     if(b.side) { //black to move
@@ -122,7 +121,7 @@ static void generate_black_pawn_moves(S_BOARD b, S_MOVELIST *list, u64 free_sq_b
                 add_move(list, from, to, B_PAWN, capture, B_ROOK, false, false);
                 add_move(list, from, to, B_PAWN, capture, B_QUEEN, false, false);
             } else {
-                add_move(list, from, to, B_PAWN, false, false, false, false);
+                add_move(list, from, to, B_PAWN, capture, false, false, false);
             }
 
             cur_move_bb ^= (1LL << to);
@@ -228,7 +227,7 @@ static void generate_white_pawn_moves(S_BOARD b, S_MOVELIST *list, u64 free_sq_b
                 add_move(list, from, to, W_PAWN, capture, W_ROOK, false, false);
                 add_move(list, from, to, W_PAWN, capture, W_QUEEN, false, false);
             } else {
-                add_move(list, from, to, W_PAWN, false, false, false, false);
+                add_move(list, from, to, W_PAWN, capture, false, false, false);
             }
 
             cur_move_bb ^= (1LL << to);
@@ -322,22 +321,22 @@ static void generate_white_bishop_moves(S_BOARD b, S_MOVELIST *list, u64 targets
     while (cur_pce_bb) {
         from = lsb1_index(cur_pce_bb);
 
-        printf("\nFrom these pieces:\n");
-        print_bitboard((BIT_BOARD *) &cur_pce_bb);
+       // printf("\nFrom these pieces:\n");
+       // print_bitboard((BIT_BOARD *) &cur_pce_bb);
 
         cur_move_bb = BISHOPMOVES(from, b.all_pieces, targets_bb);
 
-        printf("\n\nUSING THESE VALS:\n\n");
-        printf("all pieces:\n");
-        print_bitboard((BIT_BOARD *) &(b.all_pieces));
-        printf("targets_bb:\n");
-        print_bitboard((BIT_BOARD *) &(targets_bb));
+       // printf("\n\nUSING THESE VALS:\n\n");
+       // printf("all pieces:\n");
+       // print_bitboard((BIT_BOARD *) &(b.all_pieces));
+       // printf("targets_bb:\n");
+       // print_bitboard((BIT_BOARD *) &(targets_bb));
 
         while (cur_move_bb) {
             to = lsb1_index(cur_move_bb);
 
-            printf("\nadding these moves:\n");
-            print_bitboard((BIT_BOARD *) &cur_move_bb);
+          //  printf("\nadding these moves:\n");
+          //  print_bitboard((BIT_BOARD *) &cur_move_bb);
 
             capture = b.sq[to];
             add_move(list, from, to, W_BISHOP, capture, false, false, false);
@@ -506,7 +505,7 @@ static void generate_white_king_moves(S_BOARD b, S_MOVELIST *list, u64 targets_b
  * smart to use both to see if king is in check, but also check if castling is
  * ok
  */
-static int sq_attacked(S_BOARD b, u64 target_bb, int from_side) 
+int sq_attacked(S_BOARD b, u64 target_bb, int from_side) 
 {
     u64 slide_attacks_bb;
     int sq;

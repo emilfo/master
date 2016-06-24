@@ -1,17 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+
 #include "globals.h"
 #include "movegen.h"
-
-const static char PIECE_PRINT[13] = { '\0',
-    '\0', 'N', 'B', 'R', 'Q', 'K',
-    '\0', 'N', 'B', 'R', 'Q', 'K'
-};
-
-const static char CAP_PRINT[13] = { '\0',
-    'x', 'x', 'x', 'x', 'x', 'x',
-    'x', 'x', 'x', 'x', 'x', 'x'
-};
+#include "io.h"
 
 char *sq_str(const int sq) {
     static char str[3];
