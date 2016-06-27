@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <inttypes.h>
 #include "globals.h"
 #include "data.h"
 #include "hash.h"
@@ -81,7 +82,8 @@ static void remove_piece(S_BOARD *b, int piece, int sq);
 
 void init() {
     init_data();
-    parse_fen(CASTLE2);
+    init_hash();
+    parse_fen(START_FEN);
 }
 
 int parse_fen(char *fen) {
@@ -508,6 +510,7 @@ static void remove_piece(S_BOARD *b, int piece, int sq) {
 
     b->sq[sq] = EMPTY;
     HASH_B(b, pce_key[piece][sq]);
+    //b->hash_key ^= pce_key[piece][sq];
 
     if (piece == B_PAWN) {
         b->b_pawns ^= (1LL << sq);
@@ -558,7 +561,6 @@ static void remove_piece(S_BOARD *b, int piece, int sq) {
         b->w_pieces ^= (1LL << sq);
         b->all_pieces ^= (1LL << sq);
     }
-
 }
 
 void print_board() {

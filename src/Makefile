@@ -1,10 +1,10 @@
 CC = gcc
-CFLAGS=-DNDEBUG
-#CFLAGS =-Wall -g3 -DDEBUG
+#CFLAGS=-DNDEBUG
+CFLAGS =-Wall -g3 -DDEBUG
 LDFLAGS = -lm
 
-SOURCES = main.c board.c data.c bitops.c movegen.c uci.c hash.c debug.c io.c perft.c
-DEPS = globals.h board.h data.h bitops.h movegen.h hash.h debug.h perft.h
+SOURCES = main.c board.c data.c bitops.c movegen.c hash.c debug.c io.c perft.c search.c
+DEPS = globals.h board.h data.h bitops.h movegen.h hash.h debug.h io.h perft.h search.h
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = chess
 

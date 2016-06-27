@@ -1,13 +1,15 @@
 #include <time.h>
 #include <stdlib.h>
+#include <inttypes.h>
+#include <stdio.h>
 #include "globals.h"
 #include "hash.h"
 #include "board.h"
 
 u64 generate_hash(S_BOARD *b) {
     int sq;
-    u64 hash_key;
     int pce;
+    u64 hash_key = 0LL;
 
     for(sq = 0; sq < 64; sq++) {
         pce = b->sq[sq];
@@ -33,15 +35,15 @@ u64 generate_hash(S_BOARD *b) {
 u64 rand64() {
     u64 rand64 = 0LL;
 
-    rand64 = (0xff000000 & ((u64)rand() << 48));
-    rand64 = (0x00ff0000 & ((u64)rand() << 32));
-    rand64 = (0x0000ff00 & ((u64)rand() << 16));
-    rand64 = (0x000000ff & (u64)rand());
+    rand64 |= (0xffff000000000000 & ((u64)rand() << 48));
+    rand64 |= (0x0000ffff00000000 & ((u64)rand() << 32));
+    rand64 |= (0x00000000ffff0000 & ((u64)rand() << 16));
+    rand64 |= (0x000000000000ffff & (u64)rand());
 
     return rand64;
 }
 
-void init_hash() { //TODO init this
+void init_hash() {
     srand(time(NULL));
 
     int i, j;

@@ -1,5 +1,6 @@
 #include "bitops.h"
 #include "board.h"
+
 /** 
  * Returns a count of all bits set to 1 
  * M1 puts count of each 2 bit into those 2 bits
