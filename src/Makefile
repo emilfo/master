@@ -3,8 +3,8 @@ CC = gcc
 CFLAGS =-Wall -g3 -DDEBUG
 LDFLAGS = -lm
 
-SOURCES = main.c board.c data.c bitops.c movegen.c hash.c debug.c io.c perft.c search.c
-DEPS = globals.h board.h data.h bitops.h movegen.h hash.h debug.h io.h perft.h search.h
+SOURCES = main.c board.c data.c bitops.c movegen.c hash.c debug.c io.c perft.c search.c utils.c
+DEPS = globals.h board.h data.h bitops.h movegen.h hash.h debug.h io.h perft.h search.h	utils.h
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = chess
 
