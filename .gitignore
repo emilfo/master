@@ -37,3 +37,7 @@
 
 #executable
 chess
+
+#others
+*.txt
+.nfs*
