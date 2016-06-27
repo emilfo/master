@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS=-DNDEBUG
+#CFLAGS =-Wall -g3 -DDEBUG
 LDFLAGS = -lm
 
 SOURCES = main.c board.c data.c bitops.c movegen.c uci.c hash.c debug.c io.c perft.c
@@ -8,6 +9,8 @@ OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = chess
 
 all: $(SOURCES) $(EXECUTABLE)
+
+nodebug:
 
 %.o: %.c $(DEPS)
 		$(CC) $< $(CFLAGS) -c -o $@

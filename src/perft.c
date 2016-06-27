@@ -10,13 +10,12 @@
 static int perft(S_BOARD *b, int depth);
 static int perft_divide(S_BOARD *b, int depth);
 
-void perft_fen(char *FEN, int divide) {
+void perft_fen(char *FEN, int divide, int depth) {
     int node_cnt = 0;
-    int depth = 1;
 
     parse_fen(FEN);
 
-    printf("TESTING THIS BOARD:\n");
+    printf("Perft from this position:\n");
     print_board();
 
     if (divide) {
@@ -30,6 +29,7 @@ void perft_fen(char *FEN, int divide) {
 void perft_from_file(const char *filename, int divide) {
     FILE *fp = fopen(filename, "r");
 
+
     char buf[1024];
     int i = 0;
     int depth = 0;
@@ -39,32 +39,48 @@ void perft_from_file(const char *filename, int divide) {
     //int node_count[6];
 
     
-    printf("test\n");
-
     while (fgets(buf, 1024, fp) != NULL) {
+        FILE *fp_result = fopen("perft-result.txt", "a");
+        fprintf(fp_result, "%s", buf);
+
         parse_fen(buf);
 
-        printf("TESTING THIS BOARD:\n");
+        printf("Perft from this position:\n");
         print_board();
 
+        printf("\n\n%5s || %9s | %9s |\n", "depth", "target", "count"); 
+        printf("-------------------------------------\n"); 
         i = 0;
         while(buf[i]) {
             if(buf[i] == 'D') {
                 depth = atoi(&buf[i+1]);
                 target_cnt = atoi(&buf[i+3]);
 
-                printf("depth=%d, target node count=%d\n",depth, target_cnt); 
+                printf("%5d || %9d | ",depth, target_cnt); 
+                fflush(stdout);
                 if (divide) {
                     node_cnt = perft_divide(&board, depth);
                 } else {
                     node_cnt = perft(&board, depth);
                 }
-                printf("actual node count=%d\n\n", node_cnt);
+                printf("%9d |\n", node_cnt);
+
+
+                if(target_cnt == node_cnt) {
+                    fprintf(fp_result, "D%d - OK, ", depth);
+                } else {
+                    fprintf(fp_result, "D%d - ERROR!\n\n", depth);
+                    fclose(fp_result);
+                    break;
+                }
+
 
                 assert(target_cnt == node_cnt);
             }
             i++;
         }
+        fprintf(fp_result, "\n\n");
+        fclose(fp_result);
     }
 }
 
@@ -99,6 +115,7 @@ static int perft_divide(S_BOARD *b, int depth) {
     generate_all_moves(*b, list);
 
     for (i = 0; i < list->index; i++) {
+        //if(i==19) {
         if(make_move(b, list->moves[i].move)) {
             div_count = perft(b, depth - 1);
             count += div_count;
@@ -106,7 +123,12 @@ static int perft_divide(S_BOARD *b, int depth) {
             printf("Move: %s, count: %d\n", move_str(list->moves[i].move), div_count);
             unmake_move(b);
         }
+        //else {
+        //    printf("MOVE IN CHECK: %s, %d\n", move_str(list->moves[i].move), list->moves[i].move);
+        //}
     }
+    //}
+    printf("move count: %d\n", count);
 
     return count;
 }

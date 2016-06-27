@@ -524,15 +524,15 @@ int sq_attacked(S_BOARD b, u64 target_bb, int from_side)
                         & slide_attacks_bb) { 
                     return true; 
                 }
-                if (FILE_ATTACKS[sq][(b.all_pieces & FILE_MASK[sq]) >> 57]
-                        & slide_attacks_bb) { 
+                if (FILE_ATTACKS[sq][((b.all_pieces & FILE_MASK[sq]) *
+                            FILE_MAGIC[sq]) >> 57] & slide_attacks_bb) { 
                     return true; 
                 }
             }
 
             slide_attacks_bb = b.b_queens | b.b_bishops;
             if (slide_attacks_bb) {
-                if (DIAGA8H1_ATTACKS[sq][((b.all_pieces && DIAGA8H1_MASK[sq]) 
+                if (DIAGA8H1_ATTACKS[sq][((b.all_pieces & DIAGA8H1_MASK[sq]) 
                             * DIAGA8H1_MAGIC[sq]) >> 57] & slide_attacks_bb) {
                     return true;
                 }
@@ -559,15 +559,15 @@ int sq_attacked(S_BOARD b, u64 target_bb, int from_side)
                         & slide_attacks_bb) { 
                     return true; 
                 }
-                if (FILE_ATTACKS[sq][(b.all_pieces & FILE_MASK[sq]) >> 57]
-                        & slide_attacks_bb) { 
+                if (FILE_ATTACKS[sq][((b.all_pieces & FILE_MASK[sq]) *
+                            FILE_MAGIC[sq]) >> 57] & slide_attacks_bb) { 
                     return true; 
                 }
             }
 
             slide_attacks_bb = b.w_queens | b.w_bishops;
             if (slide_attacks_bb) {
-                if (DIAGA8H1_ATTACKS[sq][((b.all_pieces && DIAGA8H1_MASK[sq]) 
+                if (DIAGA8H1_ATTACKS[sq][((b.all_pieces & DIAGA8H1_MASK[sq]) 
                             * DIAGA8H1_MAGIC[sq]) >> 57] & slide_attacks_bb) {
                     return true;
                 }

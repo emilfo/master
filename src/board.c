@@ -250,7 +250,7 @@ int make_move(S_BOARD *b, int move)
     assert(valid_piece_or_empty(cap));
     assert(valid_piece_or_empty(prom));
 
-//    printf("move: %s, %d\n", move_str(move), move);
+    //printf("MAKEMOVE TOP move: %s, %d\n", move_str(move), move);
     //if(move == 31345) {
     //    print_board();
     //    print_bitboard((BIT_BOARD *) &b->b_pawns);
@@ -356,6 +356,7 @@ int make_move(S_BOARD *b, int move)
     //    print_board();
     //    print_bitboard((BIT_BOARD *) &b->b_pawns);
     //}
+    //printf("MAKEMOVE BOT move: %s, %d\n", move_str(move), move);
     assert(debug_board(b));
 
     return (1);
@@ -363,8 +364,6 @@ int make_move(S_BOARD *b, int move)
 
 void unmake_move(S_BOARD *b)
 {
-    assert(debug_board(b));
-
     b->ply--;
 
     int move = b->prev[b->ply].move;
@@ -383,6 +382,8 @@ void unmake_move(S_BOARD *b)
     //    print_bitboard((BIT_BOARD *) &b->w_pawns);
     //}
 
+    //printf("UNMAKEMOVE TOP move: %s, %d\n", move_str(move), move);
+    assert(debug_board(b));
 
     if (prom) { 
         remove_piece(b, prom, to);
@@ -393,21 +394,21 @@ void unmake_move(S_BOARD *b)
     add_piece(b, piece, from);
 
     if (mv_castle(move)) {
-        if (b->side) { //BLACK
-            if(to == C8) {
-                remove_piece(b, B_ROOK, D8);
-                add_piece(b, B_ROOK, A8);
-            } else {
-                remove_piece(b, B_ROOK, F8);
-                add_piece(b, B_ROOK, H8);
-            }
-        } else { //WHITE
+        if (b->side) { //BLACK (unmaking whites move)
             if(to == C1) {
                 remove_piece(b, W_ROOK, D1);
                 add_piece(b, W_ROOK, A1);
             } else {
                 remove_piece(b, W_ROOK, F1);
                 add_piece(b, W_ROOK, H1);
+            }
+        } else { //WHITE
+            if(to == C8) {
+                remove_piece(b, B_ROOK, D8);
+                add_piece(b, B_ROOK, A8);
+            } else {
+                remove_piece(b, B_ROOK, F8);
+                add_piece(b, B_ROOK, H8);
             }
         }
 
@@ -434,12 +435,14 @@ void unmake_move(S_BOARD *b)
 
 
     //printf("move: %s, %d\n", move_str(b->prev[b->ply].move), b->prev[b->ply].move);
+    //printf("UNMAKEMOVE BOT move: %s, %d\n", move_str(move), move);
     assert(debug_board(b));
 }
 
 static void add_piece(S_BOARD *b, int piece, int sq) {
     assert(valid_sq(sq));
     assert(valid_piece(piece));
+    assert(b->sq[sq] == EMPTY);
 
 //    printf("ADDING: PIECE:%d, SQ:%d\n",piece,sq);
     b->sq[sq] = piece;
@@ -500,6 +503,8 @@ static void remove_piece(S_BOARD *b, int piece, int sq) {
     //printf("REMOVING PIECE:%d, SQ:%d\n",piece,sq);
     assert(valid_sq(sq));
     assert(valid_piece(piece));
+    //printf("piece: %c\n",PIECE_NAME[b->sq[sq]]);
+    assert(b->sq[sq] == piece);
 
     b->sq[sq] = EMPTY;
     HASH_B(b, pce_key[piece][sq]);

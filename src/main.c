@@ -4,7 +4,10 @@
 //#include "io.h"
 #include "perft.h"
 
-#define BUG_FEN "nBn5/P1Pk4/8/8/8/8/4Kppp/5N1N b  - 0 1"
+#define BUG_FEN1 "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N w - - 0 1"
+#define BUG_FEN2 "n1Q5/P1Pk4/8/8/8/8/4Kppp/5N1N b  - 0 1"
+#define BUG_FEN3 "nBn5/P1Pk4/8/8/8/8/4Kppp/5N1N b  - 0 1"
+
 int main() {
     printf("init data\n");
 
@@ -26,9 +29,9 @@ int main() {
 
    // print_board(); 
 
-    //perft_from_file("perftsuite.epd", true);
+    perft_from_file("perftsuite.epd", false);
     
-    perft_fen(BUG_FEN, true);
+    //perft_fen(BUG_FEN3, true, 1);
     
 
     printf("\n\"You know somethin', Utivich? I think this just might be my mast"
