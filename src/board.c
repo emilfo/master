@@ -3,6 +3,7 @@
 #include "globals.h"
 #include "data.h"
 #include "hash.h"
+#include "hashtable.h"
 #include "movegen.h"
 #include "io.h"
 
@@ -83,6 +84,7 @@ static void remove_piece(S_BOARD *b, int piece, int sq);
 void init() {
     init_data();
     init_hash();
+    init_hashtable(&tp_table, tp_size);
     parse_fen(START_FEN);
 }
 

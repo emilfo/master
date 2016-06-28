@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include "board.h"
+#include "hashtable.h"
 #include "bitops.h"
 #include "debug.h"
 
@@ -14,7 +15,7 @@
 #define BLACK 1
 
 S_BOARD board;
-
+S_HASHTABLE tp_table;
 
 /* uint32_t move
  * 0000 0000 0000 0000 0000 0011 1111 -> From, 0x3F
@@ -82,9 +83,5 @@ const static int ranks[64] = {
     7, 7, 7, 7, 7, 7, 7, 7,
     8, 8, 8, 8, 8, 8, 8, 8,
 };
-//extern const int files[];
-//extern const int ranks[];
-
-
 
 #endif /* GLOBALS_H */
