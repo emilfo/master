@@ -32,3 +32,47 @@ void init_hashtable(S_HASHTABLE *tp, u64 size)
     printf("init hashtable with %d entries\n", tp->size);
 }
 
+S_HASHENTRY *hash_get(S_HASHTABLE *tp, u64 key)
+{
+    int i = key % tp->size;
+
+    //TODO: lock here?
+    if (tp->entries[i].hash_key == key) {
+        return &tp->entries[i];
+    }
+
+    return NULL;
+}
+
+void hash_put(S_HASHTABLE *tp, u64 key, uint32_t move, int16_t eval, int16_t age)
+{
+    int i = key % tp->size;
+
+    //TODO: lock here?
+    tp->entries[i].hash_key = key;
+    tp->entries[i].move = move;
+    tp->entries[i].eval = eval;
+    tp->entries[i].age = age;
+}
+
+int hash_get_pv_line(S_HASHTABLE *tp, S_BOARD *b, int *moves, int depth)
+{
+    int i = 0;
+    int j = 0;
+
+    S_HASHENTRY *move = hash_get(tp, b->hash_key);
+
+    while(i < depth && move != NULL) {
+        if(make_move_if_exist(b, move->move)) {
+            moves[i++] = move->move;
+        } else {
+            break;
+        }
+    }
+
+    while(j++ < i) {
+        unmake_move(b);
+    }
+
+    return i;
+}

@@ -46,6 +46,15 @@ int main() {
 
         if (input[0] == 'u') {
             unmake_move(&board);
+        } else if (input[0] == 't') {
+            int moves[4];
+            int i;
+            hash_get_pv_line(&tp_table, &board, moves, 4);
+
+            for(i=0; i < 4; i++) {
+                printf("%s ", move_str(moves[i]));
+            }
+            printf("\n");
         } else if (input[0] == 'q') {
             break;
         } else if (input[0] == 'p') {
@@ -55,6 +64,7 @@ int main() {
             move = str_move(input, &board);
             if(move) {
                 make_move(&board, move); 
+                hash_put(&tp_table, board.hash_key, move, 0, 0);
             } else {
                 printf("move not valid\n");
             }

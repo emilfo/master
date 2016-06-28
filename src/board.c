@@ -565,6 +565,21 @@ static void remove_piece(S_BOARD *b, int piece, int sq) {
     }
 }
 
+int make_move_if_exist(S_BOARD *b, int move)
+{
+    int i;
+    S_MOVELIST l[1];
+
+    generate_all_moves(*b, l);
+
+    for (i = 0; i < l->index; i++) {
+        if (l->moves[i].move == move && make_move(b, move)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void print_board() {
     int file, rank;
 

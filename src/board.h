@@ -101,6 +101,7 @@ int parse_fen(char* fen);
 void reset_board();
 int make_move(S_BOARD *b, int);
 void unmake_move(S_BOARD *b);
+int make_move_if_exist(S_BOARD *b, int move);
 void print_board();
 int debug_board(S_BOARD *b);
 void print_bitboard_rank(uint8_t rank);
