@@ -13,15 +13,15 @@ static int perft_divide(S_BOARD *b, int depth);
 void perft_fen(char *FEN, int divide, int depth) {
     int node_cnt = 0;
 
-    parse_fen(&board, FEN);
+    parse_fen(&global_board, FEN);
 
     printf("Perft from this position:\n");
-    print_board();
+    print_board(&global_board);
 
     if (divide) {
-        node_cnt = perft_divide(&board, depth);
+        node_cnt = perft_divide(&global_board, depth);
     } else {
-        node_cnt = perft(&board, depth);
+        node_cnt = perft(&global_board, depth);
     }
     printf("total node count=%d\n\n", node_cnt);
 }
@@ -43,10 +43,10 @@ void perft_from_file(const char *filename, int divide) {
         FILE *fp_result = fopen("perft-result.txt", "a");
         fprintf(fp_result, "%s", buf);
 
-        parse_fen(&board, buf);
+        parse_fen(&global_board, buf);
 
         printf("Perft from this position:\n");
-        print_board();
+        print_board(&global_board);
 
         printf("\n\n%5s || %9s | %9s |\n", "depth", "target", "count"); 
         printf("-------------------------------------\n"); 
@@ -59,9 +59,9 @@ void perft_from_file(const char *filename, int divide) {
                 printf("%5d || %9d | ",depth, target_cnt); 
                 fflush(stdout);
                 if (divide) {
-                    node_cnt = perft_divide(&board, depth);
+                    node_cnt = perft_divide(&global_board, depth);
                 } else {
-                    node_cnt = perft(&board, depth);
+                    node_cnt = perft(&global_board, depth);
                 }
                 printf("%9d |\n", node_cnt);
 

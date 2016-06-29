@@ -15,7 +15,7 @@
 #define BLACK 1
 #define BOTH  2
 
-S_BOARD board;
+S_BOARD global_board;
 S_HASHTABLE tp_table;
 
 /* uint32_t move

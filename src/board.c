@@ -85,7 +85,7 @@ void init() {
     init_data();
     init_hash();
     init_hashtable(&tp_table, tp_size);
-    parse_fen(&board, START_FEN);
+    //parse_fen(&board, START_FEN);
 }
 
 int parse_fen(S_BOARD *b, char *fen) {
@@ -194,7 +194,7 @@ int parse_fen(S_BOARD *b, char *fen) {
     }
 
     //TODO this here?
-    b->hash_key = generate_hash(&board);
+    b->hash_key = generate_hash(b);
 
     return 0;
 }
@@ -210,14 +210,14 @@ void reset_board(S_BOARD *b) {
         b->all_piece_bb[i] = 0LL;
     }
 
-    board.side = WHITE;
-    board.castle_perm = EMPTY;
+    b->side = WHITE;
+    b->castle_perm = EMPTY;
 
-    board.ep_sq = EMPTY;
-    board.fifty_move_count = 0;
+    b->ep_sq = EMPTY;
+    b->fifty_move_count = 0;
 
     for (i = 0; i < 64; i++) {
-        board.sq[i] = EMPTY;
+        b->sq[i] = EMPTY;
     }
 }
 
@@ -470,13 +470,13 @@ int make_move_if_exist(S_BOARD *b, int move)
     return false;
 }
 
-void print_board() {
+void print_board(const S_BOARD *b) {
     int file, rank;
 
     for (rank = 8; rank >= 1; rank--) {
         printf("  +---+---+---+---+---+---+---+---+\n%d |", rank);
         for (file = 1; file <= 8; file++) {
-            printf("%2c |", PIECE_NAME[board.sq[FRtoSQ(file, rank)]]);
+            printf("%2c |", PIECE_NAME[b->sq[FRtoSQ(file, rank)]]);
         }
         printf("\n");
     }
@@ -485,8 +485,8 @@ void print_board() {
     printf("    a   b   c   d   e   f   g   h  \n");
 
     printf("side:%c, castle_perm:%d, ep:%i, fifty_move:%i\n",
-            (board.side)?'B':'W', board.castle_perm, board.ep_sq,
-            board.fifty_move_count);
+            (b->side)?'B':'W', b->castle_perm, b->ep_sq,
+            b->fifty_move_count);
 }
 
 /* This is a help mehtod only used in debugging */

@@ -35,42 +35,42 @@ int main() {
     
     //perft_fen(BUG_FEN3, true, 1);
     
-    char input[7];
-    int move;
-    while (true) {
-        generate_all_moves(&board, list);
-        
-        printf("hash_key %"PRIx64"\n", board.hash_key);
-        printf("action >");
-        fgets(input, 7, stdin);
+   // char input[7];
+   // int move;
+   // while (true) {
+   //     generate_all_moves(&board, list);
+   //     
+   //     printf("hash_key %"PRIx64"\n", board.hash_key);
+   //     printf("action >");
+   //     fgets(input, 7, stdin);
 
-        if (input[0] == 'u') {
-            unmake_move(&board);
-        } else if (input[0] == 't') {
-            int moves[4];
-            int i;
-            hash_get_pv_line(&tp_table, &board, moves, 4);
+   //     if (input[0] == 'u') {
+   //         unmake_move(&board);
+   //     } else if (input[0] == 't') {
+   //         int moves[4];
+   //         int i;
+   //         hash_get_pv_line(&tp_table, &board, moves, 4);
 
-            for(i=0; i < 4; i++) {
-                printf("%s ", move_str(moves[i]));
-            }
-            printf("\n");
-        } else if (input[0] == 'q') {
-            break;
-        } else if (input[0] == 'p') {
-            print_board();
-            print_movelist(list);
-        } else {
-            move = str_move(input, &board);
-            if(move) {
-                hash_put(&tp_table, board.hash_key, move, 0, 0);
-                make_move(&board, move); 
-            } else {
-                printf("move not valid\n");
-            }
-        }
-    }
-    
+   //         for(i=0; i < 4; i++) {
+   //             printf("%s ", move_str(moves[i]));
+   //         }
+   //         printf("\n");
+   //     } else if (input[0] == 'q') {
+   //         break;
+   //     } else if (input[0] == 'p') {
+   //         print_board();
+   //         print_movelist(list);
+   //     } else {
+   //         move = str_move(input, &board);
+   //         if(move) {
+   //             hash_put(&tp_table, board.hash_key, move, 0, 0);
+   //             make_move(&board, move); 
+   //         } else {
+   //             printf("move not valid\n");
+   //         }
+   //     }
+   // }
+   // 
 
     printf("\n\"You know somethin', Utivich? I think this just might be my mast"
             "erpiece.\"\n- Lt. Aldo Raine\n");
