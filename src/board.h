@@ -31,9 +31,8 @@ typedef struct {
 } S_PREV_BOARD;
 
 typedef struct {
-    u64 w_king, w_queens, w_rooks, w_bishops, w_knights, w_pawns,
-        b_king, b_queens, b_rooks, b_bishops, b_knights, b_pawns,
-        w_pieces, b_pieces, all_pieces;
+    u64 piece_bb[13];
+    u64 all_piece_bb[3];
 
     uint8_t side, castle_perm, ep_sq, fifty_move_count;
 
@@ -100,8 +99,8 @@ extern const u64 _FILEMAGICS[];
 extern const int RANKSHIFT[];
 
 void init();
-int parse_fen(char* fen);
-void reset_board();
+int parse_fen(S_BOARD *b, char *fen);
+void reset_board(S_BOARD *b);
 int make_move(S_BOARD *b, int);
 void unmake_move(S_BOARD *b);
 int make_move_if_exist(S_BOARD *b, int move);

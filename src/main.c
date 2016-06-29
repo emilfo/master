@@ -19,7 +19,7 @@ int main() {
 
     S_MOVELIST list[1];
 
-   // generate_all_moves(board, &list[0]);
+   // generate_all_moves(&board, &list[0]);
 
    // print_movelist(&list[0]);
 
@@ -31,14 +31,14 @@ int main() {
 
    // print_board(); 
 
-    //perft_from_file("perftsuite.epd", false);
+    perft_from_file("perftsuite.epd", false);
     
     //perft_fen(BUG_FEN3, true, 1);
     
     char input[7];
     int move;
     while (true) {
-        generate_all_moves(board, list);
+        generate_all_moves(&board, list);
         
         printf("hash_key %"PRIx64"\n", board.hash_key);
         printf("action >");

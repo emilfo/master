@@ -13,6 +13,7 @@
 #define FRtoSQ(file, rank) ((8*(rank-1)) + (file-1))
 #define WHITE 0
 #define BLACK 1
+#define BOTH  2
 
 S_BOARD board;
 S_HASHTABLE tp_table;
@@ -41,6 +42,11 @@ const enum { EMPTY,
     W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING,
     B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING
 } PIECES;
+
+const static int PIECE_COLOR[13] = { -1,
+    0, 0, 0, 0, 0, 0,
+    1, 1, 1, 1, 1, 1
+};
 
 const static char PIECE_NAME[13] = { ' ',
     'P', 'N', 'B', 'R', 'Q', 'K',

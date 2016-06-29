@@ -61,7 +61,7 @@ int str_move(const char *sq, S_BOARD *b) {
     assert(valid_piece_or_empty(prom));
 
     S_MOVELIST list[1];
-    generate_all_moves(*b, list);
+    generate_all_moves(b, list);
 
     for(i = 0; i < list->index; i++) {
         move = list->moves[i].move;

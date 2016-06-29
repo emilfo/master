@@ -85,52 +85,40 @@ void init() {
     init_data();
     init_hash();
     init_hashtable(&tp_table, tp_size);
-    parse_fen(START_FEN);
+    parse_fen(&board, START_FEN);
 }
 
-int parse_fen(char *fen) {
+int parse_fen(S_BOARD *b, char *fen) {
     int file, rank, piece;
-    reset_board();
+    reset_board(b);
 
     rank = 8;
     file = 1;
     while((rank >= 1) && *fen) {
         switch (*fen) {
             case 'p': piece = B_PAWN; 
-                      board.b_pawns |= (1ULL << (FRtoSQ(file, rank)));
                       break;
             case 'r': piece = B_ROOK;
-                      board.b_rooks |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'n': piece = B_KNIGHT;
-                      board.b_knights |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'b': piece = B_BISHOP;
-                      board.b_bishops |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'k': piece = B_KING;
-                      board.b_king |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'q': piece = B_QUEEN;
-                      board.b_queens |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'P': piece = W_PAWN;
-                      board.w_pawns |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'R': piece = W_ROOK;
-                      board.w_rooks |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'N': piece = W_KNIGHT;
-                      board.w_knights |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'B': piece = W_BISHOP;
-                      board.w_bishops |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'K': piece = W_KING; 
-                      board.w_king |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
             case 'Q': piece = W_QUEEN;
-                      board.w_queens |= (1ULL << (FRtoSQ(file, rank))); 
                       break;
 
             case '1':
@@ -158,33 +146,34 @@ int parse_fen(char *fen) {
         }   
 
         if (piece != EMPTY) {
-            board.sq[FRtoSQ(file, rank)] = piece;
+            b->piece_bb[piece] |= (1ULL << (FRtoSQ(file, rank))); 
+            b->sq[FRtoSQ(file, rank)] = piece;
             file += 1;
         }
 
         fen++;
     }
 
-    board.w_pieces = board.w_king | board.w_queens | board.w_rooks 
-        | board.w_bishops | board.w_knights | board.w_pawns; 
+    b->all_piece_bb[WHITE] = b->piece_bb[W_PAWN] | b->piece_bb[W_QUEEN] | b->piece_bb[W_ROOK] 
+        | b->piece_bb[W_BISHOP] | b->piece_bb[W_KNIGHT] | b->piece_bb[W_KING]; 
 
-    board.b_pieces = board.b_king | board.b_queens | board.b_rooks 
-        | board.b_bishops | board.b_knights | board.b_pawns; 
+    b->all_piece_bb[BLACK] = b->piece_bb[B_PAWN] | b->piece_bb[B_QUEEN] | b->piece_bb[B_ROOK] 
+        | b->piece_bb[B_BISHOP] | b->piece_bb[B_KNIGHT] | b->piece_bb[B_KING]; 
 
-    board.all_pieces = board.b_pieces | board.w_pieces;
+    b->all_piece_bb[BOTH] = b->all_piece_bb[WHITE] | b->all_piece_bb[BLACK];
 
     //debugging added to be certain the FEN board is correctly traversed
     assert(*fen == 'w' || *fen == 'b');
 
-    board.side = (*fen == 'w')? WHITE : BLACK;
+    b->side = (*fen == 'w')? WHITE : BLACK;
     fen += 2;
 
     while (*fen != ' ') {
         switch (*fen) {
-            case 'K': board.castle_perm |= WKCA; break;
-            case 'Q': board.castle_perm |= WQCA; break;
-            case 'k': board.castle_perm |= BKCA; break;
-            case 'q': board.castle_perm |= BQCA; break;
+            case 'K': b->castle_perm |= WKCA; break;
+            case 'Q': b->castle_perm |= WQCA; break;
+            case 'k': b->castle_perm |= BKCA; break;
+            case 'q': b->castle_perm |= BQCA; break;
             default: break;
         }
         fen++;
@@ -192,49 +181,43 @@ int parse_fen(char *fen) {
     fen++;
 
     //check that we didn't somehow screw up castle permissions
-    assert((board.castle_perm >= 0b0000) && (board.castle_perm <= 0b1111));
+    assert((b->castle_perm >= 0b0000) && (b->castle_perm <= 0b1111));
 
     if (*fen != '-') {
         file = fen[0] - 'a' + 1;
         rank = fen[1] - '1' + 1;
 
-        assert(board.side == WHITE || (rank == 3 && (file >= 1 && file <= 8)));
-        assert(board.side == BLACK || (rank == 6 && (file >= 1 && file <= 8)));
+        assert(b->side == WHITE || (rank == 3 && (file >= 1 && file <= 8)));
+        assert(b->side == BLACK || (rank == 6 && (file >= 1 && file <= 8)));
 
-        board.ep_sq = FRtoSQ(file, rank);
+        b->ep_sq = FRtoSQ(file, rank);
     }
 
     //TODO this here?
-    board.hash_key = generate_hash(&board);
+    b->hash_key = generate_hash(&board);
 
     return 0;
 }
 
-void reset_board() {
+void reset_board(S_BOARD *b) {
     int i;
 
-    board.w_king = 0ULL;
-    board.w_queens = 0ULL;
-    board.w_rooks = 0ULL;
-    board.w_bishops = 0ULL;
-    board.w_knights = 0ULL;
-    board.w_pawns = 0ULL;
+    for (i = 0; i < 13; i++) {
+        b->piece_bb[i] = 0ULL;
+    }
 
-    board.b_king = 0ULL;
-    board.b_queens = 0ULL;
-    board.b_rooks = 0ULL;
-    board.b_bishops = 0ULL;
-    board.b_knights = 0ULL;
-    board.b_pawns = 0ULL;
+    for (i = 0; i < 3; i++) {
+        b->all_piece_bb[i] = 0LL;
+    }
 
-    board.side = 0;
-    board.castle_perm = 0;
+    board.side = WHITE;
+    board.castle_perm = EMPTY;
 
-    board.ep_sq = 0;
+    board.ep_sq = EMPTY;
     board.fifty_move_count = 0;
 
     for (i = 0; i < 64; i++) {
-        board.sq[i] = 0;
+        board.sq[i] = EMPTY;
     }
 }
 
@@ -345,12 +328,12 @@ int make_move(S_BOARD *b, int move)
     b->side = 1 - b->side;
 
     if (b->side == BLACK) {
-        if (sq_attacked(*b, b->w_king, BLACK)) {
+        if (sq_attacked(b, b->piece_bb[W_KING], BLACK)) {
             unmake_move(b);
             return 0;
         }
     } else { //WHITE
-        if (sq_attacked(*b, b->b_king, WHITE)) {
+        if (sq_attacked(b, b->piece_bb[B_KING], WHITE)) {
             unmake_move(b);
             return 0;
         }
@@ -451,56 +434,9 @@ static void add_piece(S_BOARD *b, int piece, int sq) {
 //    printf("ADDING: PIECE:%d, SQ:%d\n",piece,sq);
     b->sq[sq] = piece;
     HASH_B(b, pce_key[piece][sq]);
-
-    if (piece == B_PAWN) {
-        b->b_pawns |= (1LL << sq);
-        b->b_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == B_KNIGHT) {
-        b->b_knights |= (1LL << sq);
-        b->b_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == B_BISHOP) {
-        b->b_bishops |= (1LL << sq);
-        b->b_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == B_ROOK) {
-        b->b_rooks |= (1LL << sq);
-        b->b_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == B_QUEEN) {
-        b->b_queens |= (1LL << sq);
-        b->b_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == B_KING) {
-        b->b_king |= (1LL << sq);
-        b->b_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == W_PAWN) {
-        b->w_pawns |= (1LL << sq);
-        b->w_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == W_KNIGHT) {
-        b->w_knights |= (1LL << sq);
-        b->w_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == W_BISHOP) {
-        b->w_bishops |= (1LL << sq);
-        b->w_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == W_ROOK) {
-        b->w_rooks |= (1LL << sq);
-        b->w_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == W_QUEEN) {
-        b->w_queens |= (1LL << sq);
-        b->w_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    } else if (piece == W_KING) {
-        b->w_king |= (1LL << sq);
-        b->w_pieces |= (1LL << sq);
-        b->all_pieces |= (1LL << sq);
-    }
+    b->piece_bb[piece] |= (1LL << sq);
+    b->all_piece_bb[PIECE_COLOR[piece]] |= (1LL << sq);
+    b->all_piece_bb[BOTH] |= (1LL << sq);
 }
 
 static void remove_piece(S_BOARD *b, int piece, int sq) {
@@ -514,55 +450,9 @@ static void remove_piece(S_BOARD *b, int piece, int sq) {
     HASH_B(b, pce_key[piece][sq]);
     //b->hash_key ^= pce_key[piece][sq];
 
-    if (piece == B_PAWN) {
-        b->b_pawns ^= (1LL << sq);
-        b->b_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == B_KNIGHT) {
-        b->b_knights ^= (1LL << sq);
-        b->b_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == B_BISHOP) {
-        b->b_bishops ^= (1LL << sq);
-        b->b_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == B_ROOK) {
-        b->b_rooks ^= (1LL << sq);
-        b->b_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == B_QUEEN) {
-        b->b_queens ^= (1LL << sq);
-        b->b_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == B_KING) {
-        b->b_king ^= (1LL << sq);
-        b->b_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == W_PAWN) {
-        b->w_pawns ^= (1LL << sq);
-        b->w_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == W_KNIGHT) {
-        b->w_knights ^= (1LL << sq);
-        b->w_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == W_BISHOP) {
-        b->w_bishops ^= (1LL << sq);
-        b->w_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == W_ROOK) {
-        b->w_rooks ^= (1LL << sq);
-        b->w_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == W_QUEEN) {
-        b->w_queens ^= (1LL << sq);
-        b->w_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    } else if (piece == W_KING) {
-        b->w_king ^= (1LL << sq);
-        b->w_pieces ^= (1LL << sq);
-        b->all_pieces ^= (1LL << sq);
-    }
+    b->piece_bb[piece] ^= (1LL << sq);
+    b->all_piece_bb[PIECE_COLOR[piece]] ^= (1LL << sq);
+    b->all_piece_bb[BOTH] ^= (1LL << sq);
 }
 
 int make_move_if_exist(S_BOARD *b, int move)
@@ -570,7 +460,7 @@ int make_move_if_exist(S_BOARD *b, int move)
     int i;
     S_MOVELIST l[1];
 
-    generate_all_moves(*b, l);
+    generate_all_moves(b, l);
 
     for (i = 0; i < l->index; i++) {
         if (l->moves[i].move == move && make_move(b, move)) {
@@ -601,115 +491,26 @@ void print_board() {
 
 /* This is a help mehtod only used in debugging */
 int debug_board(S_BOARD *b) {
-    int i;
+    int i, j;
 
     for (i = A1; i <= H8; i++) {
-        if (b->sq[i] == B_PAWN) {
-            assert((1ULL << i) & b->b_pawns);
-            assert((1ULL << i) & b->b_pieces);
-            assert((1ULL << i) & b->all_pieces);
+        if (b->sq[i] == EMPTY) {
+            for (j = 0; j < 13; j++) {
+//                printf("piece=%c, sq:%d, side=%d\n", PIECE_NAME[b->sq[i]], i, PIECE_COLOR[b->sq[i]]);
+                assert(!((1ULL << i) & b->piece_bb[j]));
+            }
         } else {
-            //if(((1ULL << i) & b->b_pawns)) {
-            //    print_board();
-
-            //    print_bitboard((BIT_BOARD *)&b->b_pawns);
-            //}
-            assert(!((1ULL << i) & b->b_pawns));
+            //print_bitboard((BIT_BOARD *) &b->piece_bb[B_PAWN]);
+            assert((1ULL << i) & b->piece_bb[b->sq[i]]);
+            assert((1ULL << i) & b->all_piece_bb[PIECE_COLOR[b->sq[i]]]);
+            assert((1ULL << i) & b->all_piece_bb[BOTH]);
         }
+    }
 
-        if (b->sq[i] == B_ROOK) {
-            assert((1ULL << i) & b->b_rooks);
-            assert((1ULL << i) & b->b_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->b_rooks));
-        }
-
-        if (b->sq[i] == B_KNIGHT) {
-            assert((1ULL << i) & b->b_knights);
-            assert((1ULL << i) & b->b_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->b_knights));
-        }
-
-        if (b->sq[i] == B_BISHOP) {
-            assert((1ULL << i) & b->b_bishops);
-            assert((1ULL << i) & b->b_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->b_bishops));
-        }
-
-        if (b->sq[i] == B_QUEEN) {
-            assert((1ULL << i) & b->b_queens);
-            assert((1ULL << i) & b->b_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->b_queens));
-        }
-
-        if (b->sq[i] == B_KING) {
-            assert((1ULL << i) & b->b_king);
-            assert((1ULL << i) & b->b_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->b_king));
-        }
-
-        if (b->sq[i] == W_PAWN) {
-            assert((1ULL << i) & b->w_pawns);
-            assert((1ULL << i) & b->w_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->w_pawns));
-        }
-
-        if (b->sq[i] == W_ROOK) {
-            assert((1ULL << i) & b->w_rooks);
-            assert((1ULL << i) & b->w_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->w_rooks));
-        }
-
-        if (b->sq[i] == W_KNIGHT) {
-            assert((1ULL << i) & b->w_knights);
-            assert((1ULL << i) & b->w_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->w_knights));
-        }
-
-        if (b->sq[i] == W_BISHOP) {
-            assert((1ULL << i) & b->w_bishops);
-            assert((1ULL << i) & b->w_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->w_bishops));
-        }
-
-        if (b->sq[i] == W_QUEEN) {
-            assert((1ULL << i) & b->w_queens);
-            assert((1ULL << i) & b->w_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->w_queens));
-        }
-
-        if (b->sq[i] == W_KING) {
-            assert((1ULL << i) & b->w_king);
-            assert((1ULL << i) & b->w_pieces);
-            assert((1ULL << i) & b->all_pieces);
-        } else {
-            assert(!((1ULL << i) & b->w_king));
-        }
-
-        if(b->ep_sq != EMPTY) {
-            //printf("ep_sq=%d, rank=%d, side=%d\n", b->ep_sq, ranks[b->ep_sq], b->side);
-            assert((ranks[b->ep_sq] == 6 && b->side == WHITE) ||
-                    (ranks[b->ep_sq] == 3 && b->side == BLACK));
-        }
+    if(b->ep_sq != EMPTY) {
+        //printf("ep_sq=%d, rank=%d, side=%d\n", b->ep_sq, ranks[b->ep_sq], b->side);
+        assert((ranks[b->ep_sq] == 6 && b->side == WHITE) ||
+                (ranks[b->ep_sq] == 3 && b->side == BLACK));
     }
 
     return true;

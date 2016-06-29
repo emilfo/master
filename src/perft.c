@@ -13,7 +13,7 @@ static int perft_divide(S_BOARD *b, int depth);
 void perft_fen(char *FEN, int divide, int depth) {
     int node_cnt = 0;
 
-    parse_fen(FEN);
+    parse_fen(&board, FEN);
 
     printf("Perft from this position:\n");
     print_board();
@@ -43,7 +43,7 @@ void perft_from_file(const char *filename, int divide) {
         FILE *fp_result = fopen("perft-result.txt", "a");
         fprintf(fp_result, "%s", buf);
 
-        parse_fen(buf);
+        parse_fen(&board, buf);
 
         printf("Perft from this position:\n");
         print_board();
@@ -93,7 +93,7 @@ static int perft(S_BOARD *b, int depth) {
     int count = 0;
     int i;
 
-    generate_all_moves(*b, list);
+    generate_all_moves(b, list);
 
     for (i = 0; i < list->index; i++) {
         if(make_move(b, list->moves[i].move)) {
@@ -112,7 +112,7 @@ static int perft_divide(S_BOARD *b, int depth) {
     int div_count = 0;
     int i;
 
-    generate_all_moves(*b, list);
+    generate_all_moves(b, list);
 
     for (i = 0; i < list->index; i++) {
         //if(i==19) {
