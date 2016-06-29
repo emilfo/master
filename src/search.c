@@ -1,6 +1,8 @@
+#include "search.h"
 #include "globals.h"
+#include "eval.h"
 
-int is_repetition(S_BOARD *b) 
+static int is_repetition(S_BOARD *b) 
 {
     int i;
 
@@ -11,5 +13,17 @@ int is_repetition(S_BOARD *b)
     }
 
     return false;
+}
+static void check_search_stop ()
+{
+}
+
+static void prepare_search(S_BOARD *b, S_SEARCH_SETTINGS *ss)
+{
+}
+
+static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int window) //TODO: window?
+{
+    return 0;
 }
 

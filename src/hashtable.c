@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "board.h"
 #include "hashtable.h"
+#include "io.h"
 
 u64 tp_size = (0x1000000 * 2); //2MB size TP_TABLE (TODO: not static)
 
@@ -36,6 +37,7 @@ S_HASHENTRY *hash_get(S_HASHTABLE *tp, u64 key)
 {
     int i = key % tp->size;
 
+    printf("GET entry[%d]\n", i);
     //TODO: lock here?
     if (tp->entries[i].hash_key == key) {
         return &tp->entries[i];
@@ -47,6 +49,8 @@ S_HASHENTRY *hash_get(S_HASHTABLE *tp, u64 key)
 void hash_put(S_HASHTABLE *tp, u64 key, uint32_t move, int16_t eval, int16_t age)
 {
     int i = key % tp->size;
+
+    printf("PUT entry[%d]: %s\n", i, move_str(move));
 
     //TODO: lock here?
     tp->entries[i].hash_key = key;
@@ -68,6 +72,7 @@ int hash_get_pv_line(S_HASHTABLE *tp, S_BOARD *b, int *moves, int depth)
         } else {
             break;
         }
+        move = hash_get(tp, b->hash_key);
     }
 
     while(j++ < i) {

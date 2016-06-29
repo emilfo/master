@@ -1,6 +1,8 @@
 #ifndef IO_H
 #define IO_H
 
+#include "movegen.h"
+
 const static char PIECE_PRINT[13] = { '\0',
     '\0', 'N', 'B', 'R', 'Q', 'K',
     '\0', 'N', 'B', 'R', 'Q', 'K'

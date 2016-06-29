@@ -63,15 +63,11 @@ int main() {
         } else {
             move = str_move(input, &board);
             if(move) {
-                make_move(&board, move); 
                 hash_put(&tp_table, board.hash_key, move, 0, 0);
+                make_move(&board, move); 
             } else {
                 printf("move not valid\n");
             }
-        }
-
-        if (is_repetition(&board)) {
-            printf("IS REPETITION\n");
         }
     }
     

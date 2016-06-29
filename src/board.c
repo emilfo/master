@@ -434,7 +434,7 @@ void unmake_move(S_BOARD *b)
     b->castle_perm = b->prev[b->ply].castle_perm;
     b->ep_sq = b->prev[b->ply].ep_sq;
     b->fifty_move_count = b->prev[b->ply].fifty_move_count;
-    b->prev[b->ply].hash_key = b->hash_key;
+    b->hash_key = b->prev[b->ply].hash_key;
     b->side = 1 - b->side;
 
 
