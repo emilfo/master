@@ -85,7 +85,7 @@ void init() {
     init_data();
     init_hash();
     init_hashtable(&tp_table, tp_size);
-    //parse_fen(&board, START_FEN);
+    parse_fen(&global_board, START_FEN);
 }
 
 int parse_fen(S_BOARD *b, char *fen) {
@@ -457,6 +457,7 @@ static void remove_piece(S_BOARD *b, int piece, int sq) {
 
 int make_move_if_exist(S_BOARD *b, int move)
 {
+    printf("Testing if exist: %s\n", move_str(move));
     int i;
     S_MOVELIST l[1];
 
@@ -467,6 +468,7 @@ int make_move_if_exist(S_BOARD *b, int move)
             return true;
         }
     }
+    printf("RETURNING FALSE\n");
     return false;
 }
 

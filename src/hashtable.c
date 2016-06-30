@@ -37,7 +37,7 @@ S_HASHENTRY *hash_get(const S_HASHTABLE *tp, u64 key)
 {
     int i = key % tp->size;
 
-    printf("GET entry[%d]\n", i);
+    //printf("GET entry[%d]\n", i);
     //TODO: lock here?
     if (tp->entries[i].hash_key == key) {
         return &tp->entries[i];
@@ -50,7 +50,7 @@ void hash_put(S_HASHTABLE *tp, u64 key, uint32_t move, int16_t eval, int16_t age
 {
     int i = key % tp->size;
 
-    printf("PUT entry[%d]: %s\n", i, move_str(move));
+    //printf("PUT entry[%d]: %s\n", i, move_str(move));
 
     //TODO: lock here?
     tp->entries[i].hash_key = key;

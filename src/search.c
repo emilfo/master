@@ -19,9 +19,9 @@ static int is_repetition(S_BOARD *b)
     return false;
 }
 
-static void check_search_stop ()
-{
-}
+//static void check_search_stop ()
+//{
+//}
 
 static void prepare_search(S_BOARD *b, S_SEARCH_SETTINGS *ss)
 {
@@ -49,7 +49,65 @@ static void prepare_search(S_BOARD *b, S_SEARCH_SETTINGS *ss)
 
 static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth) //, int window) //TODO: window?
 {
-    return 0;
+    int i;
+    int legal = 0;
+    int old_alpha = alpha;
+    int best_move = EMPTY;
+    int score = -INFINITE;
+
+    assert(debug_board(b));
+
+    ss->nodes++;
+
+    if (depth == 0) {
+        return eval_posistion(b);
+    }
+
+    if (b->search_ply && (is_repetition(b) || b->fifty_move_count >= 100)) {
+        return 0;
+    }
+
+    if (b->search_ply >= MAX_PLY) {
+        return eval_posistion(b);
+    }
+
+    S_MOVELIST l[1];
+    generate_all_moves(b, l);
+
+    for (i = 0; i < l->index; i++) {
+        if (make_move(b, l->moves[i].move)) {
+            legal++;
+            b->search_ply++;
+
+            score = -alpha_beta(b, ss, -beta, -alpha, depth-1);
+            unmake_move(b);
+            b->search_ply--;
+
+            if (score > alpha) {
+                if (score >= beta) {
+                    return beta;
+                }
+                alpha = score;
+                best_move = l->moves[i].move;
+            }
+        }
+    }
+
+    if (legal == 0) {
+        //printf("legal=0, k-index:%d\n", KING_INDEX[b->side]);
+        if (sq_attacked(b, lsb1_index(b->piece_bb[KING_INDEX[b->side]]), 1-b->side)) {
+            return -MATE + b->search_ply;
+        } else {
+          return 0;
+        }
+    }
+
+    if (alpha != old_alpha) {
+        hash_put(&tp_table, b->hash_key, best_move, score, b->ply);
+    }
+
+
+    return score;
 }
 
 void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
@@ -64,12 +122,14 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
 
     for (cur_depth = 1; cur_depth <= ss->depth; cur_depth++) {
         best_score = alpha_beta(b, ss, -INFINITE, INFINITE, cur_depth);
+
         pv_moves = hash_get_pv_line(&tp_table, b, best_moves, cur_depth);
         printf("depth:%d, move:%s, score:%d, nodes:%ld\n", cur_depth, move_str(best_moves[0]), best_score, ss->nodes);
 
         printf("pv: ");
-        for(i=0; i < 4; i++) {
+        for(i=0; i < pv_moves; i++) {
             printf("%s ", move_str(best_moves[i]));
         }
+        printf("\n");
     }
 }

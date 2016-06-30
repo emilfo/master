@@ -16,6 +16,7 @@
 #define BOTH  2
 
 #define INFINITE 32767
+#define MATE 30000
 
 S_BOARD global_board;
 S_HASHTABLE tp_table;
@@ -58,6 +59,10 @@ const static char PIECE_NAME[13] = { ' ',
 const static int PIECE_VAL[13] = { 0,
     100, 325, 325, 550, 1000, 20000,
     100, 325, 325, 550, 1000, 20000,
+};
+
+const static int KING_INDEX[2] = {
+    6, 12
 };
 
 //const enum { WHITE, BLACK } SIDE;
