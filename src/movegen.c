@@ -546,7 +546,7 @@ static void add_move(S_MOVELIST *list, int from, int to, int piece, int capture,
     assert(valid_bool(castling));
 
     list->moves[list->index].move = gen_move(from, to, piece, capture, promoted, ep, castling);
-    list->moves[list->index].score = 0;
+    list->moves[list->index].score = CAP_VAL[capture] + ATT_VAL[piece];
     list->index++;
     //printf("%d\n", list->index);
 }

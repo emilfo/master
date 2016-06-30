@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 #include "globals.h"
 #include "movegen.h"
@@ -10,6 +11,7 @@
 #define BUG_FEN2 "n1Q5/P1Pk4/8/8/8/8/4Kppp/5N1N b  - 0 1"
 #define BUG_FEN3 "nBn5/P1Pk4/8/8/8/8/4Kppp/5N1N b  - 0 1"
 #define WAC1 "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - -"
+#define WAC2 "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0" 
 
 int main() {
     printf("init data\n");
@@ -19,7 +21,7 @@ int main() {
     S_SEARCH_SETTINGS ss[1];
 
 
-    parse_fen(&global_board, WAC1);
+    parse_fen(&global_board, WAC2);
     
     char input[7];
     int move;
@@ -33,11 +35,12 @@ int main() {
         if (input[0] == 'u') {
             unmake_move(&global_board);
         } else if (input[0] == 's') {
-            ss->depth = 4;
+            ss->depth = 5;
             search_position(&global_board, ss);
         } else if (input[0] == 'f') {
             perft_from_file("perftsuite.epd", false);
         } else if (input[0] == 'q') {
+            free(tp_table.entries);
             break;
         } else if (input[0] == 'p') {
             print_board(&global_board);

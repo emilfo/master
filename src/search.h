@@ -16,6 +16,9 @@ typedef struct {
     int infinite;
 
     long nodes;
+
+    float fail_high;
+    float first_fail_high;
 } S_SEARCH_SETTINGS;
 
 void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss);

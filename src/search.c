@@ -30,6 +30,8 @@ static void prepare_search(S_BOARD *b, S_SEARCH_SETTINGS *ss)
     ss->starttime = cur_time_millis();
     ss->stop = 0;
     ss->nodes = 0;
+    ss->fail_high = 0;
+    ss->first_fail_high = 0;
 
     for (i = 0; i < 13; i++) {
         for (j = 0; j < 64; j++) {
@@ -45,6 +47,23 @@ static void prepare_search(S_BOARD *b, S_SEARCH_SETTINGS *ss)
 
     b->search_ply = 0;
     
+}
+
+static void set_best_move_next(int start_index, S_MOVELIST *l)
+{
+    int i;
+    int best_index = start_index;
+    int best_score = 0;
+
+    for (i = start_index; i < l->index; i++) {
+        if (l->moves[i].score > best_score) {
+            best_score = l->moves[i].score;
+            best_index = i;
+        }
+    }
+    S_MOVE swp = l->moves[start_index];
+    l->moves[start_index] = l->moves[best_index];
+    l->moves[best_index] = swp;
 }
 
 static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth) //, int window) //TODO: window?
@@ -75,8 +94,12 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     generate_all_moves(b, l);
 
     for (i = 0; i < l->index; i++) {
+
+        set_best_move_next(i, l);
+        //if(depth == 5) {
+        //    printf("testing move %s\n", move_str(l->moves[i].move));
+        //}
         if (make_move(b, l->moves[i].move)) {
-            legal++;
             b->search_ply++;
 
             score = -alpha_beta(b, ss, -beta, -alpha, depth-1);
@@ -85,11 +108,18 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
 
             if (score > alpha) {
                 if (score >= beta) {
+                    ss->fail_high++;
+                    if (legal == 0) {
+                        ss->first_fail_high++;
+                    }
                     return beta;
                 }
+
                 alpha = score;
                 best_move = l->moves[i].move;
             }
+
+            legal++;
         }
     }
 
@@ -131,5 +161,6 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
             printf("%s ", move_str(best_moves[i]));
         }
         printf("\n");
+        printf("Ordering: %.1f/%.1f = %.3f\n",ss->first_fail_high,ss->fail_high, ss->first_fail_high/ss->fail_high);
     }
 }
