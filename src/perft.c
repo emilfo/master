@@ -6,6 +6,7 @@
 #include "perft.h"
 #include "movegen.h"
 #include "io.h"
+#include "utils.h"
 
 static int perft(S_BOARD *b, int depth);
 static int perft_divide(S_BOARD *b, int depth);
@@ -39,6 +40,7 @@ void perft_from_file(const char *filename, int divide) {
     //int node_count[6];
 
     
+    long starttime = cur_time_millis();
     while (fgets(buf, 1024, fp) != NULL) {
         FILE *fp_result = fopen("perft-result.txt", "a");
         fprintf(fp_result, "%s", buf);
@@ -79,8 +81,10 @@ void perft_from_file(const char *filename, int divide) {
             }
             i++;
         }
-        fprintf(fp_result, "\n\n");
+        long totaltime = cur_time_millis() - starttime;
+        fprintf(fp_result, "\nTOTAL TIME USED: %ld\n\n", totaltime);
         fclose(fp_result);
+
     }
 }
 

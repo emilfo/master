@@ -240,7 +240,7 @@ int make_move(S_BOARD *b, int move)
     //printf("MAKEMOVE TOP move: %s, %d\n", move_str(move), move);
     //if(move == 31345) {
     //    print_board();
-    //    print_bitboard((BIT_BOARD *) &b->b_pawns);
+    //    print_bitboard((BIT_BOARD *) &b->piece_bb[B_PAWN]);
     //}
 
     assert(debug_board(b));
@@ -341,7 +341,7 @@ int make_move(S_BOARD *b, int move)
 
     //if(move == 31345) {
     //    print_board();
-    //    print_bitboard((BIT_BOARD *) &b->b_pawns);
+    //    print_bitboard((BIT_BOARD *) &b->piece_bb[B_PAWN];
     //}
     //printf("MAKEMOVE BOT move: %s, %d\n", move_str(move), move);
     assert(debug_board(b));
@@ -364,9 +364,9 @@ void unmake_move(S_BOARD *b)
 
     //if(move == 30833) {
     //    printf("from:%d, to:%d, piece:%c\n", from, to, PIECE_NAME[piece]);
-    //    print_bitboard((BIT_BOARD *) &b->b_pawns);
+    //    print_bitboard((BIT_BOARD *) &b->piece_bb[B_PAWN]);
     //    printf("iwhite\n");
-    //    print_bitboard((BIT_BOARD *) &b->w_pawns);
+    //    print_bitboard((BIT_BOARD *) &b->piece_bb[W_PAWN]);
     //}
 
     //printf("UNMAKEMOVE TOP move: %s, %d\n", move_str(move), move);

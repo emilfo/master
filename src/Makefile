@@ -1,5 +1,5 @@
 CC = gcc
-#CFLAGS=-DNDEBUG
+#CFLAGS=-DNDEBUG -O3
 CFLAGS =-Wall -g3 -DDEBUG
 LDFLAGS = -lm
 

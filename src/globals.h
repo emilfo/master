@@ -15,6 +15,8 @@
 #define BLACK 1
 #define BOTH  2
 
+#define INFINITE 32767
+
 S_BOARD global_board;
 S_HASHTABLE tp_table;
 
@@ -51,6 +53,11 @@ const static int PIECE_COLOR[13] = { -1,
 const static char PIECE_NAME[13] = { ' ',
     'P', 'N', 'B', 'R', 'Q', 'K',
     'p', 'n', 'b', 'r', 'q', 'k'
+};
+
+const static int PIECE_VAL[13] = { 0,
+    100, 325, 325, 550, 1000, 20000,
+    100, 325, 325, 550, 1000, 20000,
 };
 
 //const enum { WHITE, BLACK } SIDE;

@@ -1,6 +1,8 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
+#include "board.h"
+
 typedef struct {
     int quit;
     int stop;
@@ -16,6 +18,6 @@ typedef struct {
     long nodes;
 } S_SEARCH_SETTINGS;
 
-//int is_repetition(S_BOARD *b);
+void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss);
 
 #endif /* SEARCH_H */
