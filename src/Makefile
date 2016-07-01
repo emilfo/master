@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS=-DNDEBUG -O3
-#CFLAGS =-Wall -g3 -DDEBUG
+#CFLAGS=-DNDEBUG -O3
+CFLAGS =-Wall -g3 -DDEBUG
 LDFLAGS = -lm
 
 SOURCES = main.c board.c data.c bitops.c movegen.c hash.c debug.c io.c perft.c search.c utils.c hashtable.c eval.c

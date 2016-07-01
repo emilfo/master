@@ -49,7 +49,7 @@ static void prepare_search(S_BOARD *b, S_SEARCH_SETTINGS *ss)
     
 }
 
-static void set_best_move_next(int start_index, S_MOVELIST *l)
+void set_best_move_next(int start_index, S_MOVELIST *l)
 {
     int i;
     int best_index = start_index;
@@ -66,7 +66,7 @@ static void set_best_move_next(int start_index, S_MOVELIST *l)
     l->moves[best_index] = swp;
 }
 
-static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth) //, int window) //TODO: window?
+static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int debug) //, int window) //TODO: window?
 {
     int i;
     int legal = 0;
@@ -96,13 +96,11 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     for (i = 0; i < l->index; i++) {
 
         set_best_move_next(i, l);
-        //if(depth == 5) {
-        //    printf("testing move %s\n", move_str(l->moves[i].move));
-        //}
         if (make_move(b, l->moves[i].move)) {
             b->search_ply++;
 
-            score = -alpha_beta(b, ss, -beta, -alpha, depth-1);
+            score = -alpha_beta(b, ss, -beta, -alpha, depth-1, debug);
+
             unmake_move(b);
             b->search_ply--;
 
@@ -124,7 +122,6 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     }
 
     if (legal == 0) {
-        //printf("legal=0, k-index:%d\n", KING_INDEX[b->side]);
         if (sq_attacked(b, lsb1_index(b->piece_bb[KING_INDEX[b->side]]), 1-b->side)) {
             return -MATE + b->search_ply;
         } else {
@@ -137,7 +134,7 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     }
 
 
-    return score;
+    return alpha;
 }
 
 void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
@@ -150,8 +147,8 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
 
     prepare_search(b, ss);
 
-    for (cur_depth = 1; cur_depth <= ss->depth; cur_depth++) {
-        best_score = alpha_beta(b, ss, -INFINITE, INFINITE, cur_depth);
+    for (cur_depth = 5; cur_depth <= ss->depth; cur_depth++) {
+        best_score = alpha_beta(b, ss, -INFINITE, INFINITE, cur_depth, false);
 
         pv_moves = hash_get_pv_line(&tp_table, b, best_moves, cur_depth);
         printf("depth:%d, move:%s, score:%d, nodes:%ld\n", cur_depth, move_str(best_moves[0]), best_score, ss->nodes);

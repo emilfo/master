@@ -2,6 +2,7 @@
 #define SEARCH_H
 
 #include "board.h"
+#include "movegen.h"
 
 typedef struct {
     int quit;
@@ -22,5 +23,6 @@ typedef struct {
 } S_SEARCH_SETTINGS;
 
 void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss);
+void set_best_move_next(int start_index, S_MOVELIST *l);
 
 #endif /* SEARCH_H */
