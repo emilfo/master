@@ -454,6 +454,53 @@ int make_move_if_exist(S_BOARD *b, int move)
     return false;
 }
 
+void flip_board(S_BOARD *b)
+{
+    int i;
+    u64 swp_bb;
+
+    //Flipping piece bitboards
+    for (i = 1; i < 7; i++) {
+        swp_bb = flipVertical(b->piece_bb[i]);
+        b->piece_bb[i] = flipVertical(b->piece_bb[i+6]);
+        b->piece_bb[i+6] = swp_bb;
+    }
+    //Flipping white and black bitboards
+    swp_bb = flipVertical(b->all_piece_bb[WHITE]);
+    b->all_piece_bb[WHITE] = flipVertical(b->all_piece_bb[BLACK]);
+    b->all_piece_bb[BLACK] = swp_bb;
+
+    //Flipping all pieces board
+    b->all_piece_bb[BOTH] = flipVertical(b->all_piece_bb[BOTH]);
+
+    //Flipping side to move
+    b->side = 1 - b->side;
+
+    //castleperm
+    uint8_t new_castle_perm = 0;
+    if (b->castle_perm & BKCA) new_castle_perm |= WKCA;
+    if (b->castle_perm & BQCA) new_castle_perm |= WQCA;
+    if (b->castle_perm & WKCA) new_castle_perm |= BKCA;
+    if (b->castle_perm & WQCA) new_castle_perm |= BQCA;
+    b->castle_perm = new_castle_perm;
+
+    //en passant square
+    if (b->ep_sq) b->ep_sq = mirror[b->ep_sq];
+
+    //the piece-board
+    uint8_t new_sq[64];
+    for (i = 0; i < 64; i++) {
+        new_sq[i] = b->sq[mirror[i]];
+    }
+    for (i = 0; i < 64; i++) {
+        b->sq[i] = new_sq[i];
+    }
+
+    b->hash_key = generate_hash(b);
+
+    debug_board(b);
+}
+
 void print_board(const S_BOARD *b) {
     int file, rank;
 

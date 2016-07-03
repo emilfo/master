@@ -218,7 +218,10 @@ void test()
     int i;
     for (i = 0; i < 64; i++) {
         printf("\n%d:\n", i);
-        print_bitboard((BIT_BOARD *) &ISOLATED_PAWN_MASK[i]);
+        print_bitboard((BIT_BOARD *) &BLACK_PASSED_MASK[i]);
+        printf("\n\n");
+        u64 flip = flipVertical(BLACK_PASSED_MASK[i]);
+        print_bitboard((BIT_BOARD *) &flip);
         printf("\n\n");
     }
 }
