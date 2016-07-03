@@ -3,13 +3,19 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 #include "board.h"
 #include "hashtable.h"
 #include "bitops.h"
 #include "debug.h"
+#include "threads.h"
+#include "search.h"
 
-#define PROG_VERSION "Chess 0.1, by Emil F Ostensen"
+#define NAME "Kholin Chess Engine"
+#define AUTHOR "Emil F Ostensen"
+#define QUOTE "\n\"Well, you've shown me something today . . . You've shown me that I'm still a threat. \n\t- Dalinar Kholin\n"
+
 #define FRtoSQ(file, rank) ((8*(rank-1)) + (file-1))
 #define WHITE 0
 #define BLACK 1
@@ -19,7 +25,14 @@
 #define MATE 30000
 
 S_BOARD global_board;
-S_HASHTABLE tp_table;
+S_HASHTABLE global_tp_table;
+S_THREADS global_thread_table;
+S_SEARCH_SETTINGS global_search_settings;
+
+pthread_mutex_t go_mutex;
+pthread_cond_t go_cv;
+int go_search;
+int debug_print;
 
 /* uint32_t move
  * 0000 0000 0000 0000 0000 0011 1111 -> From, 0x3F

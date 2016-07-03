@@ -1,12 +1,12 @@
 CC = gcc
 #CFLAGS=-DNDEBUG -O3
 CFLAGS =-Wall -g3 -DDEBUG
-LDFLAGS = -lm
+LDFLAGS = -lm -lpthread
 
-SOURCES = main.c board.c data.c bitops.c movegen.c hash.c debug.c io.c perft.c search.c utils.c hashtable.c eval.c
-DEPS = globals.h board.h data.h bitops.h movegen.h hash.h debug.h io.h perft.h search.h	utils.h hashtable.h eval.h
+SOURCES = main.c board.c data.c bitops.c movegen.c hash.c debug.c io.c perft.c search.c utils.c hashtable.c eval.c uci.c threads.c
+DEPS = globals.h board.h data.h bitops.h movegen.h hash.h debug.h io.h perft.h search.h	utils.h hashtable.h eval.h uci.h threads.h
 OBJECTS = $(SOURCES:.c=.o)
-EXECUTABLE = chess
+EXECUTABLE = KholinCE
 
 all: $(SOURCES) $(EXECUTABLE)
 

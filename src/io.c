@@ -14,12 +14,13 @@ char *sq_str(const int sq) {
 
 char *move_str(const uint32_t move) {
     static char str[7];
+    int prom = mv_prom(move);
 
-    //sprintf(str, "%c", PIECE_PRINT[mv_piece(move)]); //Piece (if not pawn)
     sprintf(str, "%s", sq_str(mv_from(move))); //fromsq
-    //sprintf(&str[strlen(str)], "%c", CAP_PRINT[mv_cap(move)]); //x if a capture
     sprintf(&str[strlen(str)], "%s", sq_str(mv_to(move))); //tosq
-    sprintf(&str[strlen(str)], "%c", PIECE_PRINT[mv_prom(move)]); //promoted (if any)
+    if (prom) {
+        sprintf(&str[strlen(str)], "%c", PIECE_PRINT[mv_prom(move)]); //promoted (if any)
+    }
 
     return str;
 }
@@ -34,26 +35,28 @@ int str_sq(const char *sq) {
 int str_move(const char *sq, S_BOARD *b) {
     int from = str_sq(sq);
     int to = str_sq(sq+2);
-    int prom;
+    int prom = EMPTY;
     int i;
     int move;
 
-    switch (sq[4]) {
-        case 'N':
-            prom = (b->side)? B_KNIGHT : W_KNIGHT;
-            break;
-        case 'B':
-            prom = (b->side)? B_BISHOP : W_BISHOP;
-            break;
-        case 'R':
-            prom = (b->side)? B_ROOK : W_ROOK;
-            break;
-        case 'Q':
-            prom = (b->side)? B_QUEEN : W_QUEEN;
-            break;
-        default:
-            prom = EMPTY;
-            break;
+    if (strlen(sq) > 4) {
+        switch (sq[4]) {
+            case 'n':
+                prom = (b->side)? B_KNIGHT : W_KNIGHT;
+                break;
+            case 'b':
+                prom = (b->side)? B_BISHOP : W_BISHOP;
+                break;
+            case 'r':
+                prom = (b->side)? B_ROOK : W_ROOK;
+                break;
+            case 'q':
+                prom = (b->side)? B_QUEEN : W_QUEEN;
+                break;
+            default:
+                prom = EMPTY;
+                break;
+        }
     }
 
     assert(valid_sq(from));

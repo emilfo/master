@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "board.h"
 #include "globals.h"
+#include "eval.h"
 
 const int mirror[64] = {
     56  ,   57  ,   58  ,   59  ,   60  ,   61  ,   62  ,   63  ,
@@ -209,5 +210,15 @@ int eval_posistion(const S_BOARD *b)
         return -score;
     } else { //WHITE
         return score;
+    }
+}
+
+void test() 
+{
+    int i;
+    for (i = 0; i < 64; i++) {
+        printf("\n%d:\n", i);
+        print_bitboard((BIT_BOARD *) &ISOLATED_PAWN_MASK[i]);
+        printf("\n\n");
     }
 }

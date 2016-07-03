@@ -4,7 +4,7 @@
 #include "hashtable.h"
 #include "io.h"
 
-u64 tp_size = (0x1000000 * 2); //2MB size TP_TABLE (TODO: not static)
+u64 tp_size = (0x1000000 * 16); //16MB size TP_TABLE (TODO: not static)
 
 
 static void clear_hashtable(S_HASHTABLE *tp) 
@@ -23,21 +23,26 @@ void init_hashtable(S_HASHTABLE *tp, u64 size)
 {
     tp->size = size / sizeof(S_HASHENTRY);
 
-    if (tp->entries != NULL) {
-        free(tp->entries);
-    }
+    destroy_hashtable(tp);
+
     tp->entries = (S_HASHENTRY *) malloc(tp->size * sizeof(S_HASHENTRY));
 
     clear_hashtable(tp);
-    
+
     printf("init hashtable with %d entries\n", tp->size);
+}
+
+void destroy_hashtable(S_HASHTABLE *tp)
+{
+    if (tp->entries != NULL) {
+        free(tp->entries);
+    }
 }
 
 S_HASHENTRY *hash_get(const S_HASHTABLE *tp, u64 key)
 {
     int i = key % tp->size;
 
-    //printf("GET entry[%d]\n", i);
     //TODO: lock here?
     if (tp->entries[i].hash_key == key) {
         return &tp->entries[i];
@@ -50,9 +55,7 @@ void hash_put(S_HASHTABLE *tp, u64 key, uint32_t move, int16_t eval, int16_t age
 {
     int i = key % tp->size;
 
-    //printf("PUT entry[%d]: %s\n", i, move_str(move));
-
-    //TODO: lock here?
+    //TODO: lock here? no - implement lockless checksum
     tp->entries[i].hash_key = key;
     tp->entries[i].move = move;
     tp->entries[i].eval = eval;

@@ -4,8 +4,8 @@
 #include "movegen.h"
 
 const static char PIECE_PRINT[13] = { '\0',
-    '\0', 'N', 'B', 'R', 'Q', 'K',
-    '\0', 'N', 'B', 'R', 'Q', 'K'
+    '\0', 'n', 'b', 'r', 'q', 'k',
+    '\0', 'n', 'b', 'r', 'q', 'k'
 };
 
 const static char CAP_PRINT[13] = { '\0',

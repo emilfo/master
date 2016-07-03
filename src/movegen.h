@@ -1,7 +1,7 @@
 #ifndef MOVEGEN_H
 #define MOVEGEN_H
 
-#include "globals.h"
+#include "board.h"
 
 #define MAX_MOVES 256
 #define MAX_DEPTH 1024
@@ -30,5 +30,6 @@ const static int ATT_VAL[13] = { 0,
 int sq_attacked(const S_BOARD *b, u64 target_bb, int from_side); 
 
 void generate_all_moves(const S_BOARD *b, S_MOVELIST *list); 
+void generate_all_captures(const S_BOARD *b, S_MOVELIST *list);
 
 #endif /* MOVEGEN_H */

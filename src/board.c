@@ -6,6 +6,7 @@
 #include "hashtable.h"
 #include "movegen.h"
 #include "io.h"
+#include "eval.h"
 
 #define HASH_B(b, val) (b->hash_key ^= val)
 
@@ -81,16 +82,13 @@ const uint8_t castle_update[64] = {
 static void add_piece(S_BOARD *b, int piece, int sq);
 static void remove_piece(S_BOARD *b, int piece, int sq);
 
-void init() {
-    init_data();
-    init_hash();
-    init_hashtable(&tp_table, tp_size);
-    parse_fen(&global_board, START_FEN);
+void init_board(S_BOARD *b) {
+    parse_fen(b, START_FEN);
 }
 
 int parse_fen(S_BOARD *b, char *fen) {
     int file, rank, piece;
-    reset_board(b);
+    soft_reset_board(b);
 
     rank = 8;
     file = 1;
@@ -199,7 +197,8 @@ int parse_fen(S_BOARD *b, char *fen) {
     return 0;
 }
 
-void reset_board(S_BOARD *b) {
+void soft_reset_board(S_BOARD *b) 
+{
     int i;
 
     for (i = 0; i < 13; i++) {
@@ -216,8 +215,29 @@ void reset_board(S_BOARD *b) {
     b->ep_sq = EMPTY;
     b->fifty_move_count = 0;
 
+    b->ply = 0;
+    b->search_ply = 0;
+
     for (i = 0; i < 64; i++) {
         b->sq[i] = EMPTY;
+    }
+}
+
+void hard_reset_board(S_BOARD *b) 
+{
+    int i, j;
+    soft_reset_board(b);
+
+    for (i = 0; i < 13; i++) {
+        for (j = 0; j < 64; j++) {
+            b->search_history[i][j] = 0;
+        }
+    }
+
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < MAX_PLY; j++) {
+            b->search_history[i][j] = 0;
+        }
     }
 }
 
@@ -228,20 +248,12 @@ int make_move(S_BOARD *b, int move)
     int piece = mv_piece(move);
     int cap = mv_cap(move);
     int prom = mv_prom(move);
-    //int ep = mv_ep(move);
-    //int castle = mv_castle(move);
 
     assert(valid_sq(to));
     assert(valid_sq(from));
     assert(valid_piece(piece));
     assert(valid_piece_or_empty(cap));
     assert(valid_piece_or_empty(prom));
-
-    //printf("MAKEMOVE TOP move: %s, %d\n", move_str(move), move);
-    //if(move == 31345) {
-    //    print_board();
-    //    print_bitboard((BIT_BOARD *) &b->piece_bb[B_PAWN]);
-    //}
 
     assert(debug_board(b));
 
@@ -280,7 +292,6 @@ int make_move(S_BOARD *b, int move)
         }
     }
 
-
     if (mv_castle(move)) {
         if (b->side) { //BLACK
             if(to == C8) {
@@ -300,21 +311,16 @@ int make_move(S_BOARD *b, int move)
             }
         }
 
-    } 
-
-    else if (mv_ep(move)) {
+    } else if (mv_ep(move)) {
         if (b->side) { //BLACK
             remove_piece(b, W_PAWN, to + 8);
         } else { //WHITE
             remove_piece(b, B_PAWN, to - 8);
         }
-    }
-
-    else if (cap) { 
+    } else if (cap) { 
         b->fifty_move_count = 0;
         remove_piece(b, cap, to); 
     }
-
 
     //doing the actual move
     remove_piece(b, piece, from);
@@ -339,14 +345,9 @@ int make_move(S_BOARD *b, int move)
         }
     }
 
-    //if(move == 31345) {
-    //    print_board();
-    //    print_bitboard((BIT_BOARD *) &b->piece_bb[B_PAWN];
-    //}
-    //printf("MAKEMOVE BOT move: %s, %d\n", move_str(move), move);
     assert(debug_board(b));
 
-    return (1);
+    return 1;
 }
 
 void unmake_move(S_BOARD *b)
@@ -359,17 +360,7 @@ void unmake_move(S_BOARD *b)
     int piece = mv_piece(move);
     int cap = mv_cap(move);
     int prom = mv_prom(move);
-    //int ep = mv_ep(move);
-    //int castle = mv_castle(move);
 
-    //if(move == 30833) {
-    //    printf("from:%d, to:%d, piece:%c\n", from, to, PIECE_NAME[piece]);
-    //    print_bitboard((BIT_BOARD *) &b->piece_bb[B_PAWN]);
-    //    printf("iwhite\n");
-    //    print_bitboard((BIT_BOARD *) &b->piece_bb[W_PAWN]);
-    //}
-
-    //printf("UNMAKEMOVE TOP move: %s, %d\n", move_str(move), move);
     assert(debug_board(b));
 
     if (prom) { 
@@ -420,9 +411,6 @@ void unmake_move(S_BOARD *b)
     b->hash_key = b->prev[b->ply].hash_key;
     b->side = 1 - b->side;
 
-
-    //printf("move: %s, %d\n", move_str(b->prev[b->ply].move), b->prev[b->ply].move);
-    //printf("UNMAKEMOVE BOT move: %s, %d\n", move_str(move), move);
     assert(debug_board(b));
 }
 
@@ -431,7 +419,6 @@ static void add_piece(S_BOARD *b, int piece, int sq) {
     assert(valid_piece(piece));
     assert(b->sq[sq] == EMPTY);
 
-//    printf("ADDING: PIECE:%d, SQ:%d\n",piece,sq);
     b->sq[sq] = piece;
     HASH_B(b, pce_key[piece][sq]);
     b->piece_bb[piece] |= (1LL << sq);
@@ -440,15 +427,12 @@ static void add_piece(S_BOARD *b, int piece, int sq) {
 }
 
 static void remove_piece(S_BOARD *b, int piece, int sq) {
-    //printf("REMOVING PIECE:%d, SQ:%d\n",piece,sq);
     assert(valid_sq(sq));
     assert(valid_piece(piece));
-    //printf("piece: %c\n",PIECE_NAME[b->sq[sq]]);
     assert(b->sq[sq] == piece);
 
     b->sq[sq] = EMPTY;
     HASH_B(b, pce_key[piece][sq]);
-    //b->hash_key ^= pce_key[piece][sq];
 
     b->piece_bb[piece] ^= (1LL << sq);
     b->all_piece_bb[PIECE_COLOR[piece]] ^= (1LL << sq);
@@ -496,11 +480,9 @@ int debug_board(S_BOARD *b) {
     for (i = A1; i <= H8; i++) {
         if (b->sq[i] == EMPTY) {
             for (j = 0; j < 13; j++) {
-//                printf("piece=%c, sq:%d, side=%d\n", PIECE_NAME[b->sq[i]], i, PIECE_COLOR[b->sq[i]]);
                 assert(!((1ULL << i) & b->piece_bb[j]));
             }
         } else {
-            //print_bitboard((BIT_BOARD *) &b->piece_bb[B_PAWN]);
             assert((1ULL << i) & b->piece_bb[b->sq[i]]);
             assert((1ULL << i) & b->all_piece_bb[PIECE_COLOR[b->sq[i]]]);
             assert((1ULL << i) & b->all_piece_bb[BOTH]);
@@ -508,7 +490,6 @@ int debug_board(S_BOARD *b) {
     }
 
     if(b->ep_sq != EMPTY) {
-        //printf("ep_sq=%d, rank=%d, side=%d\n", b->ep_sq, ranks[b->ep_sq], b->side);
         assert((ranks[b->ep_sq] == 6 && b->side == WHITE) ||
                 (ranks[b->ep_sq] == 3 && b->side == BLACK));
     }

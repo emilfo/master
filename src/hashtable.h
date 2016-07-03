@@ -16,6 +16,7 @@ typedef struct {
 } S_HASHTABLE;
 
 void init_hashtable(S_HASHTABLE *tp, u64 size);
+void destroy_hashtable(S_HASHTABLE *tp);
 S_HASHENTRY *hash_get(const S_HASHTABLE *tp, u64 key);
 void hash_put(S_HASHTABLE *tp, u64 key, uint32_t move, int16_t eval, int16_t age);
 int hash_get_pv_line(const S_HASHTABLE *tp, S_BOARD *b, int *moves, int depth);

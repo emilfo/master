@@ -1,24 +1,19 @@
 #include <stdio.h>
+
+#include "globals.h"
 #include "bitops.h"
 #include "data.h"
+#include "eval.h"
 #include "board.h"
 
 #define B_INDEX(file, rank) ((rank-1)*8 + (file-1))
 #define MIN(a, b) ((a < b)? a : b)
 
-int valid_file_rank(int file, int rank);
-
-void init_data() 
-{
-    printf("ms1table\n");
-    init_ms1btable();
-    printf("mask\n");
-    init_bitboard_mask();
-    printf("attack bitmaps\n");
-    init_attack_bitmaps();
+static int valid_file_rank(int file, int rank) {
+    return ((file >= 1) && (file <= 8) && (rank >=1) && (rank <= 8));
 }
 
-void init_ms1btable() {
+static void init_ms1btable() {
     int i;
     for (i = 0; i < 256; i++) {
         MS1BTABLE[i] = (
@@ -32,7 +27,7 @@ void init_ms1btable() {
     }
 }
 
-void init_bitboard_mask() {
+static void init_bitboard_mask() {
     int sq, rank, file, diaga1h8, diaga8h1;
 
     printf("reset masks and magics\n");
@@ -60,13 +55,6 @@ void init_bitboard_mask() {
             FILE_MASK[index] = (1LL << B_INDEX(file, 2)) | (1LL << B_INDEX(file,3))
                 | (1LL << B_INDEX(file, 4)) | (1LL << B_INDEX(file, 5)) 
                 | (1LL << B_INDEX(file, 6)) | (1LL << B_INDEX(file, 7));
-
-            /*TODO: remove debug printing. */
-            //printf("filemask, index %d\n", index);
-            //print_bitboard((BIT_BOARD *) &FILE_MASK[index]);
-            //printf("\n");
-            //print_bitboard((BIT_BOARD *) &RANK_MASK[index]);
-            //printf("\n");
 
             diaga8h1 = file + rank;
             DIAGA8H1_MAGIC[index] = _DIAGA8H1MAGICS[diaga8h1 - 2];
@@ -149,7 +137,7 @@ void init_bitboard_mask() {
     }
 }
 
-void init_attack_bitmaps() {
+static void init_attack_bitmaps() {
     int sq, state, file, rank, a_file, a_rank;
     unsigned char state_6bit;
 
@@ -362,12 +350,6 @@ void init_attack_bitmaps() {
             RANK_ATTACKS[sq][state_6bit] = 0LL;
             RANK_ATTACKS[sq][state_6bit] |= 
                 (u64) GEN_SLIDING_ATTACKS[files[sq]-1][state_6bit] << (RANKSHIFT[sq]-1);
-
-            /* TODO: remove debug print */
-            //printf("\nsq:%d \n", sq);
-            //print_bitboard((BIT_BOARD *) &(RANK_ATTACKS[sq][state_6bit]));
-            //printf("\nsq:%d, state_6bit:%d \n", sq, (int) state_6bit);
-            //print_bitboard_rank(GEN_SLIDING_ATTACKS[files[sq]-1][state_6bit]);
         }
     }
 
@@ -441,15 +423,6 @@ void init_attack_bitmaps() {
     }
 
     //castling masks
-    //MASK_EG[WHITE] = (1LL << E1) | (1LL << F1) | (1LL << G1);
-    //MASK_EG[BLACK] = (1LL << E8) | (1LL << F8) | (1LL << G8);
-    //MASK_FG[WHITE] = (1LL << F1) | (1LL << G1);
-    //MASK_FG[BLACK] = (1LL << F8) | (1LL << G8);
-    //MASK_BD[WHITE] = (1LL << B1) | (1LL << C1) | (1LL << D1);
-    //MASK_BD[BLACK] = (1LL << B8) | (1LL << C8) | (1LL << D8);
-    //MASK_CE[WHITE] = (1LL << C1) | (1LL << D1) | (1LL << E8);
-    //MASK_CE[BLACK] = (1LL << C8) | (1LL << D8) | (1LL << E8);
-
     OO_MASK[WHITE] = (1LL << F1) | (1LL << G1);
     OO_MASK[BLACK] = (1LL << F8) | (1LL << G8);
     OOO_MASK[WHITE] = (1LL << B1) | (1LL << C1) | (1LL << D1);
@@ -465,6 +438,65 @@ void init_attack_bitmaps() {
     OOO_ATTACK_MASK[BLACK] = (1LL << E8) | (1LL << D8);
 }
 
-int valid_file_rank(int file, int rank) {
-    return ((file >= 1) && (file <= 8) && (rank >=1) && (rank <= 8));
+static void init_evaluate_mask()
+{
+    int i;
+    int file_index, rank_index;
+
+    for (i = 0; i < 8; i++) {
+        EVAL_RANK_MASK[i] = 0LL;
+        EVAL_FILE_MASK[i] = 0LL;
+    }
+
+    for (i = 0; i < 64; i++) {
+        EVAL_RANK_MASK[ranks[i]-1] |= (1LL << i);
+        EVAL_FILE_MASK[files[i]-1] |= (1LL << i);
+    }
+
+    for (i = 0; i < 64; i++) {
+        ISOLATED_PAWN_MASK[i] = 0LL;
+        WHITE_PASSED_MASK[i] = 0LL;
+        BLACK_PASSED_MASK[i] = 0LL;
+    }
+
+    for (i = 0; i < 64; i++) {
+        file_index = files[i] - 2;
+        if (file_index >= 0) {
+            ISOLATED_PAWN_MASK[i] |= EVAL_FILE_MASK[file_index];
+        }
+        file_index = files[i];
+        if (file_index < 8) {
+            ISOLATED_PAWN_MASK[i] |= EVAL_FILE_MASK[file_index];
+        }
+
+        for (file_index = files[i]-2; file_index <= files[i]; file_index++) {
+            for (rank_index = 7; rank_index > ranks[i]-1; rank_index--) {
+                if (file_index < 8 && file_index >=0) {
+                    WHITE_PASSED_MASK[i] |= (EVAL_FILE_MASK[file_index] & EVAL_RANK_MASK[rank_index]);
+                }
+            }
+
+            for (rank_index = 0; rank_index < ranks[i]-1; rank_index++) {
+                if (file_index < 8 && file_index >=0) {
+                    BLACK_PASSED_MASK[i] |= (EVAL_FILE_MASK[file_index] & EVAL_RANK_MASK[rank_index]);
+                }
+            }
+        }
+
+    }
+
+    for (i = 0; i < 64; i++) {
+    }
+}
+
+void init_data() 
+{
+    printf("ms1table\n");
+    init_ms1btable();
+    printf("mask\n");
+    init_bitboard_mask();
+    printf("attack bitmaps\n");
+    init_attack_bitmaps();
+    printf("evaluate masks\n");
+    init_evaluate_mask();
 }

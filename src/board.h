@@ -49,8 +49,8 @@ typedef struct {
     int search_killers[2][MAX_PLY];
 
     //storing moves 
-    uint32_t move_buffer[MAX_MOVE_BUF]; //all generated moves in current tree
-    int move_buffer_len[MAX_PLY]; //which moves belongs to which ply, TODO:better way?
+    //uint32_t move_buffer[MAX_MOVE_BUF]; //all generated moves in current tree
+    //int move_buffer_len[MAX_PLY]; //which moves belongs to which ply, TODO:better way?
 } S_BOARD;
 
 //Struct used for pretty printing only
@@ -99,9 +99,10 @@ extern const u64 _DIAGA1H8MAGICS[];
 extern const u64 _FILEMAGICS[];
 extern const int RANKSHIFT[];
 
-void init();
+void init_board();
 int parse_fen(S_BOARD *b, char *fen);
-void reset_board(S_BOARD *b);
+void soft_reset_board(S_BOARD *b); 
+void hard_reset_board(S_BOARD *b);
 int make_move(S_BOARD *b, int);
 void unmake_move(S_BOARD *b);
 int make_move_if_exist(S_BOARD *b, int move);

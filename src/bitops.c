@@ -1,5 +1,5 @@
 #include "bitops.h"
-#include "board.h"
+#include "globals.h"
 
 /** 
  * Returns a count of all bits set to 1 
@@ -85,3 +85,21 @@ int msb1_index(u64 bitmap)
     return result + MS1BTABLE[bitmap];
 }
 
+/**
+ * Taken from chessprogramming wiki:
+ * https://chessprogramming.wikispaces.com/Flipping+Mirroring+and+Rotating#The%20whole%20Bitboard
+ * Flip a bitboard vertically about the centre ranks.
+ * Rank 1 is mapped to rank 8 and vice versa.
+ * @param x any bitboard
+ * @return bitboard x flipped vertically
+ *      */
+u64 flipVertical(u64 x) {
+    return  (x << 56) |
+        ((x << 40) & (u64)0x00ff000000000000) |
+        ((x << 24) & (u64)0x0000ff0000000000) |
+        ((x <<  8) & (u64)0x000000ff00000000) |
+        ((x >>  8) & (u64)0x00000000ff000000) |
+        ((x >> 24) & (u64)0x0000000000ff0000) |
+        ((x >> 40) & (u64)0x000000000000ff00) |
+        (x >> 56);
+}

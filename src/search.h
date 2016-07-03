@@ -10,7 +10,7 @@ typedef struct {
 
     int depth;
     int depth_set;
-    
+
     int starttime;
     int stoptime;
     int time_set;

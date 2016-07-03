@@ -39,7 +39,7 @@ void perft_from_file(const char *filename, int divide) {
     //char *fen[100];
     //int node_count[6];
 
-    
+
     long starttime = cur_time_millis();
     while (fgets(buf, 1024, fp) != NULL) {
         FILE *fp_result = fopen("perft-result.txt", "a");
