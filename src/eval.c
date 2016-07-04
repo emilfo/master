@@ -5,6 +5,8 @@
 #include "globals.h"
 #include "eval.h"
 
+#define MIN(a, b) (( a < b)? a : b )
+
 const int PAWN_ISOLATED = -20;
 const int WHITE_PAWN_PASSED[8] = {0, 5, 10, 20, 40, 80, 160, 0};
 const int BLACK_PAWN_PASSED[8] = {0, 160, 80, 40, 20, 10, 5, 0};
@@ -99,7 +101,13 @@ const int KING_SQ_VAL[64] = {
     -70 ,   -70 ,   -70 ,   -70 ,   -70 ,   -70 ,   -70 ,   -70     
 };
 
-//based off wikipedia article (assumes alot)
+/**
+ * Returns true if the position is a material draw.
+ * based off this wikipedia article:
+ * https://en.wikipedia.org/wiki/Pawnless_chess_endgame#Miscellaneous_pawnless_endings
+ * which assumes alot, may return draw even if position is not (in rare cases)
+ * endgame tables will fix that porblem
+ */
 static int material_draw(const S_BOARD *b) {
     if (b->piece_bb[B_PAWN] || b->piece_bb[W_PAWN] || b->piece_bb[B_QUEEN] || b->piece_bb[W_QUEEN]) {
         return false;
@@ -177,25 +185,34 @@ int eval_posistion(const S_BOARD *b)
 {
     u64 cur_piece_bb;
     int sq;
-    int score = 0;
+    int score;
+    int score_mg = 0;
+    int score_eg = 0;
+    int queens, rooks, minors, pawns;
+    int phase;
 
     if (material_draw(b)) {
         printf("\n\nGOT HERE\n\n");
         return 0;
     }
 
+
     cur_piece_bb = b->piece_bb[B_PAWN];
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score -= PIECE_VAL[B_PAWN] + PAWN_SQ_VAL[mirror[sq]];
+        pawns++;
+        score_mg -= PIECE_VAL[B_PAWN] + PAWN_SQ_VAL[mirror[sq]];
+        score_eg -= PIECE_VAL[B_PAWN] + PAWN_SQ_VAL[mirror[sq]];
 
         if (ISOLATED_PAWN_MASK[sq] & b->piece_bb[B_PAWN]) {
-            score -= PAWN_ISOLATED;
+            score_mg -= PAWN_ISOLATED;
+            score_eg -= PAWN_ISOLATED;
         }
 
         if (BLACK_PAWN_PASSED[sq] & b->piece_bb[W_PAWN]) {
-            score -= BLACK_PASSED_MASK[files[sq] - 1];
+            score_mg -= BLACK_PASSED_MASK[files[sq] - 1];
+            score_eg -= BLACK_PASSED_MASK[files[sq] - 1] * 2;
         }
 
         cur_piece_bb ^= (1LL << sq);
@@ -205,14 +222,18 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score += PIECE_VAL[W_PAWN] + PAWN_SQ_VAL[sq];
+        pawns++;
+        score_mg += PIECE_VAL[W_PAWN] + PAWN_SQ_VAL[sq];
+        score_eg += PIECE_VAL[W_PAWN] + PAWN_SQ_VAL[sq];
 
         if (ISOLATED_PAWN_MASK[sq] & b->piece_bb[W_PAWN]) {
-            score += PAWN_ISOLATED;
+            score_mg += PAWN_ISOLATED;
+            score_eg += PAWN_ISOLATED;
         }
 
         if (WHITE_PAWN_PASSED[sq] & b->piece_bb[B_PAWN]) {
-            score += WHITE_PASSED_MASK[files[sq] - 1];
+            score_mg += WHITE_PASSED_MASK[files[sq] - 1];
+            score_eg += WHITE_PASSED_MASK[files[sq] - 1] * 2;
         }
 
         cur_piece_bb ^= (1LL << sq);
@@ -222,7 +243,9 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score -= PIECE_VAL[B_KNIGHT] + KNIGHT_SQ_VAL[mirror[sq]];
+        minors++;
+        score_mg -= PIECE_VAL[B_KNIGHT] + KNIGHT_SQ_VAL[mirror[sq]];
+        score_eg -= PIECE_VAL[B_KNIGHT] + KNIGHT_SQ_VAL[mirror[sq]] + ((pawns-10)*6);
 
         cur_piece_bb ^= (1LL << sq);
     }
@@ -231,7 +254,9 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score += PIECE_VAL[W_KNIGHT] + KNIGHT_SQ_VAL[sq];
+        minors++;
+        score_mg += PIECE_VAL[W_KNIGHT] + KNIGHT_SQ_VAL[sq];
+        score_eg += PIECE_VAL[W_KNIGHT] + KNIGHT_SQ_VAL[sq] + ((pawns-10)*6);
 
         cur_piece_bb ^= (1LL << sq);
     }
@@ -240,7 +265,9 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score -= PIECE_VAL[B_BISHOP] + BISHOP_SQ_VAL[mirror[sq]];
+        minors++;
+        score_mg -= PIECE_VAL[B_BISHOP] + BISHOP_SQ_VAL[mirror[sq]];
+        score_eg -= PIECE_VAL[B_BISHOP] + BISHOP_SQ_VAL[mirror[sq]] + ((10-pawns) * 6);
 
         cur_piece_bb ^= (1LL << sq);
     }
@@ -249,7 +276,9 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score += PIECE_VAL[W_BISHOP] + BISHOP_SQ_VAL[sq];
+        minors++;
+        score_mg += PIECE_VAL[W_BISHOP] + BISHOP_SQ_VAL[sq];
+        score_eg += PIECE_VAL[W_BISHOP] + BISHOP_SQ_VAL[sq] + ((10-pawns)*6);
 
         cur_piece_bb ^= (1LL << sq);
     }
@@ -258,13 +287,17 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score -= PIECE_VAL[B_ROOK] + ROOK_SQ_VAL[mirror[sq]];
+        rooks++;
+        score_mg -= PIECE_VAL[B_ROOK] + ROOK_SQ_VAL[mirror[sq]];
+        score_eg -= PIECE_VAL[B_ROOK] + ROOK_SQ_VAL[mirror[sq]];
 
         if (!(EVAL_FILE_MASK[files[sq]-1] & b->piece_bb[B_PAWN])) {
             if (!(EVAL_FILE_MASK[files[sq]-1] & b->piece_bb[W_PAWN])) {
-                score -= ROOK_OPEN;
+                score_mg -= ROOK_OPEN;
+                score_eg -= ROOK_OPEN;
             } else {
-                score -= ROOK_SEMI_OPEN;
+                score_mg -= ROOK_SEMI_OPEN;
+                score_eg -= (ROOK_SEMI_OPEN * 2);
             }
         }
 
@@ -275,13 +308,17 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score += PIECE_VAL[W_ROOK] + ROOK_SQ_VAL[sq];
+        rooks++;
+        score_mg += PIECE_VAL[W_ROOK] + ROOK_SQ_VAL[sq];
+        score_eg += PIECE_VAL[W_ROOK] + ROOK_SQ_VAL[sq];
 
         if (!(EVAL_FILE_MASK[files[sq]-1] & b->piece_bb[W_PAWN])) {
             if (!(EVAL_FILE_MASK[files[sq]-1] & b->piece_bb[B_PAWN])) {
-                score += ROOK_OPEN;
+                score_mg += ROOK_OPEN;
+                score_eg += ROOK_OPEN;
             } else {
-                score += ROOK_SEMI_OPEN;
+                score_mg += ROOK_SEMI_OPEN;
+                score_eg += ROOK_SEMI_OPEN * 2;
             }
         }
 
@@ -292,7 +329,9 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score -= PIECE_VAL[B_QUEEN] + QUEEN_SQ_VAL[mirror[sq]];
+        queens++;
+        score_mg -= PIECE_VAL[B_QUEEN] + QUEEN_SQ_VAL[mirror[sq]];
+        score_eg -= PIECE_VAL[B_QUEEN] + QUEEN_SQ_VAL[mirror[sq]];
 
         cur_piece_bb ^= (1LL << sq);
     }
@@ -301,7 +340,9 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score += PIECE_VAL[W_QUEEN] + QUEEN_SQ_VAL[sq];
+        queens++;
+        score_mg += PIECE_VAL[W_QUEEN] + QUEEN_SQ_VAL[sq];
+        score_eg += PIECE_VAL[W_QUEEN] + QUEEN_SQ_VAL[sq];
 
         cur_piece_bb ^= (1LL << sq);
     }
@@ -310,7 +351,8 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score -= PIECE_VAL[B_KING] + KING_SQ_VAL[mirror[sq]];
+        score_mg -= PIECE_VAL[B_KING] + KING_SQ_VAL[mirror[sq]];
+        score_eg -= PIECE_VAL[B_KING] + KING_SQ_VAL_END[mirror[sq]];
 
         cur_piece_bb ^= (1LL << sq);
     }
@@ -319,10 +361,15 @@ int eval_posistion(const S_BOARD *b)
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
-        score += PIECE_VAL[W_KING] + KING_SQ_VAL[sq];
+        score_mg += PIECE_VAL[W_KING] + KING_SQ_VAL[sq];
+        score_eg += PIECE_VAL[W_KING] + KING_SQ_VAL_END[sq];
 
         cur_piece_bb ^= (1LL << sq);
     }
+
+    phase = (queens*10) + (rooks*5) + (minors*3);
+    phase = MIN(64, phase);
+    score = (score_mg/phase) + (score_eg/(64-phase));
 
     if (b->side) { //BLACK
         return -score;
