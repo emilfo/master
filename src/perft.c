@@ -42,7 +42,7 @@ void perft_from_file(const char *filename, int divide) {
 
     long starttime = cur_time_millis();
     while (fgets(buf, 1024, fp) != NULL) {
-        FILE *fp_result = fopen("perft-result.txt", "a");
+        FILE *fp_result = fopen("LOG/perft-result.txt", "a");
         fprintf(fp_result, "%s", buf);
 
         parse_fen(&global_board, buf);
@@ -138,6 +138,9 @@ int perft_divide(S_BOARD *b, int depth) {
 }
 
 /**
+ * Tests that the eval function works the same for both sides. evals a postion,
+ * mirrors the board then eval the same position mirrored (same results is 
+ * expected)
  * Doesn't really belong here, but figured it would clutter the eval.c file
  * and is basically same as perft_from_file
  */
@@ -152,7 +155,7 @@ void eval_from_file(const char *filename)
 
     long starttime = cur_time_millis();
     while (fgets(buf, 1024, fp) != NULL) {
-        FILE *fp_result = fopen("eval-result.txt", "a");
+        FILE *fp_result = fopen("LOG/eval-result.txt", "a");
         fprintf(fp_result, "%s", buf);
 
         parse_fen(&global_board, buf);

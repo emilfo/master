@@ -102,9 +102,9 @@ void engine_shell()
         fgets(input, 256, stdin);
 
         if(strncmp(input, "file-perft", 10) == 0) {
-            perft_from_file("perftsuite.epd", false);
+            perft_from_file("EPD/perftsuite.epd", false);
         } else if(strncmp(input, "file-eval", 9) == 0) {
-            eval_from_file("perftsuite.epd");
+            eval_from_file("EPD/ecm98.epd");
         } else if(strncmp(input, "divide", 6) == 0) {
             perft_divide(&global_board, atoi(input+7));
         } else if(strncmp(input, "mirror", 6) == 0) {
