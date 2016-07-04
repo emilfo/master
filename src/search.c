@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include "search.h"
 #include "globals.h"
 #include "eval.h"
@@ -6,6 +7,9 @@
 #include "utils.h"
 #include "movegen.h"
 #include "board.h"
+
+#define BLACK_MAJ(b) (b->piece_bb[B_BISHOP] || b->piece_bb[B_ROOK] || b->piece_bb[B_QUEEN])
+#define WHITE_MAJ(b) (b->piece_bb[W_BISHOP] || b->piece_bb[W_ROOK] || b->piece_bb[W_QUEEN])
 
 static int is_repetition(S_BOARD *b) 
 {
@@ -153,18 +157,20 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
     }
 
     if (alpha != old_alpha) {
-        hash_put(&global_tp_table, b->hash_key, best_move, score, b->ply);
+        hash_put(&global_tp_table, b->hash_key, best_move, score, 0, b->ply, EXCA_FLAG);
     }
 
     return alpha;
 }
-static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int debug) //, int window) //TODO: window?
+static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int do_null) //, int window) //TODO: window?
 {
     int i;
     int legal = 0;
     int old_alpha = alpha;
     int best_move = EMPTY;
     int score = -INFINITE;
+    int best_score = -INFINITE;
+    int null_score = -INFINITE;
     int move;
     int in_check;
 
@@ -189,15 +195,45 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
         return eval_posistion(b);
     }
 
-    in_check = sq_attacked(b, lsb1_index(b->piece_bb[KING_INDEX[b->side]]), 1-b->side);
+    S_HASHENTRY entry;
+    if (probe_hash(&global_tp_table, b->hash_key, &entry, &score, alpha, beta, depth)) {
+        global_tp_table.cut++;
+        return entry.eval;
+    }
+
+    in_check = sq_attacked(b, b->piece_bb[KING_INDEX[b->side]], 1-b->side);
 
     if (in_check) {
         depth++;
     }
 
+    if (do_null && b->search_ply && depth >= 4 && !in_check) {
+        if (((b->side && WHITE_MAJ(b))) || ((!b->side) && BLACK_MAJ(b))) {
+            make_null_move(b);
+            b->search_ply++;
+
+            null_score = -alpha_beta(b, ss, -beta, -beta+1, depth-4, false);
+
+            unmake_null_move(b);
+            b->search_ply--;
+
+            if(null_score >= beta) {
+                return beta;
+            }
+        }
+    }
+
     S_MOVELIST l[1];
     generate_all_moves(b, l);
 
+    if (hash_get(&global_tp_table, b->hash_key, &entry)) {
+        for (i=0; i <l->index; i++) {
+            if (l->moves[i].move == entry.move) {
+                l->moves[i].score == 200000;
+                break;
+            }
+        }
+    }
 
     for (i = 0; i < l->index; i++) {
 
@@ -207,7 +243,7 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
         if (make_move(b, move)) {
             b->search_ply++;
 
-            score = -alpha_beta(b, ss, -beta, -alpha, depth-1, debug);
+            score = -alpha_beta(b, ss, -beta, -alpha, depth-1, do_null);
 
             unmake_move(b);
             b->search_ply--;
@@ -216,24 +252,31 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
                 return 0;
             }
 
-            if (score > alpha) {
-                if (score >= beta) {
-                    ss->fail_high++;
-                    if (legal == 0) {
-                        ss->first_fail_high++;
+            if (score > best_score) {
+                best_score = score;
+                best_move = move;
+
+                if (score > alpha) {
+                    if (score >= beta) {
+                        ss->fail_high++;
+                        if (legal == 0) {
+                            ss->first_fail_high++;
+                        }
+
+                        if(!mv_cap(move)) {
+                            store_killer(b, move);
+                        }
+
+                        hash_put(&global_tp_table, b->hash_key, best_move, best_score, depth, b->ply, BETA_FLAG);
+
+                        return beta;
                     }
 
                     if(!mv_cap(move)) {
-                        store_killer(b, move);
+                        update_history(b, mv_piece(move), mv_to(move), b->ply);
                     }
-                    return beta;
+                    alpha = score;
                 }
-
-                if(!mv_cap(move)) {
-                    update_history(b, mv_piece(move), mv_to(move), b->ply);
-                }
-                alpha = score;
-                best_move = move;
             }
 
             legal++;
@@ -249,7 +292,9 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     }
 
     if (alpha != old_alpha) {
-        hash_put(&global_tp_table, b->hash_key, best_move, score, b->ply);
+        hash_put(&global_tp_table, b->hash_key, best_move, best_score, depth, b->ply, EXCA_FLAG);
+    } else {
+        hash_put(&global_tp_table, b->hash_key, best_move, alpha, depth, b->ply, BETA_FLAG);
     }
 
     return alpha;
@@ -261,13 +306,14 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
     int best_move = EMPTY;
     int best_score = -INFINITE;
     int cur_depth = 0;
+    int start_depth = 1;
     int pv_moves = 0;
     int i;
 
     prepare_search(b, ss);
 
-    for (cur_depth = 1; cur_depth <= ss->depth; cur_depth++) {
-        best_score = alpha_beta(b, ss, -INFINITE, INFINITE, cur_depth, false);
+    for (cur_depth = start_depth; cur_depth <= ss->depth; cur_depth++) {
+        best_score = alpha_beta(b, ss, -INFINITE, INFINITE, cur_depth, true);
 
         if (ss->stop) {
             break;

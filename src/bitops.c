@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "bitops.h"
 #include "globals.h"
 
@@ -7,23 +8,21 @@
  * ie. 0b1101 becomes 1001, which is 10+01, or 2+1 = 3
  * M2 then puts the count of 4 bits into those 4 bits
  * ie. 1001 (from the previous operation) then becomes 0011 = 3 
- * and so on. Taken from MIT HAKMEM (AI Memo 239) 
+ * and so on. taken from:
+ * https://chessprogramming.wikispaces.com/Population+Count
+ * found on Donald Knuths The art of computer programming (2009)
  */
 int bit_count(u64 bitmap)
 {
-    static const u64 M1  = 0x5555555555555555;//0101010101...
-    static const u64 M2  = 0x3333333333333333;//0011001100...
-    static const u64 M4  = 0x0f0f0f0f0f0f0f0f;//0000111100...
-    static const u64 M8  = 0x00ff00ff00ff00ff;//0000000011...
-    static const u64 M16 = 0x0000ffff0000ffff;//and so on
-    static const u64 M32 = 0x00000000ffffffff;
+    static const u64 K1  = 0x5555555555555555;//0101010101...
+    static const u64 K2  = 0x3333333333333333;//0011001100...
+    static const u64 K4  = 0x0f0f0f0f0f0f0f0f;//0000111100...
+    static const u64 Kf  = 0x0101010101010101;
 
-    bitmap = (bitmap & M1)  + ((bitmap >> 1) & M1);
-    bitmap = (bitmap & M2)  + ((bitmap >> 1) & M2);
-    bitmap = (bitmap & M4)  + ((bitmap >> 1) & M4);
-    bitmap = (bitmap & M8)  + ((bitmap >> 1) & M8);
-    bitmap = (bitmap & M16) + ((bitmap >> 1) & M16);
-    bitmap = (bitmap & M32) + ((bitmap >> 1) & M32);
+    bitmap =  bitmap        - ((bitmap >> 1) & K1);
+    bitmap = (bitmap & K2)  + ((bitmap >> 2) & K2);
+    bitmap = (bitmap & K4)  + ((bitmap >> 4) & K4);
+    bitmap = (bitmap * Kf)  >> 56;
 
     return (int) bitmap;
 }

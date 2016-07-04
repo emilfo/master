@@ -1,7 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "board.h"
 #include "globals.h"
 #include "eval.h"
+
+const int PAWN_ISOLATED = -20;
+const int WHITE_PAWN_PASSED[8] = {0, 5, 10, 20, 40, 80, 160, 0};
+const int BLACK_PAWN_PASSED[8] = {0, 160, 80, 40, 20, 10, 5, 0};
+const int ROOK_OPEN = 50;
+const int ROOK_SEMI_OPEN = 20;
 
 const int mirror[64] = {
     56  ,   57  ,   58  ,   59  ,   60  ,   61  ,   62  ,   63  ,
@@ -91,6 +99,79 @@ const int KING_SQ_VAL[64] = {
     -70 ,   -70 ,   -70 ,   -70 ,   -70 ,   -70 ,   -70 ,   -70     
 };
 
+//based off wikipedia article (assumes alot)
+static int material_draw(const S_BOARD *b) {
+    if (b->piece_bb[B_PAWN] || b->piece_bb[W_PAWN] || b->piece_bb[B_QUEEN] || b->piece_bb[W_QUEEN]) {
+        return false;
+    }
+
+    int black_bishops = bit_count(b->piece_bb[B_BISHOP]);
+    int white_bishops = bit_count(b->piece_bb[W_BISHOP]);
+    int black_knights = bit_count(b->piece_bb[B_KNIGHT]);
+    int white_knights = bit_count(b->piece_bb[W_KNIGHT]);
+    int black_rooks = bit_count(b->piece_bb[B_ROOK]);
+    int white_rooks = bit_count(b->piece_bb[W_ROOK]);
+
+
+    if (white_rooks == 0 && black_rooks == 0) {
+        if (black_bishops + black_knights + white_bishops + white_knights == 2) {
+            if (black_bishops == 2 || white_bishops == 2) return false;
+            if (black_bishops == 1 || black_knights == 1) return false;
+            if (white_bishops == 1 || white_knights == 1) return false;
+            return true;
+        } else if (black_bishops + black_knights + white_bishops + white_knights == 3) {
+            if (black_bishops + black_knights == 3) return false;
+            if (white_bishops + white_knights == 3) return false;
+            if (black_bishops == 2 && white_knights == 1) return false;
+            if (white_bishops == 2 && black_knights == 1) return false;
+            return true;
+        } else if (white_knights == 0 && black_knights == 0) {
+            if (abs( black_bishops - white_bishops) <= 1) return true;
+            return false;
+        } else if (white_bishops  == 0 && black_bishops == 0) {
+            if (white_knights < 3 && black_knights < 3) return true;
+            return false;
+        }
+        return false;
+    }
+
+    if (black_rooks == 0 && white_rooks == 1) {
+        if (white_bishops == 0 && white_knights == 0) {
+            if (black_bishops + black_knights == 2) return true;
+            return false;
+        }
+        if (white_bishops == 1 && white_knights == 0) {
+            if (black_bishops + black_knights == 2 && black_knights != 2) return true;
+            return false;
+        }
+        if (white_bishops == 0 && white_knights == 1) {
+            if (black_bishops == 0 && white_knights == 2) return true;
+            return false;
+        }
+    } else if (black_rooks == 1 && white_rooks == 0) {
+        if (black_bishops == 0 && black_knights == 0) {
+            if (white_bishops + white_knights == 2) return true;
+            return false;
+        }
+        if (black_bishops == 1 && black_knights == 0) {
+            if (white_bishops + white_knights == 2 && white_knights != 2) return true;
+            return false;
+        }
+        if (black_bishops == 0 && black_knights == 1) {
+            if (white_bishops == 0 && black_knights == 2) return true;
+            return false;
+        }
+    } else if (black_rooks == 1 && white_rooks == 1){
+        if (black_bishops + black_knights < 2 && white_knights + white_bishops < 2) return true;
+    } else if (black_rooks == 2 && white_rooks == 0){
+        if (white_bishops + white_knights == 3) return true;
+    } else if (black_rooks == 0 && white_rooks == 2){
+        if (black_bishops + black_knights == 3) return true;
+    }
+    return false;
+
+}
+
 /* Evaluates position from the one to moves side of view */
 int eval_posistion(const S_BOARD *b) 
 {
@@ -98,11 +179,24 @@ int eval_posistion(const S_BOARD *b)
     int sq;
     int score = 0;
 
+    if (material_draw(b)) {
+        printf("\n\nGOT HERE\n\n");
+        return 0;
+    }
+
     cur_piece_bb = b->piece_bb[B_PAWN];
     while(cur_piece_bb) {
         sq = lsb1_index(cur_piece_bb);
 
         score -= PIECE_VAL[B_PAWN] + PAWN_SQ_VAL[mirror[sq]];
+
+        if (ISOLATED_PAWN_MASK[sq] & b->piece_bb[B_PAWN]) {
+            score -= PAWN_ISOLATED;
+        }
+
+        if (BLACK_PAWN_PASSED[sq] & b->piece_bb[W_PAWN]) {
+            score -= BLACK_PASSED_MASK[files[sq] - 1];
+        }
 
         cur_piece_bb ^= (1LL << sq);
     }
@@ -112,6 +206,14 @@ int eval_posistion(const S_BOARD *b)
         sq = lsb1_index(cur_piece_bb);
 
         score += PIECE_VAL[W_PAWN] + PAWN_SQ_VAL[sq];
+
+        if (ISOLATED_PAWN_MASK[sq] & b->piece_bb[W_PAWN]) {
+            score += PAWN_ISOLATED;
+        }
+
+        if (WHITE_PAWN_PASSED[sq] & b->piece_bb[B_PAWN]) {
+            score += WHITE_PASSED_MASK[files[sq] - 1];
+        }
 
         cur_piece_bb ^= (1LL << sq);
     }
@@ -158,6 +260,14 @@ int eval_posistion(const S_BOARD *b)
 
         score -= PIECE_VAL[B_ROOK] + ROOK_SQ_VAL[mirror[sq]];
 
+        if (!(EVAL_FILE_MASK[files[sq]-1] & b->piece_bb[B_PAWN])) {
+            if (!(EVAL_FILE_MASK[files[sq]-1] & b->piece_bb[W_PAWN])) {
+                score -= ROOK_OPEN;
+            } else {
+                score -= ROOK_SEMI_OPEN;
+            }
+        }
+
         cur_piece_bb ^= (1LL << sq);
     }
 
@@ -166,6 +276,14 @@ int eval_posistion(const S_BOARD *b)
         sq = lsb1_index(cur_piece_bb);
 
         score += PIECE_VAL[W_ROOK] + ROOK_SQ_VAL[sq];
+
+        if (!(EVAL_FILE_MASK[files[sq]-1] & b->piece_bb[W_PAWN])) {
+            if (!(EVAL_FILE_MASK[files[sq]-1] & b->piece_bb[B_PAWN])) {
+                score += ROOK_OPEN;
+            } else {
+                score += ROOK_SEMI_OPEN;
+            }
+        }
 
         cur_piece_bb ^= (1LL << sq);
     }

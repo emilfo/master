@@ -414,6 +414,45 @@ void unmake_move(S_BOARD *b)
     assert(debug_board(b));
 }
 
+void make_null_move(S_BOARD *b)
+{
+    assert(debug_board(b));
+
+    //save state
+    b->prev[b->ply].move = EMPTY;
+    b->prev[b->ply].castle_perm = b->castle_perm;
+    b->prev[b->ply].ep_sq = b->ep_sq;
+    b->prev[b->ply].fifty_move_count = b->fifty_move_count;
+    b->prev[b->ply].hash_key = b->hash_key;
+    b->ply++;
+
+    //update en passant sq and the corresponding hash_key
+    if (b->ep_sq != EMPTY) {
+        HASH_B(b, pce_key[EMPTY][b->ep_sq]);
+    }
+
+    b->ep_sq = EMPTY;
+    b->side = 1 - b->side;
+
+    assert(debug_board(b));
+}
+
+void unmake_null_move(S_BOARD *b)
+{
+    assert(debug_board(b));
+
+    b->ply--;
+
+    //restore state
+    b->castle_perm = b->prev[b->ply].castle_perm;
+    b->ep_sq = b->prev[b->ply].ep_sq;
+    b->fifty_move_count = b->prev[b->ply].fifty_move_count;
+    b->hash_key = b->prev[b->ply].hash_key;
+    b->side = 1 - b->side;
+
+    assert(debug_board(b));
+}
+
 static void add_piece(S_BOARD *b, int piece, int sq) {
     assert(valid_sq(sq));
     assert(valid_piece(piece));

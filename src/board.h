@@ -105,6 +105,8 @@ void soft_reset_board(S_BOARD *b);
 void hard_reset_board(S_BOARD *b);
 int make_move(S_BOARD *b, int);
 void unmake_move(S_BOARD *b);
+void make_null_move(S_BOARD *b);
+void unmake_null_move(S_BOARD *b);
 int make_move_if_exist(S_BOARD *b, int move);
 void flip_board(S_BOARD *b);
 void print_board(const S_BOARD *b);

@@ -23,6 +23,7 @@
 
 #define INFINITE 32767
 #define MATE 30000
+#define ISMATE 30000-256
 
 S_BOARD global_board;
 S_HASHTABLE global_tp_table;

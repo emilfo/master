@@ -10,6 +10,7 @@
 #include "uci.h"
 #include "eval.h"
 #include "io.h"
+#include "bitops.h"
 
 static void init_all() {
     init_data();
@@ -29,6 +30,7 @@ static void destroy_all() {
 int main() {
     init_all();
 
+    bit_count(0x8000000000000000);
     engine_shell();
 
     destroy_all();
