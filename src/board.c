@@ -332,6 +332,7 @@ int make_move(S_BOARD *b, int move)
     add_piece(b, piece, to);
 
     b->side = 1 - b->side;
+    HASH_B(b, side_key);
 
     if (b->side == BLACK) {
         if (sq_attacked(b, b->piece_bb[W_KING], BLACK)) {
@@ -433,6 +434,7 @@ void make_null_move(S_BOARD *b)
 
     b->ep_sq = EMPTY;
     b->side = 1 - b->side;
+    HASH_B(b, side_key);
 
     assert(debug_board(b));
 }

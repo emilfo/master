@@ -188,11 +188,10 @@ int eval_posistion(const S_BOARD *b)
     int score;
     int score_mg = 0;
     int score_eg = 0;
-    int queens, rooks, minors, pawns;
+    int queens = 0, rooks = 0, minors = 0, pawns = 0;
     int phase;
 
     if (material_draw(b)) {
-        printf("\n\nGOT HERE\n\n");
         return 0;
     }
 
@@ -212,7 +211,7 @@ int eval_posistion(const S_BOARD *b)
 
         if (BLACK_PAWN_PASSED[sq] & b->piece_bb[W_PAWN]) {
             score_mg -= BLACK_PASSED_MASK[files[sq] - 1];
-            score_eg -= BLACK_PASSED_MASK[files[sq] - 1] * 2;
+            score_eg -= (BLACK_PASSED_MASK[files[sq] - 1] * 2);
         }
 
         cur_piece_bb ^= (1LL << sq);
@@ -233,7 +232,7 @@ int eval_posistion(const S_BOARD *b)
 
         if (WHITE_PAWN_PASSED[sq] & b->piece_bb[B_PAWN]) {
             score_mg += WHITE_PASSED_MASK[files[sq] - 1];
-            score_eg += WHITE_PASSED_MASK[files[sq] - 1] * 2;
+            score_eg += (WHITE_PASSED_MASK[files[sq] - 1] * 2);
         }
 
         cur_piece_bb ^= (1LL << sq);
@@ -318,7 +317,7 @@ int eval_posistion(const S_BOARD *b)
                 score_eg += ROOK_OPEN;
             } else {
                 score_mg += ROOK_SEMI_OPEN;
-                score_eg += ROOK_SEMI_OPEN * 2;
+                score_eg += (ROOK_SEMI_OPEN * 2);
             }
         }
 
@@ -369,7 +368,8 @@ int eval_posistion(const S_BOARD *b)
 
     phase = (queens*10) + (rooks*5) + (minors*3);
     phase = MIN(64, phase);
-    score = (score_mg/phase) + (score_eg/(64-phase));
+
+    score = (score_mg/(phase+1)) + (score_eg/((64-phase)+1));
 
     if (b->side) { //BLACK
         return -score;

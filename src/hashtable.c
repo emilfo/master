@@ -55,11 +55,11 @@ int probe_hash(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry, int *score, i
                 *score = entry->eval;
                 return true;
             }
-            if (entry->flag_and_age & EXCA_FLAG && entry->eval <= alpha) {
+            if ((entry->flag_and_age & ALPH_FLAG) && (entry->eval <= alpha)) {
                 *score = alpha;
                 return true;
             }
-            if (entry->flag_and_age & EXCA_FLAG && entry->eval >= alpha) {
+            if ((entry->flag_and_age) & BETA_FLAG && (entry->eval >= beta)) {
                 *score = beta;
                 return true;
             }
@@ -91,10 +91,17 @@ void hash_put(S_HASHTABLE *tp, u64 key, uint32_t move, int16_t eval, uint8_t dep
     int i = key % tp->size;
 
     uint16_t flag_and_age = (age & AGE_MASK) | (flag & FLAG_MASK);
+    if(flag & BETA_FLAG) {
+        tp->entries[i].beta= true;
+        tp->entries[i].alpha= false;
+        tp->entries[i].exca = false;
+    }
 
     //resetting eval to mate-score (ignoring moves to mate)
     if (eval > ISMATE) {
         eval = MATE;
+    } else if (eval < -ISMATE) {
+        eval = -MATE;
     }
 
     int32_t checksum = key ^ move ^ eval ^ depth ^ flag_and_age;

@@ -16,6 +16,9 @@ typedef struct {
     int16_t eval;
     uint16_t flag_and_age;
     uint8_t depth;
+    int alpha;
+    int beta;
+    int exca;
 } S_HASHENTRY;
 
 typedef struct {
