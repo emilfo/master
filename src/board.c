@@ -493,7 +493,7 @@ void flip_board(S_BOARD *b)
         new_sq[i] = b->sq[mirror[i]];
     }
     for (i = 0; i < 64; i++) {
-        b->sq[i] = new_sq[i];
+        b->sq[i] = mirror_piece[new_sq[i]];
     }
 
     b->hash_key = generate_hash(b);

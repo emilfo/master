@@ -7,9 +7,9 @@
 #include "movegen.h"
 #include "io.h"
 #include "utils.h"
+#include "eval.h"
 
 static int perft(S_BOARD *b, int depth);
-static int perft_divide(S_BOARD *b, int depth);
 
 void perft_fen(char *FEN, int divide, int depth) {
     int node_cnt = 0;
@@ -110,7 +110,7 @@ static int perft(S_BOARD *b, int depth) {
 }
 
 
-static int perft_divide(S_BOARD *b, int depth) {
+int perft_divide(S_BOARD *b, int depth) {
     S_MOVELIST list[1];
     int count = 0;
     int div_count = 0;
@@ -135,4 +135,52 @@ static int perft_divide(S_BOARD *b, int depth) {
     printf("move count: %d\n", count);
 
     return count;
+}
+
+/**
+ * Doesn't really belong here, but figured it would clutter the eval.c file
+ * and is basically same as perft_from_file
+ */
+void eval_from_file(const char *filename)
+{
+    FILE *fp = fopen(filename, "r");
+
+
+    char buf[1024];
+    int orig_eval = 0;
+    int flip_eval = 0;
+
+    long starttime = cur_time_millis();
+    while (fgets(buf, 1024, fp) != NULL) {
+        FILE *fp_result = fopen("eval-result.txt", "a");
+        fprintf(fp_result, "%s", buf);
+
+        parse_fen(&global_board, buf);
+
+        printf("Eval test from this position:\n");
+
+        print_board(&global_board);
+        orig_eval = eval_posistion(&global_board);
+
+        flip_board(&global_board);
+
+        print_board(&global_board);
+        flip_eval = eval_posistion(&global_board);
+
+        if(orig_eval == flip_eval) {
+            printf("orig_eval = flip_eval =%d - ok,\n", orig_eval);
+            fprintf(fp_result, "orig_eval = flip_eval =%d - ok,\n", orig_eval);
+        } else {
+            printf("orig_eval = %d != flip_eval =%d\n", orig_eval, flip_eval);
+            fprintf(fp_result, "orig_eval = %d != flip_eval =%d\n", orig_eval, flip_eval);
+            fclose(fp_result);
+            break;
+        }
+
+        assert(orig_eval == flip_eval);
+
+        long totaltime = cur_time_millis() - starttime;
+        fprintf(fp_result, "\nTOTAL TIME USED: %ld\n\n", totaltime);
+        fclose(fp_result);
+    }
 }

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "globals.h"
 #include "movegen.h"
@@ -95,39 +96,45 @@ void engine_shell()
     char input[256];
 
     while (true) {
-        memset(input, 0, sizeof(input));
         printf(">");
         fflush(stdout);
 
-        if(fgets(input, 256, stdin) && !(input[0] == '\n')) {
-            if(strncmp(input, "file-perft", 10) == 0) {
-                perft_from_file("perftsuite.epd", false);
-            } else if(strncmp(input, "fen", 8) == 0) {
-                parse_fen(&global_board, input+4);
-            } else if(strncmp(input, "mirror", 6) == 0) {
-                flip_board(&global_board);
-            } else if(strncmp(input, "print", 5) == 0) {
-                print_board(&global_board);
-            } else if(strncmp(input, "quit", 4) == 0) {
-                break;
-            } else if(strncmp(input, "move", 4) == 0) {
-                make_move_if_exist(&global_board, str_move(input+5, &global_board));
-            } else if(strncmp(input, "uci", 3) == 0) {
-                uci_loop();
-                break;
-            } else if(strncmp(input, "h", 3) == 0) {
-                printf("\n\ncommands:\n");
-                printf("file-perft\n");
-                printf("fen\n");
-                printf("mirror\n");
-                printf("print\n");
-                printf("quit\n");
-                printf("move\n");
-                printf("uci\n");
-                printf("h\n");
-            } else {
-                printf("h for help\n");
-            }
+        fgets(input, 256, stdin);
+
+        if(strncmp(input, "file-perft", 10) == 0) {
+            perft_from_file("perftsuite.epd", false);
+        } else if(strncmp(input, "file-eval", 9) == 0) {
+            eval_from_file("perftsuite.epd");
+        } else if(strncmp(input, "divide", 6) == 0) {
+            perft_divide(&global_board, atoi(input+7));
+        } else if(strncmp(input, "mirror", 6) == 0) {
+            flip_board(&global_board);
+        } else if(strncmp(input, "print", 5) == 0) {
+            print_board(&global_board);
+        } else if(strncmp(input, "quit", 4) == 0) {
+            global_search_settings.stop = true;
+            global_search_settings.quit = true;
+            thread_search_go();
+            break;
+        } else if(strncmp(input, "move", 4) == 0) {
+            make_move_if_exist(&global_board, str_move(input+5, &global_board));
+        } else if(strncmp(input, "fen", 3) == 0) {
+            parse_fen(&global_board, input+4);
+        } else if(strncmp(input, "uci", 3) == 0) {
+            uci_loop();
+            break;
+        } else if(strncmp(input, "h", 1) == 0) {
+            printf("\n\ncommands:\n");
+            printf("file-perft\n");
+            printf("fen\n");
+            printf("mirror\n");
+            printf("print\n");
+            printf("quit\n");
+            printf("move\n");
+            printf("uci\n");
+            printf("h\n");
+        } else {
+            printf("h for help\n");
         }
     }
 }

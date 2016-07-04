@@ -112,4 +112,9 @@ int debug_board(S_BOARD *b);
 void print_bitboard_rank(uint8_t rank);
 void print_bitboard(BIT_BOARD  *bboard);
 
+const static int mirror_piece[13] = { 0,
+    7,  8,  9, 10, 11, 12,
+    1,  2,  3,  4,  5,  6
+};
+
 #endif /* BOARD_H */
