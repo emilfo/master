@@ -16,5 +16,6 @@ const static char CAP_PRINT[13] = { '\0',
 void print_movelist(S_MOVELIST *list);
 char *move_str(const uint32_t move);
 int str_move(const char *sq, S_BOARD *b);
+void engine_shell(); 
 
 #endif /* IO_H */

@@ -123,7 +123,7 @@ void uci_loop()
 
     char input[MAX_INPUT_SIZE];
 
-    //uci_identify();
+    uci_identify();
 
     while (true) {
         memset(input, 0, sizeof(input));
@@ -155,7 +155,6 @@ void uci_loop()
             thread_search_go();
             break;
         }
-
     }
 }
 

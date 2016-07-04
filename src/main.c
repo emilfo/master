@@ -9,6 +9,7 @@
 #include "threads.h"
 #include "uci.h"
 #include "eval.h"
+#include "io.h"
 
 static void init_all() {
     init_data();
@@ -28,9 +29,7 @@ static void destroy_all() {
 int main() {
     init_all();
 
-    test();
-
-    uci_loop();
+    engine_shell();
 
     destroy_all();
 
