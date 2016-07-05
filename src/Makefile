@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS=-DNDEBUG -O3
-#CFLAGS =-Wall -g3 -DDEBUG
+#CFLAGS=-DNDEBUG -O3
+CFLAGS =-Wall -g3 -DDEBUG
 #CFLAGS=-DNDEBUG -pg
 LDFLAGS = -lm -lpthread
 

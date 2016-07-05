@@ -27,7 +27,12 @@ static int is_repetition(S_BOARD *b)
 static void check_search_stop(S_SEARCH_SETTINGS *ss)
 {
     if (ss->time_set && cur_time_millis() >= ss->stoptime) {
-        ss->stop = true;
+        // only one thread needs to report this
+        if (!pthread_mutex_trylock(&go_mutex)) {
+                ss->stop = true;
+                go_search = false;
+                pthread_mutex_unlock(&go_mutex);
+        }
     }
 }
 
@@ -88,7 +93,7 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
 {
     int i;
     int legal = 0;
-    int old_alpha = alpha;
+    //int old_alpha = alpha;
     int best_move = EMPTY;
     int score;
     int move;
@@ -239,57 +244,66 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     if (hash_hit) {
         for (i=0; i <l->index; i++) {
             if (l->moves[i].move == entry.move) {
-                l->moves[i].score == 200000;
+                l->moves[i].score = 200000;
                 break;
             }
         }
     }
 
+
     for (i = 0; i < l->index; i++) {
 
-        set_best_move_next(i, l);
-        move = l->moves[i].move;
 
-        if (make_move(b, move)) {
-            b->search_ply++;
+        /**
+         * oldest brother always search the first node himself, and
+         * parallelising stops if depth is less than 2 (2 little work to invoke
+         * other nodes
+         */
+        if (i == 0 || depth < 2) {
+            set_best_move_next(i, l);
+            move = l->moves[i].move;
 
-            score = -alpha_beta(b, ss, -beta, -alpha, depth-1, do_null);
+            if (make_move(b, move)) {
+                b->search_ply++;
 
-            unmake_move(b);
-            b->search_ply--;
+                score = -alpha_beta(b, ss, -beta, -alpha, depth-1, do_null);
 
-            if (ss->stop) {
-                return 0;
-            }
+                unmake_move(b);
+                b->search_ply--;
 
-            if (score > best_score) {
-                best_score = score;
-                best_move = move;
+                if (ss->stop) {
+                    return 0;
+                }
 
-                if (score > alpha) {
-                    if (score >= beta) {
-                        ss->fail_high++;
-                        if (legal == 0) {
-                            ss->first_fail_high++;
+                if (score > best_score) {
+                    best_score = score;
+                    best_move = move;
+
+                    if (score > alpha) {
+                        if (score >= beta) {
+                            ss->fail_high++;
+                            if (legal == 0) {
+                                ss->first_fail_high++;
+                            }
+
+                            if(!mv_cap(move)) {
+                                store_killer(b, move);
+                            }
+
+                            hash_put(&global_tp_table, b->hash_key, best_move, beta, depth, b->ply, BETA_FLAG);
+
+                            return beta;
                         }
 
                         if(!mv_cap(move)) {
-                            store_killer(b, move);
+                            update_history(b, mv_piece(move), mv_to(move), b->ply);
                         }
-
-                        hash_put(&global_tp_table, b->hash_key, best_move, beta, depth, b->ply, BETA_FLAG);
-
-                        return beta;
+                        alpha = score;
                     }
-
-                    if(!mv_cap(move)) {
-                        update_history(b, mv_piece(move), mv_to(move), b->ply);
-                    }
-                    alpha = score;
                 }
-            }
 
-            legal++;
+                legal++;
+            }
         }
     }
 
@@ -310,6 +324,16 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     return alpha;
 }
 
+/**
+ * younger brothers gets a board and a move they have to do before searching.
+ * the board is not sent by reference, so here they have a local copy of the
+ * board struct
+ */
+void make_move_and_search(S_BOARD b, int move, S_SEARCH_SETTINGS *ss)
+{
+    if (make_move(&b, move)) {
+    }
+}
 void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
 {
     int best_moves[MAX_PLY];

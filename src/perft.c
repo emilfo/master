@@ -197,12 +197,9 @@ void rating_from_file(const char *filename)
 
     char buf[1024];
     char *ptr;
-    int orig_eval = 0;
-    int flip_eval = 0;
     char move[6];
     int i;
 
-    long starttime = cur_time_millis();
     while (fgets(buf, 1024, fp) != NULL) {
 
         parse_fen(&global_board, buf);
