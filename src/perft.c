@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "globals.h"
 #include "board.h"
@@ -185,5 +187,48 @@ void eval_from_file(const char *filename)
         long totaltime = cur_time_millis() - starttime;
         fprintf(fp_result, "\nTOTAL TIME USED: %ld\n\n", totaltime);
         fclose(fp_result);
+    }
+}
+
+void rating_from_file(const char *filename)
+{
+    FILE *fp = fopen(filename, "r");
+
+
+    char buf[1024];
+    char *ptr;
+    int orig_eval = 0;
+    int flip_eval = 0;
+    char move[6];
+    int i;
+
+    long starttime = cur_time_millis();
+    while (fgets(buf, 1024, fp) != NULL) {
+
+        parse_fen(&global_board, buf);
+
+        ptr = strstr(buf, "bm");
+        ptr += 3;
+        i = 0;
+        do {
+            if (*ptr != ';')
+                move[i++] = *ptr;
+        } while (*ptr++);
+        move[i] = '\0';
+
+        printf("RATING Testing this position:\n");
+
+        print_board(&global_board);
+        printf("\nMove to find: %s\n", move);
+        global_search_settings.depth = MAX_PLY;
+        global_search_settings.time_set = true;
+        global_search_settings.starttime = cur_time_millis();
+        global_search_settings.stoptime = global_search_settings.starttime + 900000;
+
+        //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
+
+        thread_search_go();
+        sleep(900);
+
     }
 }
