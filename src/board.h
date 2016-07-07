@@ -22,7 +22,20 @@ typedef uint64_t u64;
 #define BISHOPSB "6K1/1B6/4N3/8/1N4b1/1b3n2/1n6/2B3k1 b - - 0 1 "
 #define CASTLE1 "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
 #define CASTLE2 "3rk2r/8/8/8/8/8/6p1/R3K2R b KQk - 0 1"
+#define MAX_MOVES 256
+#define MAX_DEPTH 1024
 
+typedef struct {
+    uint32_t move;
+    uint32_t score;
+    uint16_t eval;
+} S_MOVE;
+
+typedef struct {
+    S_MOVE moves[MAX_MOVES];
+    int index;
+    volatile int returned;
+} S_MOVELIST;
 
 typedef struct {
     int move;
@@ -30,7 +43,9 @@ typedef struct {
     u64 hash_key;
 } S_PREV_BOARD;
 
-typedef struct {
+typedef struct S_BOARD S_BOARD;
+
+struct S_BOARD {
     u64 piece_bb[13];
     u64 all_piece_bb[3];
 
@@ -45,13 +60,19 @@ typedef struct {
     int ply;
     int search_ply;
 
-    int search_history[13][64];
-    int search_killers[2][MAX_PLY];
+    S_MOVELIST l;
 
-    //storing moves 
-    //uint32_t move_buffer[MAX_MOVE_BUF]; //all generated moves in current tree
-    //int move_buffer_len[MAX_PLY]; //which moves belongs to which ply, TODO:better way?
-} S_BOARD;
+    //alphabeta values for threads
+    volatile int beta_cut;
+    int alpha;
+    int beta;
+    // int score;
+    int depth_left;
+    int do_null;
+
+    int prev_move_index;
+    S_BOARD *prev_board;
+};
 
 //Struct used for pretty printing only
 typedef struct {
@@ -68,10 +89,6 @@ u64 DIAGA1H8_MAGIC[64];
 u64 DIAGA8H1_MAGIC[64];
 
 //castling
-//u64 MASK_EG[2];
-//u64 MASK_FG[2];
-//u64 MASK_BD[2];
-//u64 MASK_CE[2];
 u64 OO_MASK[2];
 u64 OOO_MASK[2];
 u64 OO_ATTACK_MASK[2];

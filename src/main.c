@@ -17,13 +17,12 @@ static void init_all() {
     init_hash();
     init_hashtable(&global_tp_table, tp_size);
     init_board(&global_board);
-    init_thread_cv();
-    create_workers(&global_thread_table, 1, &global_search_settings);
+    init_threads(1);
+    //create_workers(&global_thread_table, 1, &global_search_settings);
 }
 
 static void destroy_all() {
     destroy_hashtable(&global_tp_table);
-    destroy_thread_cv();
     destroy_workers(&global_thread_table);
 }
 

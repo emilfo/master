@@ -1,22 +1,8 @@
 #ifndef UCI_H
 #define UCI_H
 
-//const static char* PIECE_STR[13] = { " ",
-//    "P", "N", "B", "R", "Q", "K",
-//    "P", "N", "B", "R", "Q", "K"
-//};
-//
-//const static char* FILE_STR[64] = {
-//    "a", "b", "c", "d","e","f","g", 
-//    "a", "b", "c", "d","e","f","g", 
-//    "a", "b", "c", "d","e","f","g", 
-//    "a", "b", "c", "d","e","f","g", 
-//    "a", "b", "c", "d","e","f","g", 
-//    "a", "b", "c", "d","e","f","g", 
-//    "a", "b", "c", "d","e","f","g", 
-//    "a", "b", "c", "d","e","f","g"
-//};
-//
+#include "board.h"
+#include "search.h"
 //const static char* SQ_STR[64] = {
 //  "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
 //  "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
@@ -29,5 +15,7 @@
 //};
 
 void uci_loop();
+void uci_report_scores(S_BOARD *b, S_SEARCH_SETTINGS *ss, int score);
+void uci_print_bestmove();
 
 #endif /* UCI_H */

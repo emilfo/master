@@ -3,20 +3,6 @@
 
 #include "board.h"
 
-#define MAX_MOVES 256
-#define MAX_DEPTH 1024
-
-typedef struct {
-    uint32_t move;
-    uint32_t score;
-} S_MOVE;
-
-typedef struct {
-    S_MOVE moves[MAX_MOVES];
-    int index;
-} S_MOVELIST;
-
-
 const static int CAP_VAL[13] = { 0,
     100, 200, 300, 400, 500, 600,
     100, 200, 300, 400, 500, 600,

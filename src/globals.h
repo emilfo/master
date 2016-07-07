@@ -30,10 +30,14 @@ S_HASHTABLE global_tp_table;
 S_THREADS global_thread_table;
 S_SEARCH_SETTINGS global_search_settings;
 
+volatile int global_search_history[13][64];
+volatile int global_search_killers[2][MAX_PLY];
+
 pthread_mutex_t go_mutex;
 pthread_cond_t go_cv;
 int go_search;
 int debug_print;
+int global_bestmove;
 
 /* uint32_t move
  * 0000 0000 0000 0000 0000 0011 1111 -> From, 0x3F

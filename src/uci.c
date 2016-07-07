@@ -8,6 +8,7 @@
 #include "io.h"
 #include "search.h"
 #include "globals.h"
+#include "threads.h"
 
 #define MAX_INPUT_SIZE 4096
 #define NOT_SET -1
@@ -97,6 +98,7 @@ static void parse_go(char *input, S_SEARCH_SETTINGS *ss, S_BOARD *b)
 
     //Setting settings parsed
     ss->depth = depth;
+    ss->cur_depth = 0;
 
     if (movetime != NOT_SET) {
         time = movetime;
@@ -113,7 +115,9 @@ static void parse_go(char *input, S_SEARCH_SETTINGS *ss, S_BOARD *b)
     }
 
     printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
-    thread_search_go();
+
+    pthread_mutex_unlock(&report_move);
+    signal_threads();
 }
 
 void uci_loop() 
@@ -152,50 +156,32 @@ void uci_loop()
         }
 
         if(global_search_settings.quit) {
-            thread_search_go();
             break;
         }
     }
 }
 
-//void move_string(uint32_t move, char *mv_str)
-//{
-//    mv_str = "";
-//    if (mv_piece(move) == W_KING && mv_castle(move)) {
-//        if (mv_to(move) == G1) {
-//            strcat(mv_str, "O-O");
-//        } else {
-//            strcat(mv_str, "O-O-O");
-//        }
-//        return;
-//    }
-//
-//    if (mv_piece(move) == B_KING && mv_castle(move)) {
-//        if (mv_to(move) == G8) {
-//            strcat(mv_str, "O-O");
-//        } else {
-//            strcat(mv_str, "O-O-O");
-//        }
-//        return;
-//    }
-//
-//    //algebraic notation special for pawns
-//    if (mv_piece(move) == W_PAWN || mv_piece(move) == B_PAWN) {
-//        if (mv_cap(move)) {
-//            strcat(mv_str, FILE_STR[mv_from(move)]);
-//        }
-//    } else {
-//        strcat(mv_str, PIECE_STR[mv_piece(move)]);
-//    }
-//
-//    if (mv_cap(move)) {
-//        strcat(mv_str, "x");
-//    }
-//
-//    strcat(mv_str, SQ_STR[mv_to(move)]);
-//
-//    if (mv_prom(move)) {
-//        strcat(mv_str, "=");
-//        strcat(mv_str, PIECE_STR[mv_prom(move)]);
-//    }
-//}
+void uci_report_scores(S_BOARD *b, S_SEARCH_SETTINGS *ss, int score)
+{
+    int best_moves[MAX_PLY];
+    int pv_moves = 0;
+    int i;
+
+
+    pv_moves = hash_get_pv_line(&global_tp_table, b, best_moves, ss->cur_depth);
+    printf("info score cp %d depth %d nodes %ld time %d", score, ss->cur_depth, ss->nodes, cur_time_millis() - ss->starttime);
+
+    global_bestmove = best_moves[0];
+
+    printf(" pv");
+    for(i=0; i < pv_moves; i++) {
+        printf(" %s", move_str(best_moves[i]));
+    }
+    printf("\n");
+    //printf("Ordering: %.1f/%.1f = %.3f\n",ss->first_fail_high,ss->fail_high, ss->first_fail_high/ss->fail_high);
+}
+
+void uci_print_bestmove()
+{
+    printf("bestmove %s\n", move_str(global_bestmove));
+}

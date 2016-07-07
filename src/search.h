@@ -7,9 +7,11 @@
 typedef struct {
     int quit;
     int stop;
+    //int depth_done;
 
     int depth;
     int depth_set;
+    int cur_depth;
 
     int starttime;
     int stoptime;
@@ -24,6 +26,7 @@ typedef struct {
 
 void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss);
 void set_best_move_next(int start_index, S_MOVELIST *l);
-void make_move_and_search(S_BOARD b, int move, S_SEARCH_SETTINGS *ss);
+void make_move_and_search(S_BOARD b, S_BOARD *prev_board, int move, S_SEARCH_SETTINGS *ss);
+void start_new_search(S_BOARD *b, S_SEARCH_SETTINGS *ss);
 
 #endif /* SEARCH_H */

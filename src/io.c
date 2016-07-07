@@ -114,9 +114,6 @@ void engine_shell()
         } else if(strncmp(input, "print", 5) == 0) {
             print_board(&global_board);
         } else if(strncmp(input, "quit", 4) == 0) {
-            global_search_settings.stop = true;
-            global_search_settings.quit = true;
-            thread_search_go();
             break;
         } else if(strncmp(input, "move", 4) == 0) {
             make_move_if_exist(&global_board, str_move(input+5, &global_board));

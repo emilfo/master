@@ -230,13 +230,13 @@ void hard_reset_board(S_BOARD *b)
 
     for (i = 0; i < 13; i++) {
         for (j = 0; j < 64; j++) {
-            b->search_history[i][j] = 0;
+            global_search_history[i][j] = 0;
         }
     }
 
     for (i = 0; i < 2; i++) {
         for (j = 0; j < MAX_PLY; j++) {
-            b->search_history[i][j] = 0;
+            global_search_history[i][j] = 0;
         }
     }
 }

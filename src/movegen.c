@@ -61,6 +61,7 @@ void generate_all_moves(const S_BOARD *b, S_MOVELIST *list)
     u64 targets_bb, free_sq_bb;
 
     list->index = 0;
+    list->returned = 0;
     free_sq_bb = ~(b->all_piece_bb[BOTH]);
 
     if(b->side) { //black to move
@@ -90,6 +91,7 @@ void generate_all_captures(const S_BOARD *b, S_MOVELIST *list)
     u64 targets_bb;
 
     list->index = 0;
+    list->returned = 0;
 
     if(b->side) { //black to move
         targets_bb = b->all_piece_bb[WHITE];
@@ -555,12 +557,12 @@ static void add_move(const S_BOARD *b, S_MOVELIST *list, int from, int to, int p
 
     if(capture) {
         list->moves[list->index].score = CAP_VAL[capture] + ATT_VAL[piece] + 1000000;
-    } else if (b->search_killers[0][b->ply] == list->moves[list->index].move) {
+    } else if (global_search_killers[0][b->ply] == list->moves[list->index].move) {
         list->moves[list->index].score = 900000;
-    } else if (b->search_killers[1][b->ply] == list->moves[list->index].move) {
+    } else if (global_search_killers[1][b->ply] == list->moves[list->index].move) {
         list->moves[list->index].score = 800000;
     } else {
-        list->moves[list->index].score = b->search_history[piece][to];
+        list->moves[list->index].score = global_search_history[piece][to];
     }
 
     list->index++;
