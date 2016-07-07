@@ -239,7 +239,7 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     if (hash_hit) {
         for (i=0; i <l->index; i++) {
             if (l->moves[i].move == entry.move) {
-                l->moves[i].score == 200000;
+                l->moves[i].score = 200000;
                 break;
             }
         }
