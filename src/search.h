@@ -26,7 +26,7 @@ typedef struct {
 
 void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss);
 void set_best_move_next(int start_index, S_MOVELIST *l);
-void make_move_and_search(S_BOARD b, S_SEARCH_SETTINGS *ss, S_MOVELIST *l, int move_index, int alpha, int beta, int depth);
+void make_move_and_search(S_BOARD *b, S_SEARCH_SETTINGS *ss, S_MOVELIST *l, int move_index, int alpha, int beta, int depth);
 void start_new_search(S_BOARD *b, S_SEARCH_SETTINGS *ss);
 
 #endif /* SEARCH_H */

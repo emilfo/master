@@ -63,7 +63,7 @@ void work_loop(S_SEARCH_SETTINGS *ss)
             //printf("out of jobs\n");
             break;
         }
-        make_move_and_search(*job.b, ss, job.l, move_index, job.alpha, job.beta, job.depth);
+        make_move_and_search(job.b, ss, job.l, move_index, job.alpha, job.beta, job.depth);
 
     }
 }

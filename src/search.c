@@ -321,7 +321,7 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
     int score = -INFINITE;
     int old_alpha = alpha;
 
-    if (depth <= 2) {
+    if (depth <= 4) {
         S_MOVELIST l[1];
         generate_all_moves(b, l);
         buffer_add_job(b, l, alpha, beta, depth);
@@ -333,16 +333,18 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
 
         for (i = 0; i < l->index; i++) {
             score = l->moves[i].eval;
+            //printf("score:%d, move:%s\n", score, move_str(l->moves[i].move));
             if (score > best_score) {
                 best_score = score;
                 best_move = l->moves[i].move;
             }
         }
+        //printf("score:%d, move:%s\n", best_score, move_str(best_move));
 
         //printf ("best score:%d, best move:%s, alpha:%d, beta: %d\n", best_score, move_str(best_move), alpha, beta);
 
-        if (score > alpha) {
-            if (score >= beta) {
+        if (best_score > alpha) {
+            if (best_score >= beta) {
 
                 if(!mv_cap(best_move)) {
                     store_killer(b, best_move);
@@ -356,7 +358,7 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
             if(!mv_cap(best_move)) {
                 update_history(b, mv_piece(best_move), mv_to(best_move), b->ply);
             }
-            alpha = score;
+            alpha = best_score;
         }
 
         if (alpha != old_alpha) {
@@ -401,7 +403,7 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
         depth++;
     }
 
-    if (do_null && b->search_ply && depth >= 4 && !in_check) {
+    if (do_null && b->search_ply && depth > 4 && !in_check) {
         if (((b->side && WHITE_MAJ(b))) || ((!b->side) && BLACK_MAJ(b))) {
             make_null_move(b);
             b->search_ply++;
@@ -496,10 +498,11 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
 
 }
 
-void make_move_and_search(S_BOARD b, S_SEARCH_SETTINGS *ss, S_MOVELIST *l, int move_index, int alpha, int beta, int depth)
+void make_move_and_search(S_BOARD *b, S_SEARCH_SETTINGS *ss, S_MOVELIST *l, int move_index, int alpha, int beta, int depth)
 {
-    if (make_move(&b, l->moves[move_index].move)) {
-        int score = -alpha_beta(&b, ss, -beta, -alpha, depth-1, false);
+    S_BOARD local_board = *b;
+    if (make_move(&local_board, l->moves[move_index].move)) {
+        int score = -alpha_beta(&local_board, ss, -beta, -alpha, depth-1, false);
         l->moves[move_index].eval = score;
         //printf("EVAL:%d, score:%d\n", l->moves[move_index].eval, score);
     } else {
@@ -521,7 +524,7 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
 
     for (cur_depth = 1; cur_depth <= ss->depth; cur_depth++) {
         printf("searching depth %d\n", cur_depth);
-        best_score = -thread_alpha_beta(b, ss, -INFINITE, INFINITE, cur_depth, true);
+        best_score = thread_alpha_beta(b, ss, -INFINITE, INFINITE, cur_depth, true);
 
         if (ss->stop) {
             break;
