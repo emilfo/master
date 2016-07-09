@@ -5,41 +5,42 @@
 #include <semaphore.h>
 
 #include "search.h"
+#include "board.h"
 
 #define JOB_BUF_SIZE 64
 
 //semaphores for the job buffer
-pthread_mutex_t start_lock;
-pthread_mutex_t end_lock;
-pthread_mutex_t start_search;
-pthread_mutex_t report_move;
-pthread_barrier_t barrier;
+pthread_mutex_t main_thread;
+pthread_barrier_t io_barrier;
+pthread_barrier_t work_barrier;
 
 typedef struct {
     pthread_t *threads;
-    //S_BOARD b;
     int size;
 } S_THREADS;
 
 typedef struct {
-    S_BOARD b;
+    S_BOARD *b;
+    S_MOVELIST *l;
+
+    //alphabeta values for threads
+    int alpha;
+    int beta;
+    int depth;
+
     volatile int _cur_job;
 } S_JOB;
 
-typedef struct {
-    S_JOB buf[JOB_BUF_SIZE];
-    int start;
-    int end;
-} S_JOB_BUFFER;
+S_JOB job;
 
-S_JOB_BUFFER jobs;
-
-void thread_search_go();
-void buffer_add_job(S_BOARD *b, int first_available_move);
+void buffer_add_job(S_BOARD *b, S_MOVELIST *l, int alpha, int beta, int depth);
 void create_workers(S_THREADS *tt, int size, S_SEARCH_SETTINGS *ss);
 void destroy_workers(S_THREADS *tt);
 void init_search_barrier(unsigned int count);
 void init_threads(int thread_count);
-void signal_threads();
+void io_signal_threads();
+void work_signal_threads();
+void work_loop();
+void destroy_threads();
 
 #endif /* THREADS_H */

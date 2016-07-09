@@ -17,19 +17,17 @@ static void init_all() {
     init_hash();
     init_hashtable(&global_tp_table, tp_size);
     init_board(&global_board);
-    init_threads(1);
-    //create_workers(&global_thread_table, 1, &global_search_settings);
+    init_threads(2);
 }
 
 static void destroy_all() {
     destroy_hashtable(&global_tp_table);
-    destroy_workers(&global_thread_table);
+    destroy_threads();
 }
 
 int main() {
     init_all();
 
-    bit_count(0x8000000000000000);
     engine_shell();
 
     destroy_all();

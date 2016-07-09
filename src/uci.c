@@ -116,8 +116,8 @@ static void parse_go(char *input, S_SEARCH_SETTINGS *ss, S_BOARD *b)
 
     printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
-    pthread_mutex_unlock(&report_move);
-    signal_threads();
+    printf("SIGNALING THREADS\n");
+    io_signal_threads();
 }
 
 void uci_loop() 

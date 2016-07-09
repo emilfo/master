@@ -26,18 +26,6 @@ typedef uint64_t u64;
 #define MAX_DEPTH 1024
 
 typedef struct {
-    uint32_t move;
-    uint32_t score;
-    uint16_t eval;
-} S_MOVE;
-
-typedef struct {
-    S_MOVE moves[MAX_MOVES];
-    int index;
-    volatile int returned;
-} S_MOVELIST;
-
-typedef struct {
     int move;
     uint8_t castle_perm, ep_sq, fifty_move_count;
     u64 hash_key;
@@ -59,19 +47,6 @@ struct S_BOARD {
     S_PREV_BOARD prev[MAX_MOVE_BUF];
     int ply;
     int search_ply;
-
-    S_MOVELIST l;
-
-    //alphabeta values for threads
-    volatile int beta_cut;
-    int alpha;
-    int beta;
-    // int score;
-    int depth_left;
-    int do_null;
-
-    int prev_move_index;
-    S_BOARD *prev_board;
 };
 
 //Struct used for pretty printing only

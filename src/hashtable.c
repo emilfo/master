@@ -76,7 +76,8 @@ int hash_get(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry)
         *entry = tp->entries[i];
 
         //Only return if checksum is OK
-        if(entry->checksum == (entry->hash_key ^ entry->move ^ entry->eval ^ entry->depth ^ entry->flag_and_age)) {
+        int checksum = entry->hash_key ^ entry->move ^ entry->eval ^ entry->depth ^ entry->flag_and_age;
+        if(entry->checksum == checksum) {
             return 1;
         }
         fail_checksum++;
@@ -122,13 +123,12 @@ int hash_get_pv_line(const S_HASHTABLE *tp, S_BOARD *b, int *moves, int depth)
     S_HASHENTRY entry;
     hash_get(tp, b->hash_key, &entry);
 
-    while(i < depth && &entry != NULL) {
+    while(i < depth && hash_get(tp, b->hash_key, &entry)) {
         if(make_move_if_exist(b, entry.move)) {
             moves[i++] = entry.move;
         } else {
             break;
         }
-        hash_get(tp, b->hash_key, &entry);
     }
 
     while(j++ < i) {
