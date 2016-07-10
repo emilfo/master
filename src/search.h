@@ -18,7 +18,7 @@ typedef struct {
     int time_set;
     int infinite;
 
-    long nodes;
+    volatile long nodes;
 
     float fail_high;
     float first_fail_high;

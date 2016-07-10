@@ -7,6 +7,7 @@ typedef struct {
     uint32_t move;
     uint32_t score;
     uint32_t eval;
+    long nodes;
 } S_MOVE;
 
 typedef struct {

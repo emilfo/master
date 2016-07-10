@@ -42,6 +42,7 @@ struct S_BOARD {
     uint8_t sq[64];
 
     u64 hash_key;
+    long nodes;
 
     //used to unmake move
     S_PREV_BOARD prev[MAX_MOVE_BUF];
