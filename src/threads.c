@@ -29,14 +29,14 @@ void work_signal_threads()
     pthread_barrier_wait(&work_barrier);
 }
 
-void buffer_add_job(S_BOARD *b, S_MOVELIST *l, int alpha, int beta, int depth)
+void buffer_add_job(S_BOARD *b, S_MOVELIST *l, int start_move, int alpha, int beta, int depth)
 {
     job.b = b;
     job.l = l;
     job.alpha = alpha;
     job.beta = beta;
     job.depth = depth;
-    job._cur_job = 0;
+    job._cur_job = start_move;
 }
 
 static int get_job(int *move_index)
@@ -66,6 +66,7 @@ void work_loop(S_SEARCH_SETTINGS *ss)
         make_move_and_search(job.b, ss, job.l, move_index, job.alpha, job.beta, job.depth);
 
     }
+    pthread_barrier_wait(&work_done_barrier);
 }
 
 static void thread_wait_for_work(S_SEARCH_SETTINGS *ss) 
@@ -93,6 +94,7 @@ static void *thread_wait_for_io()
             /* One thread is main, which allocates work to the others */
             printf("main-thread\n");
             search_position(&global_board, &global_search_settings);
+            work_signal_threads();
             pthread_mutex_unlock(&main_thread);
         } else {
             printf("workerthread\n");
@@ -126,8 +128,6 @@ void destroy_workers(S_THREADS *tt)
     global_search_settings.quit = true;
     global_search_settings.stop = true;
 
-
-    work_signal_threads();
     io_signal_threads();
 
     for(i = 0; i < tt->size; i++) {
@@ -145,6 +145,7 @@ void init_threads(int thread_count)
     pthread_mutex_init(&main_thread, NULL);
     pthread_barrier_init(&io_barrier, NULL, thread_count+1);
     pthread_barrier_init(&work_barrier, NULL, thread_count);
+    pthread_barrier_init(&work_done_barrier, NULL, thread_count);
     create_workers(&global_thread_table, thread_count, &global_search_settings);
 }
 
@@ -153,5 +154,6 @@ void destroy_threads()
     destroy_workers(&global_thread_table);
     pthread_barrier_destroy(&io_barrier);
     pthread_barrier_destroy(&work_barrier);
+    pthread_barrier_destroy(&work_done_barrier);
     pthread_mutex_destroy(&main_thread);
 }

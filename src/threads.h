@@ -13,6 +13,7 @@
 pthread_mutex_t main_thread;
 pthread_barrier_t io_barrier;
 pthread_barrier_t work_barrier;
+pthread_barrier_t work_done_barrier;
 
 typedef struct {
     pthread_t *threads;
@@ -33,7 +34,7 @@ typedef struct {
 
 S_JOB job;
 
-void buffer_add_job(S_BOARD *b, S_MOVELIST *l, int alpha, int beta, int depth);
+void buffer_add_job(S_BOARD *b, S_MOVELIST *l, int start_move, int alpha, int beta, int depth);
 void create_workers(S_THREADS *tt, int size, S_SEARCH_SETTINGS *ss);
 void destroy_workers(S_THREADS *tt);
 void init_search_barrier(unsigned int count);

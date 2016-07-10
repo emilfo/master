@@ -324,7 +324,7 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
     if (depth <= 4) {
         S_MOVELIST l[1];
         generate_all_moves(b, l);
-        buffer_add_job(b, l, alpha, beta, depth);
+        buffer_add_job(b, l, 0, alpha, beta, depth);
         //printf("before loop\n");
         
         work_signal_threads();
