@@ -220,12 +220,13 @@ void rating_from_file(const char *filename)
         global_search_settings.depth = MAX_PLY;
         global_search_settings.time_set = true;
         global_search_settings.starttime = cur_time_millis();
-        global_search_settings.stoptime = global_search_settings.starttime + 900000;
+        global_search_settings.stoptime = global_search_settings.starttime + 900;
+        global_search_settings.cur_depth = 0;
 
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
         io_signal_threads();
-        sleep(900);
+        sleep(2);
 
     }
 }

@@ -324,7 +324,7 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
     int move;
     int legal = 0;
     int in_check = false;
-    b->nodes = 0;
+    b->nodes = 0L;
 
     
     if (probe_hash(&global_tp_table, b->hash_key, &entry, &score, alpha, beta, depth)) {
@@ -394,7 +394,11 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
 
             legal++;
             break;
+        } else {
+            l->moves[i].eval = -INFINITE;
+            l->moves[i].nodes = 0L;
         }
+            
     }
 
     if (legal == 0) {
@@ -407,6 +411,7 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
 
     buffer_add_job(b, l, i, alpha, beta, depth);
 
+    work_signal_threads();
     work_signal_threads();
     work_loop(ss);
 
@@ -587,14 +592,14 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
 void make_move_and_search(S_BOARD *b, S_SEARCH_SETTINGS *ss, S_MOVELIST *l, int move_index, int alpha, int beta, int depth)
 {
     S_BOARD local_board = *b;
-    local_board.nodes=0;
+    local_board.nodes=0L;
     if (make_move(&local_board, l->moves[move_index].move)) {
         int score = -alpha_beta(&local_board, ss, -beta, -alpha, depth-1, false);
         l->moves[move_index].eval = score;
         l->moves[move_index].nodes = local_board.nodes;
     } else {
         l->moves[move_index].eval = -INFINITE;
-        l->moves[move_index].nodes = 0;
+        l->moves[move_index].nodes = 0L;
     }
 }
 

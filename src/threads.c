@@ -54,17 +54,15 @@ void work_loop(S_SEARCH_SETTINGS *ss)
     int move_index;
 
     while (true) {
-        if (ss->stop) {
-            break;
-        }
-
-
         if (!get_job(&move_index)) {
             //printf("out of jobs\n");
             break;
         }
         make_move_and_search(job.b, ss, job.l, move_index, job.alpha, job.beta, job.depth);
 
+        if (ss->stop) {
+            break;
+        }
     }
     pthread_barrier_wait(&work_done_barrier);
 }
@@ -77,6 +75,7 @@ static void thread_wait_for_work(S_SEARCH_SETTINGS *ss)
         if(ss->stop) {
             break;
         }
+        wait_for_work_signal();
         work_loop(ss);
     }
 }
@@ -85,19 +84,18 @@ static void *thread_wait_for_io()
 {
     while (true) {
         wait_for_io_signal();
-
         if (global_search_settings.quit) {
             break; 
         }
 
         if (pthread_mutex_trylock(&main_thread) == 0) {
             /* One thread is main, which allocates work to the others */
-            printf("main-thread\n");
+            //printf("main-thread\n");
             search_position(&global_board, &global_search_settings);
             work_signal_threads();
             pthread_mutex_unlock(&main_thread);
         } else {
-            printf("workerthread\n");
+            //printf("workerthread\n");
             thread_wait_for_work(&global_search_settings);
         }
     }
