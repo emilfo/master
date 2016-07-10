@@ -88,8 +88,8 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
 {
     int i;
     int legal = 0;
-    int old_alpha = alpha;
-    int best_move = EMPTY;
+    //int old_alpha = alpha;
+    //int best_move = EMPTY;
     int score;
     int move;
 
@@ -156,7 +156,7 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
                     return beta;
                 }
                 alpha = score;
-                best_move = move;
+                //best_move = move;
             }
 
             legal++;
@@ -180,7 +180,6 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     int best_score = -INFINITE;
     int null_score = -INFINITE;
     int move;
-    int hash_hit;
     int in_check;
 
     assert(debug_board(b));
@@ -205,8 +204,7 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
 
     S_HASHENTRY entry;
 
-    hash_hit = probe_hash(&global_tp_table, b->hash_key, &entry, &score, alpha, beta, depth);
-    if (hash_hit) {
+    if (probe_hash(&global_tp_table, b->hash_key, &entry, &score, alpha, beta, depth)) {
         global_tp_table.cut++;
         return score;
     }
@@ -236,7 +234,7 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     S_MOVELIST l[1];
     generate_all_moves(b, l);
 
-    if (hash_hit) {
+    if (hash_get(&global_tp_table, b->hash_key, &entry)) {
         for (i=0; i <l->index; i++) {
             if (l->moves[i].move == entry.move) {
                 l->moves[i].score = 200000;

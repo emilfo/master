@@ -10,19 +10,19 @@
 u64 tp_size = ((u64)0x1000000 * (u64)64); //16MB size TP_TABLE (TODO: not static)
 
 
-static void clear_hashtable(S_HASHTABLE *tp) 
-{
-    int i;
-    fail_checksum = 0;
-
-    for(i = 0; i < tp->size; i++) {
-        tp->entries[i].hash_key = 0LL;
-        tp->entries[i].move = 0;
-        tp->entries[i].eval = 0;
-        tp->entries[i].flag_and_age = 0;
-        tp->entries[i].checksum = 0;
-    }
-}
+//static void clear_hashtable(S_HASHTABLE *tp) 
+//{
+//    int i;
+//    fail_checksum = 0;
+//
+//    for(i = 0; i < tp->size; i++) {
+//        tp->entries[i].hash_key = 0LL;
+//        tp->entries[i].move = 0;
+//        tp->entries[i].eval = 0;
+//        tp->entries[i].flag_and_age = 0;
+//        tp->entries[i].checksum = 0;
+//    }
+//}
 
 void init_hashtable(S_HASHTABLE *tp, u64 size)
 {
@@ -76,7 +76,8 @@ int hash_get(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry)
         *entry = tp->entries[i];
 
         //Only return if checksum is OK
-        if(entry->checksum == entry->hash_key ^ entry->move ^ entry->eval ^ entry->depth ^ entry->flag_and_age) {
+        uint32_t local_checksum = entry->hash_key ^ entry->move ^ entry->eval ^ entry->depth ^ entry->flag_and_age;
+        if(entry->checksum == local_checksum) {
             return 1;
         }
         fail_checksum++;
@@ -120,15 +121,13 @@ int hash_get_pv_line(const S_HASHTABLE *tp, S_BOARD *b, int *moves, int depth)
     int j = 0;
 
     S_HASHENTRY entry;
-    hash_get(tp, b->hash_key, &entry);
 
-    while(i < depth && &entry != NULL) {
+    while(i < depth && hash_get(tp, b->hash_key, &entry)) {
         if(make_move_if_exist(b, entry.move)) {
             moves[i++] = entry.move;
         } else {
             break;
         }
-        hash_get(tp, b->hash_key, &entry);
     }
 
     while(j++ < i) {
