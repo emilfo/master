@@ -91,7 +91,7 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
     int i;
     int legal = 0;
     //int old_alpha = alpha;
-    int best_move = EMPTY;
+    //int best_move = EMPTY;
     int score;
     int move;
 
@@ -159,7 +159,7 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
                     return beta;
                 }
                 alpha = score;
-                best_move = move;
+                //best_move = move;
             }
 
             legal++;
@@ -458,7 +458,7 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
     int score = -INFINITE;
     int old_alpha = alpha;
 
-    if (depth <= 2) {
+    if (depth <= 4) {
         return split_alpha_beta(b, ss, alpha, beta, depth);
     }
 
