@@ -7,7 +7,7 @@
 #include "hashtable.h"
 #include "io.h"
 
-u64 tp_size = ((u64)0x1000000 * (u64)64); //16MB size TP_TABLE (TODO: not static)
+u64 tp_size = ((u64)0x1000000 * (u64)64); //64MB size TP_TABLE (TODO: not static)
 
 
 //static void clear_hashtable(S_HASHTABLE *tp) 
