@@ -12,6 +12,8 @@
 
 #define BLACK_MAJ(b) (b->piece_bb[B_BISHOP] || b->piece_bb[B_ROOK] || b->piece_bb[B_QUEEN])
 #define WHITE_MAJ(b) (b->piece_bb[W_BISHOP] || b->piece_bb[W_ROOK] || b->piece_bb[W_QUEEN])
+#define MIN(a, b) (( a < b)? a : b )
+#define MAX(a, b) (( a > b)? a : b )
 
 static int is_repetition(S_BOARD *b) 
 {
@@ -103,7 +105,6 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
         check_search_stop(ss);
     }
 
-    //ss->nodes++;
     b->nodes++;
 
     if (is_repetition(b) || b->fifty_move_count >= 100) {
@@ -412,7 +413,9 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
     buffer_add_job(b, l, i, alpha, beta, depth);
 
     work_signal_threads();
-    work_signal_threads();
+    //To avoid concurrency issues we make sure all threads have been notified
+    //before anyone begin searching, therefore we have to signal twice
+    work_signal_threads(); 
     work_loop(ss);
 
     for (i = 0; i < l->index; i++) {
@@ -452,16 +455,15 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
 
 static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int do_null)
 {
+    if (depth <= 4) {
+        return split_alpha_beta(b, ss, alpha, beta, depth);
+    }
+
     int i;
     int best_score = -INFINITE;
     int best_move = EMPTY;
     int score = -INFINITE;
     int old_alpha = alpha;
-
-    if (depth <= 4) {
-        return split_alpha_beta(b, ss, alpha, beta, depth);
-    }
-
     int legal = 0;
     int null_score = -INFINITE;
     int move;
@@ -499,7 +501,7 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
             make_null_move(b);
             b->search_ply++;
 
-            null_score = -thread_alpha_beta(b, ss, -beta, -beta+1, depth-4, false);
+            null_score = -alpha_beta(b, ss, -beta, -beta+1, depth-4, false);
 
             unmake_null_move(b);
             b->search_ply--;
@@ -611,12 +613,33 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
     int cur_depth = 0;
     int pv_moves = 0;
     int i;
+    int a_index;
+    int b_index;
+    volatile int alpha = -INFINITE;
+    volatile int beta = INFINITE;
 
     prepare_search(b, ss);
 
     for (cur_depth = 1; cur_depth <= ss->depth; cur_depth++) {
         //printf("searching depth %d\n", cur_depth);
         best_score = thread_alpha_beta(b, ss, -INFINITE, INFINITE, cur_depth, true);
+
+        do {
+            best_score = alpha_beta(b, ss, alpha, beta, cur_depth, true);
+            if (ss->stop) {
+                break;
+            }
+
+            if (best_score <= alpha) { //fail low
+                alpha = MAX(-INFINITE, best_score - aspiration_window[MIN(a_index, 3)]);
+                a_index++;
+            } else if (best_score >= beta) { //fail high
+                beta  = MIN(INFINITE, (best_score + aspiration_window[MIN(b_index,3)]));
+                b_index++;
+            } else {
+                break;
+            }
+        } while(true);
 
         if (ss->stop) {
             break;
@@ -632,7 +655,10 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
             printf(" %s", move_str(best_moves[i]));
         }
         printf("\n");
-        //printf("Ordering: %.1f/%.1f = %.3f\n",ss->first_fail_high,ss->fail_high, ss->first_fail_high/ss->fail_high);
+
+        alpha = MAX(-INFINITE, (best_score - aspiration_window[0]));
+        beta  = MIN(INFINITE, (best_score + aspiration_window[0]));
+        a_index = b_index = 1;
     }
 
     printf("bestmove %s\n", move_str(best_move));
