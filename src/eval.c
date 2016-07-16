@@ -209,9 +209,9 @@ int eval_posistion(const S_BOARD *b)
             score_eg -= PAWN_ISOLATED;
         }
 
-        if (BLACK_PAWN_PASSED[sq] & b->piece_bb[W_PAWN]) {
-            score_mg -= BLACK_PASSED_MASK[files[sq] - 1];
-            score_eg -= (BLACK_PASSED_MASK[files[sq] - 1] * 2);
+        if (BLACK_PASSED_MASK[sq] & b->piece_bb[W_PAWN]) {
+            score_mg -= BLACK_PAWN_PASSED[files[sq] - 1];
+            score_eg -= (BLACK_PAWN_PASSED[files[sq] - 1] * 2);
         }
 
         cur_piece_bb ^= (1LL << sq);
@@ -230,9 +230,9 @@ int eval_posistion(const S_BOARD *b)
             score_eg += PAWN_ISOLATED;
         }
 
-        if (WHITE_PAWN_PASSED[sq] & b->piece_bb[B_PAWN]) {
-            score_mg += WHITE_PASSED_MASK[files[sq] - 1];
-            score_eg += (WHITE_PASSED_MASK[files[sq] - 1] * 2);
+        if (WHITE_PASSED_MASK[sq] & b->piece_bb[B_PAWN]) {
+            score_mg += WHITE_PAWN_PASSED[files[sq] - 1];
+            score_eg += (WHITE_PAWN_PASSED[files[sq] - 1] * 2);
         }
 
         cur_piece_bb ^= (1LL << sq);
