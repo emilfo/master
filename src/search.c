@@ -97,7 +97,7 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
 
     assert(debug_board(b));
 
-    if (ss->nodes & 4095) {
+    if ((ss->nodes & 4095) == 0) {
         check_search_stop(ss);
     }
 
@@ -189,7 +189,7 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
         return quiescence(b, ss, alpha, beta);
     }
 
-    if (ss->nodes & 4095) {
+    if ((ss->nodes & 4095) == 0) {
         check_search_stop(ss);
     }
 
