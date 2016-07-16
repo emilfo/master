@@ -17,6 +17,7 @@ pthread_barrier_t work_done_barrier;
 
 typedef struct {
     pthread_t *threads;
+    S_BOARD *tb;
     int size;
 } S_THREADS;
 
@@ -41,7 +42,7 @@ void init_search_barrier(unsigned int count);
 void init_threads(int thread_count);
 void io_signal_threads();
 void work_signal_threads();
-void work_loop();
+void work_loop(S_SEARCH_SETTINGS *ss, S_BOARD *my_b);
 void destroy_threads();
 
 #endif /* THREADS_H */

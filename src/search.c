@@ -99,9 +99,7 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
 
     assert(debug_board(b));
 
-    //printf("WORKER THREAD quiescence\n");
-
-    if (b->nodes & 4095) {
+    if ((b->nodes & 4095) == 0) {
         check_search_stop(ss);
     }
 
@@ -117,6 +115,7 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
     }
 
     score = eval_posistion(b);
+
 
     if (score >= beta) {
         return beta;
@@ -177,6 +176,7 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
 
 static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int do_null) //, int window) //TODO: window?
 {
+    //printf("alpha beta, depth:%d\n", depth);
     int i;
     int legal = 0;
     int old_alpha = alpha;
@@ -314,8 +314,9 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     return alpha;
 }
 
-static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth)
+static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, S_BOARD *my_b)
 {
+    //printf("split alphabeta\n");
     int i;
     int best_score = -INFINITE;
     int best_move = EMPTY;
@@ -346,6 +347,7 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
     }
 
     for (i = 0; i < l->index; i++) {
+        //printf("i:%d\n", i);
 
         set_best_move_next(i, l);
         move = l->moves[i].move;
@@ -353,7 +355,9 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
         if (make_move(b, move)) {
             b->search_ply++;
 
+            //printf("before alpha beta\n");
             score = -alpha_beta(b, ss, -beta, -alpha, depth-1, false);
+            //printf("after alpha beta, score:%d\n", score);
             //printf("move:%s, score:%d\n", move_str(move), score);
             l->moves[i].eval = score;
             l->moves[i].nodes = b->nodes;
@@ -366,6 +370,7 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
             }
 
             if (score > best_score) {
+                //printf("yo\n");
                 best_score = score;
                 best_move = move;
 
@@ -379,6 +384,7 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
                         if(!mv_cap(move)) {
                             store_killer(b, move);
                         }
+                        //printf("yo2, beta:%d\n", beta);
 
                         hash_put(&global_tp_table, b->hash_key, best_move, beta, depth, b->ply, BETA_FLAG);
 
@@ -393,6 +399,7 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
                 }
             }
 
+            //printf("yo3\n");
             legal++;
             break;
         } else {
@@ -410,13 +417,17 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
         }
     }
 
+    //printf("adding job\n");
     buffer_add_job(b, l, i, alpha, beta, depth);
 
+    //printf("signal1\n");
     work_signal_threads();
     //To avoid concurrency issues we make sure all threads have been notified
     //before anyone begin searching, therefore we have to signal twice
+    //printf("signal2\n");
     work_signal_threads(); 
-    work_loop(ss);
+    //printf("work-loop\n");
+    work_loop(ss, my_b);
 
     for (i = 0; i < l->index; i++) {
         score = l->moves[i].eval;
@@ -453,16 +464,22 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
     return alpha;
 }
 
-static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int do_null)
+static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int do_null, S_BOARD *my_b)
 {
+    int score = -INFINITE;
+    //if (depth == 0) {
+    //    return quiescence(b, ss, alpha, beta);
+    //}
+
     if (depth <= 4) {
-        return split_alpha_beta(b, ss, alpha, beta, depth);
+        score = split_alpha_beta(b, ss, alpha, beta, depth, my_b);
+        //printf ("returning score:%d\n", score);
+        return score;
     }
 
     int i;
     int best_score = -INFINITE;
     int best_move = EMPTY;
-    int score = -INFINITE;
     int old_alpha = alpha;
     int legal = 0;
     int null_score = -INFINITE;
@@ -532,7 +549,7 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
         if (make_move(b, move)) {
             b->search_ply++;
 
-            score = -thread_alpha_beta(b, ss, -beta, -alpha, depth-1, do_null);
+            score = -thread_alpha_beta(b, ss, -beta, -alpha, depth-1, do_null, my_b);
             //printf("move:%s, score:%d\n", move_str(move), score);
 
             unmake_move(b);
@@ -591,21 +608,29 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
 
 }
 
-void make_move_and_search(S_BOARD *b, S_SEARCH_SETTINGS *ss, S_MOVELIST *l, int move_index, int alpha, int beta, int depth)
+void make_move_and_search(S_BOARD *b, S_SEARCH_SETTINGS *ss, S_MOVELIST *l, int move_index, int alpha, int beta, int depth, S_BOARD *my_b)
 {
-    S_BOARD local_board = *b;
-    local_board.nodes=0L;
-    if (make_move(&local_board, l->moves[move_index].move)) {
-        int score = -alpha_beta(&local_board, ss, -beta, -alpha, depth-1, false);
+    int i;
+    
+    for (i = 0; i < 13; i++) my_b->piece_bb[i] = b->piece_bb[i];
+    for (i = 0; i < 3; i++) my_b->all_piece_bb[i] = b->all_piece_bb[i];
+    my_b->side = b->side; my_b->castle_perm = b->castle_perm;
+    my_b->ep_sq = b->ep_sq; my_b->fifty_move_count = b->fifty_move_count;
+    for (i = 0; i < 64; i++) my_b->sq[i] = b->sq[i];
+    my_b->ply = b->ply; my_b->search_ply = b->search_ply;
+    for (i = 0; i < b->ply; i++) my_b->prev[i] = b->prev[i];
+    
+    if (make_move(my_b, l->moves[move_index].move)) {
+        int score = -alpha_beta(my_b, ss, -beta, -alpha, depth-1, false);
         l->moves[move_index].eval = score;
-        l->moves[move_index].nodes = local_board.nodes;
+        l->moves[move_index].nodes = my_b->nodes;
     } else {
         l->moves[move_index].eval = -INFINITE;
         l->moves[move_index].nodes = 0L;
     }
 }
 
-void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
+void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss, S_BOARD *my_b)
 {
     int best_moves[MAX_PLY];
     int best_move = EMPTY;
@@ -622,10 +647,8 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
 
     for (cur_depth = 1; cur_depth <= ss->depth; cur_depth++) {
         //printf("searching depth %d\n", cur_depth);
-        best_score = thread_alpha_beta(b, ss, -INFINITE, INFINITE, cur_depth, true);
-
         do {
-            best_score = alpha_beta(b, ss, alpha, beta, cur_depth, true);
+            best_score = thread_alpha_beta(b, ss, alpha, beta, cur_depth, true, my_b);
             if (ss->stop) {
                 break;
             }

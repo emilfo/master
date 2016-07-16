@@ -31,9 +31,9 @@ void init_hashtable(S_HASHTABLE *tp, u64 size)
 
     destroy_hashtable(tp);
 
-    tp->entries = (S_HASHENTRY *) malloc(tp->size * sizeof(S_HASHENTRY));
+    tp->entries = (S_HASHENTRY *) calloc(tp->size, sizeof(S_HASHENTRY));
 
-    clear_hashtable(tp);
+    //clear_hashtable(tp);
 
     printf("init hashtable with %d entries\n", tp->size);
 }

@@ -49,8 +49,10 @@ static int get_job(int *move_index)
    return false;
 }
 
-void work_loop(S_SEARCH_SETTINGS *ss)
+//#pragma OPTIMIZE off
+void work_loop(S_SEARCH_SETTINGS *ss, S_BOARD *my_b)
 {
+    //printf("work loop\n");
     int move_index;
 
     while (true) {
@@ -58,7 +60,7 @@ void work_loop(S_SEARCH_SETTINGS *ss)
             //printf("out of jobs\n");
             break;
         }
-        make_move_and_search(job.b, ss, job.l, move_index, job.alpha, job.beta, job.depth);
+        make_move_and_search(job.b, ss, job.l, move_index, job.alpha, job.beta, job.depth, my_b);
 
         if (ss->stop) {
             break;
@@ -66,8 +68,9 @@ void work_loop(S_SEARCH_SETTINGS *ss)
     }
     pthread_barrier_wait(&work_done_barrier);
 }
+//#pragma OPTIMIZE on
 
-static void thread_wait_for_work(S_SEARCH_SETTINGS *ss) 
+static void thread_wait_for_work(S_SEARCH_SETTINGS *ss, S_BOARD *my_b) 
 {
     while (true) {
         //printf("waiting for work\n");
@@ -76,12 +79,13 @@ static void thread_wait_for_work(S_SEARCH_SETTINGS *ss)
             break;
         }
         wait_for_work_signal();
-        work_loop(ss);
+        work_loop(ss, my_b);
     }
 }
 
-static void *thread_wait_for_io() 
+static void *thread_wait_for_io(void *thread_board) 
 {
+    S_BOARD *my_b = (S_BOARD *)thread_board;
     while (true) {
         wait_for_io_signal();
         if (global_search_settings.quit) {
@@ -90,13 +94,14 @@ static void *thread_wait_for_io()
 
         if (pthread_mutex_trylock(&main_thread) == 0) {
             /* One thread is main, which allocates work to the others */
-            //printf("main-thread\n");
-            search_position(&global_board, &global_search_settings);
+            printf("main-thread\n");
+            //*my_b = global_board;
+            search_position(&global_board, &global_search_settings, my_b);
             work_signal_threads();
             pthread_mutex_unlock(&main_thread);
         } else {
-            //printf("workerthread\n");
-            thread_wait_for_work(&global_search_settings);
+            printf("workerthread\n");
+            thread_wait_for_work(&global_search_settings, my_b);
         }
     }
 
@@ -113,9 +118,10 @@ void create_workers(S_THREADS *tt, int size, S_SEARCH_SETTINGS *ss)
     }
 
     tt->threads = (pthread_t *)malloc(tt->size * sizeof(pthread_t));
+    tt->tb = (S_BOARD *)malloc(tt->size * sizeof(S_BOARD));
 
     for (i = 0; i < tt->size; i++) {
-        pthread_create(&tt->threads[i], NULL, &thread_wait_for_io, NULL);
+        pthread_create(&tt->threads[i], NULL, &thread_wait_for_io, (void *)&tt->tb[i]);
     }
 }
 
@@ -135,6 +141,9 @@ void destroy_workers(S_THREADS *tt)
     tt->size = 0;
     if (tt->threads != NULL) {
         free(tt->threads);
+    }
+    if (tt->tb != NULL) {
+        free(tt->tb);
     }
 }
 

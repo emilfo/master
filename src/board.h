@@ -45,9 +45,9 @@ struct S_BOARD {
     long nodes;
 
     //used to unmake move
-    S_PREV_BOARD prev[MAX_MOVE_BUF];
     int ply;
     int search_ply;
+    S_PREV_BOARD prev[MAX_MOVE_BUF];
 };
 
 //Struct used for pretty printing only
