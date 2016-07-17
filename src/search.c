@@ -467,11 +467,8 @@ static int split_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int be
 static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int do_null, S_BOARD *my_b)
 {
     int score = -INFINITE;
-    //if (depth == 0) {
-    //    return quiescence(b, ss, alpha, beta);
-    //}
 
-    if (depth <= 4) {
+    if (depth == 4) {
         score = split_alpha_beta(b, ss, alpha, beta, depth, my_b);
         //printf ("returning score:%d\n", score);
         return score;
@@ -485,6 +482,10 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
     int null_score = -INFINITE;
     int move;
     int in_check;
+
+    if (depth == 0) {
+        return quiescence(b, ss, alpha, beta);
+    }
 
     if ((ss->nodes & 4095) == 0) {
         check_search_stop(ss);
@@ -518,7 +519,7 @@ static int thread_alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int b
             make_null_move(b);
             b->search_ply++;
 
-            null_score = -alpha_beta(b, ss, -beta, -beta+1, depth-4, false);
+            null_score = -thread_alpha_beta(b, ss, -beta, -beta+1, depth-4, false, my_b);
 
             unmake_null_move(b);
             b->search_ply--;
