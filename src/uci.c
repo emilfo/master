@@ -112,8 +112,8 @@ static void parse_go(char *input, S_SEARCH_SETTINGS *ss, S_BOARD *b)
         ss->stoptime = ss->starttime + time + inc;
     }
 
-    printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
-    thread_search_go();
+    printf("time:%d start:%ld stop:%ld depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
+    io_signal_threads();
 }
 
 void uci_loop() 
@@ -152,7 +152,6 @@ void uci_loop()
         }
 
         if(global_search_settings.quit) {
-            thread_search_go();
             break;
         }
     }

@@ -9,6 +9,7 @@
 typedef struct {
     uint32_t move;
     uint32_t score;
+    int eval;
 } S_MOVE;
 
 typedef struct {

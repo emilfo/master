@@ -555,12 +555,12 @@ static void add_move(const S_BOARD *b, S_MOVELIST *list, int from, int to, int p
 
     if(capture) {
         list->moves[list->index].score = CAP_VAL[capture] + ATT_VAL[piece] + 1000000;
-    } else if (b->search_killers[0][b->ply] == list->moves[list->index].move) {
+    } else if (global_search_killers[0][b->ply] == list->moves[list->index].move) {
         list->moves[list->index].score = 900000;
-    } else if (b->search_killers[1][b->ply] == list->moves[list->index].move) {
+    } else if (global_search_killers[1][b->ply] == list->moves[list->index].move) {
         list->moves[list->index].score = 800000;
     } else {
-        list->moves[list->index].score = b->search_history[piece][to];
+        list->moves[list->index].score = global_search_history[piece][to];
     }
 
     list->index++;

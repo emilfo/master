@@ -29,6 +29,9 @@ S_BOARD global_board;
 S_HASHTABLE global_tp_table;
 S_THREADS global_thread_table;
 S_SEARCH_SETTINGS global_search_settings;
+int global_search_history[13][64];
+int global_search_killers[2][MAX_PLY];
+
 
 pthread_mutex_t go_mutex;
 pthread_cond_t go_cv;

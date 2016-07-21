@@ -41,16 +41,14 @@ typedef struct {
     u64 hash_key;
 
     //used to unmake move
-    S_PREV_BOARD prev[MAX_MOVE_BUF];
     int ply;
     int search_ply;
+    S_PREV_BOARD prev[MAX_MOVE_BUF];
 
-    int search_history[13][64];
-    int search_killers[2][MAX_PLY];
+    long nodes;
+    float first_fail_high;
+    float fail_high;
 
-    //storing moves 
-    //uint32_t move_buffer[MAX_MOVE_BUF]; //all generated moves in current tree
-    //int move_buffer_len[MAX_PLY]; //which moves belongs to which ply, TODO:better way?
 } S_BOARD;
 
 //Struct used for pretty printing only
