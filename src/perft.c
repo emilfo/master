@@ -225,7 +225,9 @@ void rating_from_file(const char *filename)
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
         thread_search_go();
-        sleep(900);
+        sleep(902);
 
     }
+
+    fclose(fp);
 }
