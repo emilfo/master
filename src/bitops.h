@@ -1,7 +1,7 @@
 #ifndef BITOPS_H
 #define BITOPS_H
 
-#include "board.h"
+#include "defs.h"
 
 int bit_count(u64 bitmap);
 int lsb1_index(u64 bitmap);

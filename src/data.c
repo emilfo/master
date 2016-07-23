@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-#include "globals.h"
+//#include "globals.h"
+#include "defs.h"
 #include "bitops.h"
 #include "data.h"
 #include "eval.h"

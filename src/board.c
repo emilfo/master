@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <inttypes.h>
-#include "globals.h"
+//#include "globals.h"
+#include "defs.h"
 #include "data.h"
 #include "hash.h"
 #include "hashtable.h"
 #include "movegen.h"
 #include "io.h"
 #include "eval.h"
+#include "bitops.h"
 
 #define HASH_B(b, val) (b->hash_key ^= val)
 
@@ -179,7 +181,7 @@ int parse_fen(S_BOARD *b, char *fen) {
     fen++;
 
     //check that we didn't somehow screw up castle permissions
-    assert((b->castle_perm >= 0b0000) && (b->castle_perm <= 0b1111));
+    assert((b->castle_perm <= 0b1111));
 
     if (*fen != '-') {
         file = fen[0] - 'a' + 1;
@@ -480,7 +482,7 @@ static void remove_piece(S_BOARD *b, int piece, int sq) {
     b->all_piece_bb[BOTH] ^= (1LL << sq);
 }
 
-int make_move_if_exist(S_BOARD *b, int move)
+int make_move_if_exist(S_BOARD *b, u32 move)
 {
     int i;
     S_MOVELIST l[1];

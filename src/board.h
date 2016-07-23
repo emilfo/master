@@ -1,7 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include <stdint.h>
+#include "defs.h"
 
 typedef uint64_t u64;
 
@@ -9,7 +9,7 @@ typedef uint64_t u64;
 #define U64FULL C64(0xFFFFFFFFFFFFFFFF)
 
 #define MAX_MOVE_BUF 1024
-#define MAX_PLY 256
+//#define MAX_PLY 256
 
 #define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 #define TEST_FEN "rNb5/3P4/2P1n3/P4R2/4K2p/p1p3k1/5b2/nR6 w - - 0 1"
@@ -45,8 +45,8 @@ typedef struct {
     int ply;
     int search_ply;
 
-    int search_history[13][64];
-    int search_killers[2][MAX_PLY];
+    u32 search_history[13][64];
+    u32 search_killers[2][MAX_PLY];
 
     //storing moves 
     //uint32_t move_buffer[MAX_MOVE_BUF]; //all generated moves in current tree
@@ -107,14 +107,14 @@ int make_move(S_BOARD *b, int);
 void unmake_move(S_BOARD *b);
 void make_null_move(S_BOARD *b);
 void unmake_null_move(S_BOARD *b);
-int make_move_if_exist(S_BOARD *b, int move);
+int make_move_if_exist(S_BOARD *b, u32 move);
 void flip_board(S_BOARD *b);
 void print_board(const S_BOARD *b);
 int debug_board(S_BOARD *b);
 void print_bitboard_rank(uint8_t rank);
 void print_bitboard(BIT_BOARD  *bboard);
 
-const static int mirror_piece[13] = { 0,
+static const int mirror_piece[13] = { 0,
     7,  8,  9, 10, 11, 12,
     1,  2,  3,  4,  5,  6
 };

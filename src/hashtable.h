@@ -1,6 +1,7 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
+#include "defs.h"
 #include "board.h"
 
 #define AGE_MASK  0x0fff
@@ -11,11 +12,11 @@
 
 typedef struct {
     u64 hash_key;
-    uint32_t move;
-    uint32_t checksum;
-    int16_t eval;
-    uint16_t flag_and_age;
-    uint8_t depth;
+    u32 move;
+    u32 checksum;
+    i16 eval;
+    u16 flag_and_age;
+    u8  depth;
     int alpha;
     int beta;
     int exca;

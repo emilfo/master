@@ -2,8 +2,10 @@
 #include <stdlib.h>
 
 #include "board.h"
-#include "globals.h"
+//#include "globals.h"
+#include "defs.h"
 #include "eval.h"
+#include "bitops.h"
 
 #define MIN(a, b) (( a < b)? a : b )
 

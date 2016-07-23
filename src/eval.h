@@ -1,6 +1,9 @@
 #ifndef EVAL_H
 #define EVAL_H
 
+#include "defs.h"
+#include "board.h"
+
 int eval_posistion(const S_BOARD *b);
 void test();
 

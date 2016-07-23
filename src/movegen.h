@@ -1,14 +1,15 @@
 #ifndef MOVEGEN_H
 #define MOVEGEN_H
 
+#include "defs.h"
 #include "board.h"
 
 #define MAX_MOVES 256
 #define MAX_DEPTH 1024
 
 typedef struct {
-    uint32_t move;
-    uint32_t score;
+    u32 move;
+    int score;
 } S_MOVE;
 
 typedef struct {
@@ -17,12 +18,12 @@ typedef struct {
 } S_MOVELIST;
 
 
-const static int CAP_VAL[13] = { 0,
+static const int CAP_VAL[13] = { 0,
     100, 200, 300, 400, 500, 600,
     100, 200, 300, 400, 500, 600,
 };
 
-const static int ATT_VAL[13] = { 0,
+static const int ATT_VAL[13] = { 0,
     5, 4, 3, 2, 1, 0,
     5, 4, 3, 2, 1, 0,
 };

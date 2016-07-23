@@ -1,6 +1,7 @@
 #include <stdio.h>
+
 #include "bitops.h"
-#include "globals.h"
+#include "defs.h"
 
 /** 
  * Returns a count of all bits set to 1 

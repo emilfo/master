@@ -2,6 +2,8 @@
 
 #include "search.h"
 #include "globals.h"
+#include "defs.h"
+#include "hashtable.h"
 #include "eval.h"
 #include "io.h"
 #include "utils.h"

@@ -1,8 +1,8 @@
 #include <time.h>
 #include <stdlib.h>
-#include <inttypes.h>
 #include <stdio.h>
-#include "globals.h"
+//#include "globals.h"
+#include "defs.h"
 #include "hash.h"
 #include "board.h"
 
@@ -26,7 +26,7 @@ u64 generate_hash(S_BOARD *b) {
         hash_key ^= pce_key[EMPTY][b->ep_sq];
     }
 
-    assert(b->castle_perm >= 0 && b->castle_perm <= 15);
+    assert(b->castle_perm <= 0b1111);
     hash_key ^= castle_key[b->castle_perm];
 
     return hash_key;

@@ -5,6 +5,12 @@
 #include "threads.h"
 #include "search.h"
 #include "globals.h"
+#include "defs.h"
+
+pthread_mutex_t go_mutex;
+pthread_cond_t go_cv;
+int go_search;
+int debug_print;
 
 
 static void *thread_wait_for_work(void *search_settings) 
