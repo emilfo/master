@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <inttypes.h>
 
 #include "globals.h"
 #include "board.h"
@@ -220,14 +221,47 @@ void rating_from_file(const char *filename)
         global_search_settings.depth = MAX_PLY;
         global_search_settings.time_set = true;
         global_search_settings.starttime = cur_time_millis();
-        global_search_settings.stoptime = global_search_settings.starttime + 900000;
+        global_search_settings.stoptime = global_search_settings.starttime + 9000;
 
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
         thread_search_go();
-        sleep(902);
-
+        sleep(10);
     }
 
     fclose(fp);
+}
+
+void bench_file(const char *filename)
+{
+    FILE *fp = fopen(filename, "r");
+
+    char buf[1024];
+
+    unsigned long cumulative_time = 0;
+    long cumulative_nodes = 0L;
+    unsigned long start_time;
+
+    while (fgets(buf, 1024, fp) != NULL) {
+
+        parse_fen(&global_board, buf);
+        global_search_settings.depth = 6;
+        global_search_settings.time_set = false;
+        global_search_settings.starttime = cur_time_millis();
+        global_search_settings.stoptime = 0;
+
+        //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
+
+        start_time = cur_time_millis();
+        search_position(&global_board, &global_search_settings);
+        cumulative_time += cur_time_millis() - start_time;
+        cumulative_nodes += global_search_settings.nodes;
+        //thread_search_go();
+    }
+    fclose(fp);
+
+    printf("|         bench done         \n");
+    printf("|----------------------------\n");
+    printf("|time  : %ld\n", cumulative_time);
+    printf("|nodes : %ld\n", cumulative_nodes);
 }

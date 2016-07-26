@@ -47,7 +47,7 @@ void destroy_hashtable(S_HASHTABLE *tp)
     }
 }
 
-int probe_hash(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry, int *score, int alpha, int beta, int depth)
+int probe_hash(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry, i16 *score, i16 alpha, i16 beta, int depth)
 {
     if (hash_get(tp, key, entry)) {
         if (entry->depth >= depth) {
@@ -87,19 +87,19 @@ int hash_get(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry)
     return 0;
 }
 
-void hash_put(S_HASHTABLE *tp, u64 key, uint32_t move, int16_t eval, uint8_t depth, int16_t age, int16_t flag)
+void hash_put(S_HASHTABLE *tp, u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag)
 {
     int i = key % tp->size;
 
-    uint16_t flag_and_age = (age & AGE_MASK) | (flag & FLAG_MASK);
-    if(flag & BETA_FLAG) {
-        tp->entries[i].beta= true;
-        tp->entries[i].alpha= false;
-        tp->entries[i].exca = false;
-    }
+    u16 flag_and_age = (age & AGE_MASK) | (flag & FLAG_MASK);
+    //if(flag & BETA_FLAG) {
+    //    tp->entries[i].beta= true;
+    //    tp->entries[i].alpha= false;
+    //    tp->entries[i].exca = false;
+    //}
 
     //resetting eval to mate-score (ignoring moves to mate)
-    if (eval > ISMATE) {
+    if (eval >  ISMATE) {
         eval = MATE;
     } else if (eval < -ISMATE) {
         eval = -MATE;
@@ -115,14 +115,14 @@ void hash_put(S_HASHTABLE *tp, u64 key, uint32_t move, int16_t eval, uint8_t dep
     tp->entries[i].checksum = checksum;
 }
 
-int hash_get_pv_line(const S_HASHTABLE *tp, S_BOARD *b, int *moves, int depth)
+int hash_get_pv_line(const S_HASHTABLE *tp, S_BOARD *b, u32 *moves, int depth)
 {
     int i = 0;
     int j = 0;
 
     S_HASHENTRY entry;
 
-    while(i < depth && hash_get(tp, b->hash_key, &entry)) {
+    while(i < depth && hash_get(tp , b->hash_key, &entry)) {
         if(make_move_if_exist(b, entry.move)) {
             moves[i++] = entry.move;
         } else {
@@ -130,7 +130,7 @@ int hash_get_pv_line(const S_HASHTABLE *tp, S_BOARD *b, int *moves, int depth)
         }
     }
 
-    while(j++ < i) {
+    while(j++ < i) { 
         unmake_move(b);
     }
 

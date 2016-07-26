@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <strings.h>
+#include <string.h>
 
 #include "movegen.h"
 #include "globals.h"

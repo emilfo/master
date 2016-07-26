@@ -11,6 +11,7 @@ pthread_mutex_t go_mutex;
 pthread_cond_t go_cv;
 int go_search;
 int debug_print;
+volatile int global_depth;
 
 
 static void *thread_wait_for_work(void *search_settings) 
@@ -34,6 +35,29 @@ static void *thread_wait_for_work(void *search_settings)
         }
     }
     pthread_exit(NULL);
+}
+
+void try_report(int depth)
+{
+    if (global_depth >= depth) {
+        return;
+    }
+
+    int global_depth_cpy;
+
+    do {
+        global_depth_cpy = __sync_lock_test_and_set (&global_depth, -1);
+    } while (global_depth_cpy != -1);
+
+    if (global_depth_cpy < depth) {
+        //REPORT HERE
+
+        //Should always be -1
+        __sync_lock_test_and_set (&global_depth, depth);
+    } else {
+        //Should always be -1
+        __sync_lock_test_and_set (&global_depth, global_depth_cpy);
+    }
 }
 
 void thread_search_go() 

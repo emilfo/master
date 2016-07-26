@@ -113,6 +113,8 @@ void engine_shell()
             flip_board(&global_board);
         } else if(strncmp(input, "print", 5) == 0) {
             print_board(&global_board);
+        } else if(strncmp(input, "bench", 5) == 0) {
+            bench_file("EPD/BT2450.epd");
         } else if(strncmp(input, "quit", 4) == 0) {
             global_search_settings.stop = true;
             global_search_settings.quit = true;

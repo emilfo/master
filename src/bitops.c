@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "bitops.h"
 #include "defs.h"
@@ -38,11 +39,11 @@ int bit_count(u64 bitmap)
  * @precondition bb != 0
  * @return index (0..63) of least significant one bit
  */
-int lsb1_index(u64 bitmap)
+int lsb1_index_debruijn(u64 bitmap)
 {
     assert(bitmap != 0); //Can't be called with bitmap=0
 
-    const int index64[64] = {
+    static const int index64[64] = {
         0, 47,  1, 56, 48, 27,  2, 60,
         57, 49, 41, 37, 28, 16,  3, 61,
         54, 58, 35, 52, 50, 42, 21, 44,
@@ -53,7 +54,7 @@ int lsb1_index(u64 bitmap)
         13, 18,  8, 12,  7,  6,  5, 63
     };
 
-    const u64 debruijn64 = 0x03f79d71b4cb0a89;
+    static const u64 debruijn64 = 0x03f79d71b4cb0a89;
 
 
     return index64[((bitmap ^ (bitmap-1)) * debruijn64) >> 58];

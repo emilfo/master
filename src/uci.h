@@ -30,4 +30,10 @@
 
 void uci_loop();
 
+typedef struct {
+    long hash_size;
+    int threads;
+} S_UCI_OPTIONS;
+
+
 #endif /* UCI_H */

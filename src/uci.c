@@ -1,8 +1,9 @@
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
+#include "defs.h"
 #include "uci.h"
 #include "utils.h"
 #include "io.h"
@@ -10,12 +11,28 @@
 #include "globals.h"
 
 #define MAX_INPUT_SIZE 4096
-#define NOT_SET -1
+#define NOT_SET 0
+
+//UCI-options
+#define HASH_DEF 64
+#define HASH_MIN 1
+#define HASH_MAX 1000
+#define THREADS_DEF 1
+#define THREADS_MIN 1
+#define THREADS_MAX 64
 
 static void uci_identify() 
 {
     printf("id name %s\n", NAME);
     printf("id auhor %s\n", AUTHOR);
+
+    //UCI-options
+    printf("\n");
+    printf("option name Hash type spin default %d min %d max %d\n",
+            HASH_DEF, HASH_MIN, HASH_MAX);
+    printf("option name Threads type spin default %d min %d max %d\n",
+            THREADS_DEF, THREADS_MIN, THREADS_MAX);
+
     printf("uciok\n");
 }
 
@@ -63,8 +80,8 @@ static void parse_go(char *input, S_SEARCH_SETTINGS *ss, S_BOARD *b)
     char *buf_ptr = NULL;
     int depth = MAX_PLY;
     int movestogo = 30; //TODO? time management
-    int movetime = NOT_SET;
-    int time = NOT_SET;
+    u64 movetime = NOT_SET;
+    u64 time = NOT_SET;
     int inc = 0;
     ss->time_set = false;
 
@@ -112,7 +129,7 @@ static void parse_go(char *input, S_SEARCH_SETTINGS *ss, S_BOARD *b)
         ss->stoptime = ss->starttime + time + inc;
     }
 
-    printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
+    printf("time:%"PRIu64" start:%"PRIu64" stop:%"PRIu64" depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
     thread_search_go();
 }
 

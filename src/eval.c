@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "board.h"
 //#include "globals.h"
@@ -183,13 +184,13 @@ static int material_draw(const S_BOARD *b) {
 }
 
 /* Evaluates position from the one to moves side of view */
-int eval_posistion(const S_BOARD *b) 
+i16 eval_posistion(const S_BOARD *b) 
 {
     u64 cur_piece_bb;
     int sq;
-    int score;
-    int score_mg = 0;
-    int score_eg = 0;
+    i16 score;
+    i16 score_mg = 0;
+    i16 score_eg = 0;
     int queens = 0, rooks = 0, minors = 0, pawns = 0;
     int phase;
 

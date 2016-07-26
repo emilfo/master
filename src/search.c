@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "search.h"
 #include "globals.h"
@@ -12,8 +13,6 @@
 
 #define BLACK_MAJ(b) (b->piece_bb[B_BISHOP] || b->piece_bb[B_ROOK] || b->piece_bb[B_QUEEN])
 #define WHITE_MAJ(b) (b->piece_bb[W_BISHOP] || b->piece_bb[W_ROOK] || b->piece_bb[W_QUEEN])
-#define MIN(a, b) (( a < b)? a : b )
-#define MAX(a, b) (( a > b)? a : b )
 
 static int is_repetition(S_BOARD *b) 
 {
@@ -88,14 +87,14 @@ void set_best_move_next(int start_index, S_MOVELIST *l)
     l->moves[best_index] = swp;
 }
 
-static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
+static i16 quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
 {
     int i;
     int legal = 0;
     //int old_alpha = alpha;
     //int best_move = EMPTY;
-    int score;
-    int move;
+    i16 score;
+    u32 move;
 
     assert(debug_board(b));
 
@@ -173,17 +172,17 @@ static int quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
 
     return alpha;
 }
-static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int do_null) //, int window) //TODO: window?
+static i16 alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int do_null) //, int window) //TODO: window?
 {
     int i;
     int legal = 0;
-    int old_alpha = alpha;
-    int best_move = EMPTY;
-    int score = -INFINITE;
-    int best_score = -INFINITE;
-    int null_score = -INFINITE;
-    int move;
     int in_check;
+    i16 old_alpha = alpha;
+    i16 score = -INFINITE;
+    i16 best_score = -INFINITE;
+    i16 null_score = -INFINITE;
+    u32 move;
+    u32 best_move = EMPTY;
 
     assert(debug_board(b));
 
@@ -314,16 +313,16 @@ static int alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
 
 void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
 {
-    int best_moves[MAX_PLY];
-    int best_move = EMPTY;
-    int best_score = -INFINITE;
+    u32 best_moves[MAX_PLY];
+    u32 best_move = EMPTY;
+    i16 best_score = -INFINITE;
     int cur_depth = 0;
     int pv_moves = 0;
     int i;
     int a_index;
     int b_index;
-    volatile int alpha = -INFINITE;
-    volatile int beta = INFINITE;
+    volatile i16 alpha = -INFINITE;
+    volatile i16 beta = INFINITE;
 
     prepare_search(b, ss);
 
@@ -351,7 +350,7 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
         }
 
         pv_moves = hash_get_pv_line(&global_tp_table, b, best_moves, cur_depth);
-        printf("info score cp %d depth %d nodes %ld time %d", best_score, cur_depth, ss->nodes, cur_time_millis() - ss->starttime);
+        printf("info score cp %d depth %d nodes %ld time %"PRIu64"", best_score, cur_depth, ss->nodes, cur_time_millis() - ss->starttime);
 
         best_move = best_moves[0];
 

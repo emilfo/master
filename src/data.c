@@ -8,7 +8,6 @@
 #include "board.h"
 
 #define B_INDEX(file, rank) ((rank-1)*8 + (file-1))
-#define MIN(a, b) ((a < b)? a : b)
 
 static int valid_file_rank(int file, int rank) {
     return ((file >= 1) && (file <= 8) && (rank >=1) && (rank <= 8));

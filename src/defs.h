@@ -2,6 +2,7 @@
 #define DEFS_H
 
 #include <stdint.h>
+//#include <string.h>
 #include <assert.h>
 #include <stdbool.h>
 
@@ -9,11 +10,12 @@
 #include "debug.h"
 #endif
 
-//more compressed int-types
+//int-types
 #define u64 uint64_t
 #define u32 uint32_t
 #define u16 uint16_t
 #define u8  uint8_t
+#define i64 int64_t
 #define i32 int32_t
 #define i16 int16_t
 #define i8  int8_t
@@ -26,6 +28,9 @@
 #define WHITE 0
 #define BLACK 1
 #define BOTH  2
+
+#define MIN(a, b) (( a < b)? a : b )
+#define MAX(a, b) (( a > b)? a : b )
 
 #define MAX_PLY INT8_MAX
 #define INFINITE INT16_MAX
@@ -42,6 +47,7 @@
 #define mv_pawn_double(m) ((m >> 27) & (0b1))
 
 #define FRtoSQ(file, rank) ((8*(rank-1)) + (file-1))
+
 
 const enum { WKCA=0b0001, WQCA=0b0010, BKCA=0b0100, BQCA=0b1000 } CASTLE_PERM;
 

@@ -4,7 +4,7 @@
 #include "defs.h"
 #include "board.h"
 
-int eval_posistion(const S_BOARD *b);
+i16 eval_posistion(const S_BOARD *b);
 void test();
 
 u64 EVAL_RANK_MASK[8];
