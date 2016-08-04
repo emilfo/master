@@ -5,6 +5,7 @@
 #include <inttypes.h>
 
 #include "globals.h"
+#include "globals.h"
 #include "board.h"
 #include "perft.h"
 #include "movegen.h"
@@ -17,15 +18,15 @@ static int perft(S_BOARD *b, int depth);
 void perft_fen(char *FEN, int divide, int depth) {
     int node_cnt = 0;
 
-    parse_fen(&global_board, FEN);
+    parse_fen(&g_board, FEN);
 
     printf("Perft from this position:\n");
-    print_board(&global_board);
+    print_board(&g_board);
 
     if (divide) {
-        node_cnt = perft_divide(&global_board, depth);
+        node_cnt = perft_divide(&g_board, depth);
     } else {
-        node_cnt = perft(&global_board, depth);
+        node_cnt = perft(&g_board, depth);
     }
     printf("total node count=%d\n\n", node_cnt);
 }
@@ -48,10 +49,10 @@ void perft_from_file(const char *filename, int divide) {
         FILE *fp_result = fopen("LOG/perft-result.txt", "a");
         fprintf(fp_result, "%s", buf);
 
-        parse_fen(&global_board, buf);
+        parse_fen(&g_board, buf);
 
         printf("Perft from this position:\n");
-        print_board(&global_board);
+        print_board(&g_board);
 
         printf("\n\n%5s || %9s | %9s |\n", "depth", "target", "count"); 
         printf("-------------------------------------\n"); 
@@ -64,9 +65,9 @@ void perft_from_file(const char *filename, int divide) {
                 printf("%5d || %9d | ",depth, target_cnt); 
                 fflush(stdout);
                 if (divide) {
-                    node_cnt = perft_divide(&global_board, depth);
+                    node_cnt = perft_divide(&g_board, depth);
                 } else {
-                    node_cnt = perft(&global_board, depth);
+                    node_cnt = perft(&g_board, depth);
                 }
                 printf("%9d |\n", node_cnt);
 
@@ -161,17 +162,17 @@ void eval_from_file(const char *filename)
         FILE *fp_result = fopen("LOG/eval-result.txt", "a");
         fprintf(fp_result, "%s", buf);
 
-        parse_fen(&global_board, buf);
+        parse_fen(&g_board, buf);
 
         printf("Eval test from this position:\n");
 
-        print_board(&global_board);
-        orig_eval = eval_posistion(&global_board);
+        print_board(&g_board);
+        orig_eval = eval_posistion(&g_board);
 
-        flip_board(&global_board);
+        flip_board(&g_board);
 
-        print_board(&global_board);
-        flip_eval = eval_posistion(&global_board);
+        print_board(&g_board);
+        flip_eval = eval_posistion(&g_board);
 
         if(orig_eval == flip_eval) {
             printf("orig_eval = flip_eval =%d - ok,\n", orig_eval);
@@ -202,8 +203,9 @@ void rating_from_file(const char *filename)
     int i;
 
     while (fgets(buf, 1024, fp) != NULL) {
+        wait_search_complete_barrier();
 
-        parse_fen(&global_board, buf);
+        parse_fen(&g_board, buf);
 
         ptr = strstr(buf, "bm");
         ptr += 3;
@@ -216,17 +218,16 @@ void rating_from_file(const char *filename)
 
         printf("RATING Testing this position:\n");
 
-        print_board(&global_board);
+        print_board(&g_board);
         printf("\nMove to find: %s\n", move);
-        global_search_settings.depth = MAX_PLY;
-        global_search_settings.time_set = true;
-        global_search_settings.starttime = cur_time_millis();
-        global_search_settings.stoptime = global_search_settings.starttime + 9000;
+        g_search_info.depth = MAX_PLY;
+        g_search_info.time_set = true;
+        g_search_info.starttime = cur_time_millis();
+        g_search_info.stoptime = g_search_info.starttime + 9000;
 
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
-        thread_search_go();
-        sleep(10);
+        wait_search_ready_barrier();
     }
 
     fclose(fp);
@@ -242,21 +243,24 @@ void bench_file(const char *filename)
     long cumulative_nodes = 0L;
     unsigned long start_time;
 
+    wait_search_complete_barrier();
     while (fgets(buf, 1024, fp) != NULL) {
 
-        parse_fen(&global_board, buf);
-        global_search_settings.depth = 6;
-        global_search_settings.time_set = false;
-        global_search_settings.starttime = cur_time_millis();
-        global_search_settings.stoptime = 0;
+        parse_fen(&g_board, buf);
+        g_search_info.depth = 6;
+        g_search_info.time_set = false;
+        g_search_info.starttime = cur_time_millis();
+        g_search_info.stoptime = 0;
 
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
         start_time = cur_time_millis();
-        search_position(&global_board, &global_search_settings);
+        wait_search_ready_barrier();
+
+        wait_search_complete_barrier();
         cumulative_time += cur_time_millis() - start_time;
-        cumulative_nodes += global_search_settings.nodes;
-        //thread_search_go();
+        cumulative_nodes += count_all_nodes();
+
     }
     fclose(fp);
 

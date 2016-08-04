@@ -1,55 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 
 #include "globals.h"
 #include "board.h"
 #include "hashtable.h"
 #include "io.h"
 
-u64 tp_size = ((u64)0x1000000 * (u64)64); //64MB size TP_TABLE (TODO: not static)
+S_HASHTABLE g_hash_table;
 
-
-//static void clear_hashtable(S_HASHTABLE *tp) 
-//{
-//    int i;
-//    fail_checksum = 0;
-//
-//    for(i = 0; i < tp->size; i++) {
-//        tp->entries[i].hash_key = 0LL;
-//        tp->entries[i].move = 0;
-//        tp->entries[i].eval = 0;
-//        tp->entries[i].flag_and_age = 0;
-//        tp->entries[i].checksum = 0;
-//    }
-//}
-
-void init_hashtable(S_HASHTABLE *tp, u64 size)
+void clear_hashtable()
 {
-    tp->size = size / sizeof(S_HASHENTRY);
-    tp->cut = 0;
+    g_hash_table.fail_checksum = 0;
+    g_hash_table.cut = 0;
 
-    destroy_hashtable(tp);
-
-    tp->entries = (S_HASHENTRY *) calloc(tp->size, sizeof(S_HASHENTRY));
-
-    //clear_hashtable(tp);
-
-    printf("init hashtable with %d entries\n", tp->size);
+    memset(g_hash_table.entries, 0, g_hash_table.size);
 }
 
-void destroy_hashtable(S_HASHTABLE *tp)
+void init_hashtable(u64 size)
 {
-    if (tp->entries != NULL) {
-        printf("fail_checksums:%d",fail_checksum);
-        printf("hash cuts:%d",tp->cut);
-        free(tp->entries);
+    if (size == 0) {
+        size = HASH_DEF;
+    }
+
+    g_hash_table.size = size / sizeof(S_HASHENTRY);
+    g_hash_table.cut = 0;
+
+    destroy_hashtable();
+
+    g_hash_table.entries = (S_HASHENTRY *) calloc(g_hash_table.size, sizeof(S_HASHENTRY));
+
+    printf("init hashtable with %d entries\n", g_hash_table.size);
+}
+
+void destroy_hashtable()
+{
+    if (g_hash_table.entries != NULL) {
+        printf("fail_checksums:%d",g_hash_table.fail_checksum);
+        printf("hash cuts:%d",g_hash_table.cut);
+        free(g_hash_table.entries);
     }
 }
 
-int probe_hash(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry, i16 *score, i16 alpha, i16 beta, int depth)
+int probe_hash(u64 key, S_HASHENTRY *entry, i16 *score, i16 alpha, i16 beta, int depth)
 {
-    if (hash_get(tp, key, entry)) {
+    if (hash_get(key, entry)) {
         if (entry->depth >= depth) {
             if (entry->flag_and_age & EXCA_FLAG) {
                 *score = entry->eval;
@@ -68,12 +63,12 @@ int probe_hash(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry, i16 *score, i
     return false;
 }
 
-int hash_get(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry)
+int hash_get(u64 key, S_HASHENTRY *entry)
 {
-    int i = key % tp->size;
+    int i = key % g_hash_table.size;
 
-    if (tp->entries[i].hash_key == key) {
-        *entry = tp->entries[i];
+    if (g_hash_table.entries[i].hash_key == key) {
+        *entry = g_hash_table.entries[i];
 
         //Only return if checksum is OK
         uint32_t local_checksum = entry->hash_key ^ entry->move ^ entry->eval ^ entry->depth ^ entry->flag_and_age;
@@ -87,15 +82,15 @@ int hash_get(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry)
     return 0;
 }
 
-void hash_put(S_HASHTABLE *tp, u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag)
+void hash_put(u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag)
 {
-    int i = key % tp->size;
+    int i = key % g_hash_table.size;
 
     u16 flag_and_age = (age & AGE_MASK) | (flag & FLAG_MASK);
     //if(flag & BETA_FLAG) {
-    //    tp->entries[i].beta= true;
-    //    tp->entries[i].alpha= false;
-    //    tp->entries[i].exca = false;
+    //    g_hash_table.entries[i].beta= true;
+    //    g_hash_table.entries[i].alpha= false;
+    //    g_hash_table.entries[i].exca = false;
     //}
 
     //resetting eval to mate-score (ignoring moves to mate)
@@ -107,22 +102,22 @@ void hash_put(S_HASHTABLE *tp, u64 key, u32 move, i16 eval, u8 depth, i16 age, i
 
     int32_t checksum = key ^ move ^ eval ^ depth ^ flag_and_age;
 
-    tp->entries[i].hash_key = key;
-    tp->entries[i].move = move;
-    tp->entries[i].eval = eval;
-    tp->entries[i].depth = depth;
-    tp->entries[i].flag_and_age = flag_and_age;
-    tp->entries[i].checksum = checksum;
+    g_hash_table.entries[i].hash_key = key;
+    g_hash_table.entries[i].move = move;
+    g_hash_table.entries[i].eval = eval;
+    g_hash_table.entries[i].depth = depth;
+    g_hash_table.entries[i].flag_and_age = flag_and_age;
+    g_hash_table.entries[i].checksum = checksum;
 }
 
-int hash_get_pv_line(const S_HASHTABLE *tp, S_BOARD *b, u32 *moves, int depth)
+int hash_get_pv_line(S_BOARD *b, u32 *moves, int depth)
 {
     int i = 0;
     int j = 0;
 
     S_HASHENTRY entry;
 
-    while(i < depth && hash_get(tp , b->hash_key, &entry)) {
+    while(i < depth && hash_get(b->hash_key, &entry)) {
         if(make_move_if_exist(b, entry.move)) {
             moves[i++] = entry.move;
         } else {

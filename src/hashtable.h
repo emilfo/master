@@ -23,14 +23,16 @@ typedef struct {
     S_HASHENTRY *entries;
     int size;
     int cut;
+    int fail_checksum;
 } S_HASHTABLE;
 
-void init_hashtable(S_HASHTABLE *tp, u64 size);
-void destroy_hashtable(S_HASHTABLE *tp);
-int hash_get(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry);
-void hash_put(S_HASHTABLE *tp, u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag);
-int hash_get_pv_line(const S_HASHTABLE *tp, S_BOARD *b, u32 *moves, int depth);
-int probe_hash(const S_HASHTABLE *tp, u64 key, S_HASHENTRY *entry, i16 *score, i16 alpha, i16 beta, int depth);
+void init_hashtable(u64 size);
+void clear_hashtable();
+void destroy_hashtable();
+int hash_get(u64 key, S_HASHENTRY *entry);
+void hash_put(u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag);
+int hash_get_pv_line(S_BOARD *b, u32 *moves, int depth);
+int probe_hash(u64 key, S_HASHENTRY *entry, i16 *score, i16 alpha, i16 beta, int depth);
 
 extern u64 tp_size; 
 

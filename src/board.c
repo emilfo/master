@@ -12,6 +12,8 @@
 
 #define HASH_B(b, val) (b->hash_key ^= val)
 
+S_BOARD g_board;
+
 const u64 _DIAGA8H1MAGICS[] = {
     0x0,
     0x0,
@@ -541,7 +543,7 @@ void flip_board(S_BOARD *b)
 
     b->hash_key = generate_hash(b);
 
-    debug_board(b);
+    assert(debug_board(b));
 }
 
 void print_board(const S_BOARD *b) {

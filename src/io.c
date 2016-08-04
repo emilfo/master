@@ -108,22 +108,22 @@ void engine_shell()
         } else if(strncmp(input, "file-eval", 9) == 0) {
             eval_from_file("EPD/ecm98.epd");
         } else if(strncmp(input, "divide", 6) == 0) {
-            perft_divide(&global_board, atoi(input+7));
+            perft_divide(&g_board, atoi(input+7));
         } else if(strncmp(input, "mirror", 6) == 0) {
-            flip_board(&global_board);
+            flip_board(&g_board);
         } else if(strncmp(input, "print", 5) == 0) {
-            print_board(&global_board);
+            print_board(&g_board);
         } else if(strncmp(input, "bench", 5) == 0) {
             bench_file("EPD/BT2450.epd");
         } else if(strncmp(input, "quit", 4) == 0) {
-            global_search_settings.stop = true;
-            global_search_settings.quit = true;
-            thread_search_go();
+            g_search_info.stop = true;
+            g_search_info.quit = true;
+            //thread_search_go();
             break;
         } else if(strncmp(input, "move", 4) == 0) {
-            make_move_if_exist(&global_board, str_move(input+5, &global_board));
+            make_move_if_exist(&g_board, str_move(input+5, &g_board));
         } else if(strncmp(input, "fen", 3) == 0) {
-            parse_fen(&global_board, input+4);
+            parse_fen(&g_board, input+4);
         } else if(strncmp(input, "uci", 3) == 0) {
             uci_loop();
             break;

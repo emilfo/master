@@ -48,6 +48,14 @@
 
 #define FRtoSQ(file, rank) ((8*(rank-1)) + (file-1))
 
+//UCI-options
+#define HASH_DEF 64
+#define HASH_MIN 1
+#define HASH_MAX 1000
+#define THREADS_DEF 1
+#define THREADS_MIN 1
+#define THREADS_MAX 64
+
 
 const enum { WKCA=0b0001, WQCA=0b0010, BKCA=0b0100, BQCA=0b1000 } CASTLE_PERM;
 

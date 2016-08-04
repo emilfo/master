@@ -9,7 +9,6 @@ typedef uint64_t u64;
 #define U64FULL C64(0xFFFFFFFFFFFFFFFF)
 
 #define MAX_MOVE_BUF 1024
-//#define MAX_PLY 256
 
 #define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 #define TEST_FEN "rNb5/3P4/2P1n3/P4R2/4K2p/p1p3k1/5b2/nR6 w - - 0 1"
@@ -44,13 +43,16 @@ typedef struct {
     S_PREV_BOARD prev[MAX_MOVE_BUF];
     int ply;
     int search_ply;
+    int age;
 
     u32 search_history[13][64];
     u32 search_killers[2][MAX_PLY];
+    u32 principal_variation[MAX_PLY];
 
-    //storing moves 
-    //uint32_t move_buffer[MAX_MOVE_BUF]; //all generated moves in current tree
-    //int move_buffer_len[MAX_PLY]; //which moves belongs to which ply, TODO:better way?
+    long nodes;
+    int fail_high;
+    int first_fail_high;
+
 } S_BOARD;
 
 //Struct used for pretty printing only

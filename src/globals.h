@@ -6,9 +6,11 @@
 #include "threads.h"
 #include "search.h"
 
-S_BOARD global_board;
-S_HASHTABLE global_tp_table;
-S_THREADS global_thread_table;
-S_SEARCH_SETTINGS global_search_settings;
+extern S_BOARD g_board;
+extern S_HASHTABLE g_hash_table;
+extern S_THREADS g_thread_table;
+extern S_SEARCH_SETTINGS g_search_info;
+
+extern int g_depth;
 
 #endif /* GLOBALS_H */

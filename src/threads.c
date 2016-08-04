@@ -7,102 +7,131 @@
 #include "globals.h"
 #include "defs.h"
 
-pthread_mutex_t go_mutex;
-pthread_cond_t go_cv;
-int go_search;
-int debug_print;
-volatile int global_depth;
+static pthread_spinlock_t report_lock;
+static pthread_barrier_t search_complete_barrier;
+static pthread_barrier_t search_ready_barrier;
+
+S_THREADS g_thread_table;
 
 
-static void *thread_wait_for_work(void *search_settings) 
+static void *thread_work_loop(void *th_id) 
 {
-    S_SEARCH_SETTINGS *ss = (S_SEARCH_SETTINGS *)search_settings;
+    int thread_id = *(int *)th_id;
 
     while (true) {
-        pthread_mutex_lock(&go_mutex);
-        while (!go_search) {
-            pthread_cond_wait(&go_cv, &go_mutex);
-        }
+        //wait until all threads have completed the current search before the
+        //io-thread can setup a new search
+        wait_search_complete_barrier();
 
-        if (ss->quit) {
-            pthread_mutex_unlock(&go_mutex);
+        g_thread_table.threads[thread_id].b.nodes = 0;
+
+        //wait until io has setup a new search
+        wait_search_ready_barrier(); 
+
+        if (g_search_info.quit) {
             break;
-        } else {
-            go_search = false;
-            pthread_mutex_unlock(&go_mutex);
-
-            search_position(&global_board, ss);
         }
+
+        search_position(&g_thread_table.threads[thread_id].b, thread_id);
     }
     pthread_exit(NULL);
 }
 
-void try_report(int depth)
+int aquire_reportlock_if_deepest(int depth)
 {
-    if (global_depth >= depth) {
-        return;
-    }
-
-    int global_depth_cpy;
-
     do {
-        global_depth_cpy = __sync_lock_test_and_set (&global_depth, -1);
-    } while (global_depth_cpy != -1);
+        if (g_depth >= depth) {
+            return false;
+        }
+    } while(pthread_spin_trylock(&report_lock) != 0);
 
-    if (global_depth_cpy < depth) {
-        //REPORT HERE
-
-        //Should always be -1
-        __sync_lock_test_and_set (&global_depth, depth);
-    } else {
-        //Should always be -1
-        __sync_lock_test_and_set (&global_depth, global_depth_cpy);
+    if (g_depth >= depth) {
+        pthread_spin_unlock(&report_lock);
+        return false;
     }
+
+    g_depth = depth;
+
+    return true;
 }
 
-void thread_search_go() 
+void release_reportlock()
 {
-    pthread_mutex_lock(&go_mutex);
-    go_search = true;
-    pthread_cond_signal(&go_cv);
-    pthread_mutex_unlock(&go_mutex);
+    pthread_spin_unlock(&report_lock);
 }
 
-void create_workers(S_THREADS *tt, int size, S_SEARCH_SETTINGS *ss) 
+void wait_search_complete_barrier()
 {
-    int i;
-    tt->size = size;
-    if (tt->threads != NULL) {
-        free(tt->threads);
-    }
-
-    tt->threads = (pthread_t *)malloc(tt->size * sizeof(pthread_t));
-
-    for (i = 0; i < tt->size; i++) {
-        pthread_create(&tt->threads[i], NULL, &thread_wait_for_work, (void *) ss);
-    }
+    pthread_barrier_wait(&search_complete_barrier);
 }
 
-void destroy_workers(S_THREADS *tt) 
+void wait_search_ready_barrier()
+{
+    pthread_barrier_wait(&search_ready_barrier);
+}
+
+static void create_workers(int size) 
 {
     int i;
-    for(i = 0; i < tt->size; i++) {
-        pthread_join(tt->threads[i], NULL);
+    if (g_thread_table.threads != NULL) {
+        free(g_thread_table.threads);
     }
 
-    tt->size = 0;
-    if (tt->threads != NULL) {
-        free(tt->threads);
+    g_thread_table.size = size;
+    g_thread_table.threads = (S_THREAD *)malloc(g_thread_table.size * sizeof(S_THREAD));
+
+    for (i = 0; i < g_thread_table.size; i++) {
+        pthread_create(&g_thread_table.threads[i].thread, NULL, &thread_work_loop, (void *) &i);
     }
 }
 
-void init_thread_cv() 
+static void destroy_workers() 
 {
-    pthread_mutex_init(&go_mutex, NULL);
-    pthread_cond_init (&go_cv, NULL);
+    int i;
+
+    g_search_info.quit = true;
+    g_search_info.stop = true;
+
+
+    //TODO what barriers should we wait for here?
+
+    for(i = 0; i < g_thread_table.size; i++) {
+        pthread_join(g_thread_table.threads[i].thread, NULL);
+    }
+
+    g_thread_table.size = 0;
+    if (g_thread_table.threads != NULL) {
+        free(g_thread_table.threads);
+    }
 }
-void destroy_thread_cv() 
+
+static void init_search_barriers(int thread_count)
 {
-    pthread_mutex_destroy(&go_mutex);
-    pthread_cond_destroy(&go_cv);
+    pthread_barrier_init(&search_ready_barrier, NULL, thread_count+1);
+    pthread_barrier_init(&search_complete_barrier, NULL, thread_count+1);
+}
+
+
+static void destroy_search_barriers()
+{
+    pthread_barrier_destroy(&search_ready_barrier);
+    pthread_barrier_destroy(&search_complete_barrier);
+}
+
+void init_threads(int thread_count)
+{
+    init_search_barriers(thread_count);
+    create_workers(thread_count);
+}
+
+void destroy_threads()
+{
+    destroy_workers();
+    destroy_search_barriers();
+}
+
+void reinit_threads(int thread_count)
+{
+    destroy_threads();
+    init_threads(thread_count);
 }

@@ -4,17 +4,33 @@
 #include <pthread.h>
 #include <semaphore.h>
 
-#include "search.h"
+#include "board.h"
 
 typedef struct {
-    pthread_t *threads;
+    pthread_t thread;
+    S_BOARD b;
+} S_THREAD;
+
+typedef struct {
+    S_THREAD *threads;
     int size;
 } S_THREADS;
 
-void thread_search_go();
-void create_workers(S_THREADS *tt, int size, S_SEARCH_SETTINGS *ss);
-void destroy_workers(S_THREADS *tt);
-void init_thread_cv();
-void destroy_thread_cv();
+/* Report_lock is used to ensure that only one thread reports its result to the
+ * UI at a time */
+int aquire_reportlock_if_deepest(int depth);
+void release_reportlock();
+
+/* Barriers used to ensure that the all workers have completed searching, before
+ * the main/io-thread can setup a new search. And that the io thread is done
+ * setting up a new search before workers can start a new search */
+void wait_search_complete_barrier();
+void wait_search_ready_barrier();
+
+/* init and destroy used when starting up and closing the program, reinit is
+ * used if the UI asks to change the number of threads */
+void init_threads(int thread_count);
+void destroy_threads();
+void reinit_threads(int thread_count);
 
 #endif /* THREADS_H */

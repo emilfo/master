@@ -13,14 +13,6 @@
 #define MAX_INPUT_SIZE 4096
 #define NOT_SET 0
 
-//UCI-options
-#define HASH_DEF 64
-#define HASH_MIN 1
-#define HASH_MAX 1000
-#define THREADS_DEF 1
-#define THREADS_MIN 1
-#define THREADS_MAX 64
-
 static void uci_identify() 
 {
     printf("id name %s\n", NAME);
@@ -130,7 +122,6 @@ static void parse_go(char *input, S_SEARCH_SETTINGS *ss, S_BOARD *b)
     }
 
     printf("time:%"PRIu64" start:%"PRIu64" stop:%"PRIu64" depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
-    thread_search_go();
 }
 
 void uci_loop() 
@@ -148,28 +139,30 @@ void uci_loop()
 
         if(fgets(input, MAX_INPUT_SIZE, stdin) && !(input[0] == '\n')) {
             if(strncmp(input, "ucinewgame", 10) == 0) {
-                hard_reset_board(&global_board);
-                //parse_position("position startpos\n", &global_board);
+                wait_search_complete_barrier();
+                hard_reset_board(&g_board);
             } else if(strncmp(input, "position", 8) == 0) {
-                parse_position(input, &global_board);
+                wait_search_complete_barrier();
+                parse_position(input, &g_board);
             }else if(strncmp(input, "isready", 7) == 0) {
                 printf("readyok\n");
             } else if(strncmp(input, "stop", 4) == 0) {
-                global_search_settings.stop = true;
+                g_search_info.stop = true;
             } else if(strncmp(input, "quit", 4) == 0) {
-                global_search_settings.stop = true;
-                global_search_settings.quit = true;
+                g_search_info.stop = true;
+                g_search_info.quit = true;
             } else if(strncmp(input, "uci", 3) == 0) {
                 uci_identify();
             } else if(strncmp(input, "go", 2) == 0) {
-                parse_go(input, &global_search_settings, &global_board);
+                wait_search_complete_barrier();
+                parse_go(input, &g_search_info, &g_board);
             } else {
                 printf("error parsing input: %s\n", input);
             }
         }
 
-        if(global_search_settings.quit) {
-            thread_search_go();
+        if(g_search_info.quit) {
+            wait_search_ready_barrier();
             break;
         }
     }

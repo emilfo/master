@@ -14,6 +14,10 @@
 #define BLACK_MAJ(b) (b->piece_bb[B_BISHOP] || b->piece_bb[B_ROOK] || b->piece_bb[B_QUEEN])
 #define WHITE_MAJ(b) (b->piece_bb[W_BISHOP] || b->piece_bb[W_ROOK] || b->piece_bb[W_QUEEN])
 
+S_SEARCH_SETTINGS g_search_info;
+u32 g_best_move;
+int g_depth;
+
 static int is_repetition(S_BOARD *b) 
 {
     int i;
@@ -27,21 +31,42 @@ static int is_repetition(S_BOARD *b)
     return false;
 }
 
-static void check_search_stop(S_SEARCH_SETTINGS *ss)
+static void check_search_stop()
 {
-    if (ss->time_set && cur_time_millis() >= ss->stoptime) {
-        ss->stop = true;
+    if (g_search_info.time_set && cur_time_millis() >= g_search_info.stoptime) {
+        g_search_info.stop = true;
     }
 }
 
-static void prepare_search(S_BOARD *b, S_SEARCH_SETTINGS *ss)
+static void thread_setup_board(S_BOARD *b)
 {
     int i, j;
 
-    ss->stop = 0;
-    ss->nodes = 0;
-    ss->fail_high = 0;
-    ss->first_fail_high = 0;
+    for (i = 0; i < 13; i++) {
+        b->piece_bb[i] = g_board.piece_bb[i];
+    }
+    for (i = 0; i < 3; i++) {
+        b->all_piece_bb[i] = g_board.all_piece_bb[i];
+    }
+
+    b->side = g_board.side;
+    b->castle_perm = g_board.castle_perm;
+    b->ep_sq = g_board.ep_sq;
+    b->fifty_move_count = g_board.fifty_move_count;
+
+    for (i = 0; i < 64; i++) {
+        b->sq[i] = g_board.sq[i];
+    }
+
+    b->hash_key = g_board.hash_key;
+
+    for (i = 0; i < g_board.ply; i++) {
+        b->prev[i] = g_board.prev[i];
+    }
+
+    b->ply = g_board.ply;
+    b->search_ply = 0;
+    b->age = g_board.age;
 
     for (i = 0; i < 13; i++) {
         for (j = 0; j < 64; j++) {
@@ -55,8 +80,9 @@ static void prepare_search(S_BOARD *b, S_SEARCH_SETTINGS *ss)
         }
     }
 
-    b->search_ply = 0;
-
+    b->nodes = 0;
+    b->fail_high = 0;
+    b->first_fail_high = 0;
 }
 
 static void store_killer(S_BOARD *b, int move) 
@@ -87,7 +113,7 @@ void set_best_move_next(int start_index, S_MOVELIST *l)
     l->moves[best_index] = swp;
 }
 
-static i16 quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
+static i16 quiescence(S_BOARD *b, int alpha, int beta)
 {
     int i;
     int legal = 0;
@@ -98,11 +124,11 @@ static i16 quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
 
     assert(debug_board(b));
 
-    if ((ss->nodes & 4095) == 0) {
-        check_search_stop(ss);
+    if ((b->nodes & 4095) == 0) {
+        check_search_stop();
     }
 
-    ss->nodes++;
+    b->nodes++;
 
     if (is_repetition(b) || b->fifty_move_count >= 100) {
         return 0;
@@ -135,24 +161,20 @@ static i16 quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
         if (make_move(b, move)) {
             b->search_ply++;
 
-            score = -quiescence(b, ss, -beta, -alpha);
+            score = -quiescence(b, -beta, -alpha);
 
             unmake_move(b);
             b->search_ply--;
 
-            if (ss->stop) {
-                return 0;
-            }
-
-            if(ss->stop) {
+            if (g_search_info.stop) {
                 return 0;
             }
 
             if (score > alpha) {
                 if (score >= beta) {
-                    ss->fail_high++;
+                    b->fail_high++;
                     if (legal == 0) {
-                        ss->first_fail_high++;
+                        b->first_fail_high++;
                     }
 
                     return beta;
@@ -172,7 +194,7 @@ static i16 quiescence(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta)
 
     return alpha;
 }
-static i16 alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, int depth, int do_null) //, int window) //TODO: window?
+static i16 alpha_beta(S_BOARD *b, int alpha, int beta, int depth, int do_null) //, int window) //TODO: window?
 {
     int i;
     int legal = 0;
@@ -187,14 +209,14 @@ static i16 alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     assert(debug_board(b));
 
     if (depth == 0) {
-        return quiescence(b, ss, alpha, beta);
+        return quiescence(b, alpha, beta);
     }
 
-    if ((ss->nodes & 4095) == 0) {
-        check_search_stop(ss);
+    if ((b->nodes & 4095) == 0) {
+        check_search_stop();
     }
 
-    ss->nodes++;
+    b->nodes++;
 
     if (b->search_ply && (is_repetition(b) || b->fifty_move_count >= 100)) {
         return 0;
@@ -206,8 +228,8 @@ static i16 alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
 
     S_HASHENTRY entry;
 
-    if (probe_hash(&global_tp_table, b->hash_key, &entry, &score, alpha, beta, depth)) {
-        global_tp_table.cut++;
+    if (probe_hash(b->hash_key, &entry, &score, alpha, beta, depth)) {
+        g_hash_table.cut++;
         return score;
     }
 
@@ -222,7 +244,7 @@ static i16 alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
             make_null_move(b);
             b->search_ply++;
 
-            null_score = -alpha_beta(b, ss, -beta, -beta+1, depth-4, false);
+            null_score = -alpha_beta(b, -beta, -beta+1, depth-4, false);
 
             unmake_null_move(b);
             b->search_ply--;
@@ -236,7 +258,7 @@ static i16 alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     S_MOVELIST l[1];
     generate_all_moves(b, l);
 
-    if (hash_get(&global_tp_table, b->hash_key, &entry)) {
+    if (hash_get(b->hash_key, &entry)) {
         for (i=0; i <l->index; i++) {
             if (l->moves[i].move == entry.move) {
                 l->moves[i].score = 200000;
@@ -253,12 +275,12 @@ static i16 alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
         if (make_move(b, move)) {
             b->search_ply++;
 
-            score = -alpha_beta(b, ss, -beta, -alpha, depth-1, do_null);
+            score = -alpha_beta(b, -beta, -alpha, depth-1, do_null);
 
             unmake_move(b);
             b->search_ply--;
 
-            if (ss->stop) {
+            if (g_search_info.stop) {
                 return 0;
             }
 
@@ -268,16 +290,16 @@ static i16 alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
 
                 if (score > alpha) {
                     if (score >= beta) {
-                        ss->fail_high++;
+                        b->fail_high++;
                         if (legal == 0) {
-                            ss->first_fail_high++;
+                            b->first_fail_high++;
                         }
 
                         if(!mv_cap(move)) {
                             store_killer(b, move);
                         }
 
-                        hash_put(&global_tp_table, b->hash_key, best_move, beta, depth, b->ply, BETA_FLAG);
+                        hash_put(b->hash_key, best_move, beta, depth, b->ply, BETA_FLAG);
 
                         return beta;
                     }
@@ -303,34 +325,54 @@ static i16 alpha_beta(S_BOARD *b, S_SEARCH_SETTINGS *ss, int alpha, int beta, in
     }
 
     if (alpha != old_alpha) {
-        hash_put(&global_tp_table, b->hash_key, best_move, best_score, depth, b->ply, EXCA_FLAG);
+        hash_put(b->hash_key, best_move, best_score, depth, b->ply, EXCA_FLAG);
+        b->principal_variation[b->search_ply] = best_move;
     } else {
-        hash_put(&global_tp_table, b->hash_key, best_move, alpha, depth, b->ply, ALPH_FLAG);
+        hash_put(b->hash_key, best_move, alpha, depth, b->ply, ALPH_FLAG);
     }
 
     return alpha;
 }
 
-void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
+long count_all_nodes()
 {
-    u32 best_moves[MAX_PLY];
-    u32 best_move = EMPTY;
-    i16 best_score = -INFINITE;
-    int cur_depth = 0;
-    int pv_moves = 0;
+    int i;
+    long all_nodes = 0L;
+    for (i = 0; i < g_thread_table.size; i++) {
+        all_nodes += g_thread_table.threads[i].b.nodes;
+    }
+
+    return all_nodes;
+}
+
+void search_position(S_BOARD *b, int thread_id)
+{
+    i16 best_score;
+    int cur_depth;
     int i;
     int a_index;
     int b_index;
-    volatile i16 alpha = -INFINITE;
-    volatile i16 beta = INFINITE;
+    volatile i16 alpha;
+    volatile i16 beta;
+    long total_nodes;
 
-    prepare_search(b, ss);
+    thread_setup_board(b);
 
-    for (cur_depth = 1; cur_depth <= ss->depth; cur_depth++) {
+    //temporary best_score for aspiration window
+    best_score = quiescence(b, -INFINITE, INFINITE);
+
+    while (g_depth < g_search_info.depth) {
+        //Half of the threads search at 1 ply deeper
+        cur_depth = MAX(g_search_info.depth, g_depth + (thread_id%2)); 
+
+        //Alpha and beta are set to the aspiration window from previous search
+        alpha = MAX(-INFINITE, (best_score - aspiration_window[0]));
+        beta  = MIN(INFINITE, (best_score + aspiration_window[0]));
+        a_index = b_index = 1;
 
         do {
-            best_score = alpha_beta(b, ss, alpha, beta, cur_depth, true);
-            if (ss->stop) {
+            best_score = alpha_beta(b, alpha, beta, cur_depth, true);
+            if (g_search_info.stop) {
                 break;
             }
 
@@ -345,25 +387,32 @@ void search_position(S_BOARD *b, S_SEARCH_SETTINGS *ss)
             }
         } while(true);
 
-        if (ss->stop) {
+        if (g_search_info.stop) {
             break;
         }
 
-        pv_moves = hash_get_pv_line(&global_tp_table, b, best_moves, cur_depth);
-        printf("info score cp %d depth %d nodes %ld time %"PRIu64"", best_score, cur_depth, ss->nodes, cur_time_millis() - ss->starttime);
+        //only report the result if the deepest yet
+        if (aquire_reportlock_if_deepest(cur_depth)) {
 
-        best_move = best_moves[0];
+            total_nodes = count_all_nodes();
 
-        printf(" pv");
-        for(i=0; i < pv_moves; i++) {
-            printf(" %s", move_str(best_moves[i]));
+            printf("info score cp %d depth %d nodes %ld time %"PRIu64"", best_score, cur_depth, total_nodes, cur_time_millis() - g_search_info.starttime);
+
+            g_best_move = b->principal_variation[0];
+
+            printf(" pv");
+            for(i=0; i < cur_depth; i++) {
+                printf(" %s", move_str(b->principal_variation[i]));
+            }
+            printf("\n");
+
+            release_reportlock();
         }
-        printf("\n");
 
-        alpha = MAX(-INFINITE, (best_score - aspiration_window[0]));
-        beta  = MIN(INFINITE, (best_score + aspiration_window[0]));
-        a_index = b_index = 1;
     }
 
-    printf("bestmove %s\n", move_str(best_move));
+    //only one thread prints best move
+    if (thread_id == 0) {
+        printf("bestmove %s\n", move_str(g_best_move));
+    }
 }
