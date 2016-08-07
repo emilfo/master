@@ -118,7 +118,7 @@ void engine_shell()
         } else if(strncmp(input, "quit", 4) == 0) {
             g_search_info.stop = true;
             g_search_info.quit = true;
-            //thread_search_go();
+            wait_search_complete_barrier();
             break;
         } else if(strncmp(input, "move", 4) == 0) {
             make_move_if_exist(&g_board, str_move(input+5, &g_board));

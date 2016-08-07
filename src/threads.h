@@ -9,6 +9,7 @@
 typedef struct {
     pthread_t thread;
     S_BOARD b;
+    int thread_id;
 } S_THREAD;
 
 typedef struct {

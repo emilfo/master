@@ -86,8 +86,8 @@ const uint8_t castle_update[64] = {
 static void add_piece(S_BOARD *b, int piece, int sq);
 static void remove_piece(S_BOARD *b, int piece, int sq);
 
-void init_board(S_BOARD *b) {
-    parse_fen(b, START_FEN);
+void init_board() {
+    parse_fen(&g_board, START_FEN);
 }
 
 int parse_fen(S_BOARD *b, char *fen) {

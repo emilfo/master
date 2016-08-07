@@ -17,7 +17,7 @@ static void init_all() {
     init_hash();
     init_hashtable(0);
     init_board();
-    init_threads(1);
+    init_threads(4);
 }
 
 static void destroy_all() {

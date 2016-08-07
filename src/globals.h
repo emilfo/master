@@ -11,6 +11,6 @@ extern S_HASHTABLE g_hash_table;
 extern S_THREADS g_thread_table;
 extern S_SEARCH_SETTINGS g_search_info;
 
-extern int g_depth;
+extern volatile int g_depth;
 
 #endif /* GLOBALS_H */

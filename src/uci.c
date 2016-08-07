@@ -151,6 +151,8 @@ void uci_loop()
             } else if(strncmp(input, "quit", 4) == 0) {
                 g_search_info.stop = true;
                 g_search_info.quit = true;
+                wait_search_complete_barrier();
+                break;
             } else if(strncmp(input, "uci", 3) == 0) {
                 uci_identify();
             } else if(strncmp(input, "go", 2) == 0) {
@@ -161,10 +163,10 @@ void uci_loop()
             }
         }
 
-        if(g_search_info.quit) {
-            wait_search_ready_barrier();
-            break;
-        }
+        //if(g_search_info.quit) {
+        //    wait_search_ready_barrier();
+        //    break;
+        //}
     }
 }
 

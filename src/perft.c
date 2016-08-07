@@ -222,6 +222,7 @@ void rating_from_file(const char *filename)
         printf("\nMove to find: %s\n", move);
         g_search_info.depth = MAX_PLY;
         g_search_info.time_set = true;
+        g_search_info.stop = false;
         g_search_info.starttime = cur_time_millis();
         g_search_info.stoptime = g_search_info.starttime + 9000;
 
