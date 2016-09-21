@@ -16,7 +16,9 @@
 
 S_SEARCH_SETTINGS g_search_info;
 u32 g_best_move;
+
 volatile int g_depth;
+volatile int g_currently_searching;
 
 static int is_repetition(S_BOARD *b) 
 {
@@ -363,7 +365,7 @@ void search_position(S_BOARD *b, int thread_id)
 
     while (g_depth < g_search_info.depth) {
         //Half of the threads search at 1 ply deeper
-        cur_depth = MIN(g_search_info.depth, g_depth + 1 + (thread_id%2)); 
+        cur_depth = g_depth + 1 + (thread_id%2); 
 
         //Alpha and beta are set to the aspiration window from previous search
         alpha = MAX(-INFINITE, (best_score - aspiration_window[0]));
@@ -399,9 +401,13 @@ void search_position(S_BOARD *b, int thread_id)
         //only report the result if the deepest yet
         //printf("aquiring report lock\n");
         if (aquire_reportlock_if_deepest(cur_depth)) {
+            if (cur_depth == g_search_info.depth) {
+                g_search_info.stop = true;
+            }
+
             total_nodes = count_all_nodes();
 
-            printf("thread %d ", thread_id);
+            //printf("thread %d ", thread_id);
             printf("info score cp %d depth %d nodes %ld time %"PRIu64"", best_score, cur_depth, total_nodes, cur_time_millis() - g_search_info.starttime);
 
             g_best_move = b->principal_variation[0];
@@ -419,6 +425,8 @@ void search_position(S_BOARD *b, int thread_id)
 
     //only one thread prints best move
     if (thread_id == 0) {
+        aquire_reportlock();
         printf("bestmove %s\n", move_str(g_best_move));
+        release_reportlock();
     }
 }

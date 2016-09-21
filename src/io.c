@@ -95,6 +95,7 @@ void engine_shell()
 {
     char input[256];
 
+
     while (true) {
         printf(">");
         fflush(stdout);
@@ -116,9 +117,6 @@ void engine_shell()
         } else if(strncmp(input, "bench", 5) == 0) {
             bench_file("EPD/BT2450.epd");
         } else if(strncmp(input, "quit", 4) == 0) {
-            g_search_info.stop = true;
-            g_search_info.quit = true;
-            wait_search_complete_barrier();
             break;
         } else if(strncmp(input, "move", 4) == 0) {
             make_move_if_exist(&g_board, str_move(input+5, &g_board));
@@ -141,4 +139,9 @@ void engine_shell()
             printf("h for help\n");
         }
     }
+
+    //g_search_info.stop = true;
+    //g_search_info.quit = true;
+    //wait_search_complete_barrier();
+    //wait_search_ready_barrier();
 }

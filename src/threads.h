@@ -20,6 +20,7 @@ typedef struct {
 /* Report_lock is used to ensure that only one thread reports its result to the
  * UI at a time */
 int aquire_reportlock_if_deepest(int depth);
+void aquire_reportlock();
 void release_reportlock();
 
 /* Barriers used to ensure that the all workers have completed searching, before

@@ -23,15 +23,20 @@ static void *thread_work_loop(void *th_id)
         //io-thread can setup a new search
         wait_search_complete_barrier();
 
-        g_thread_table.threads[thread_id].b.nodes = 0;
-
-        //only one thread sets up this stuff
         if (thread_id == 0) {
+            g_currently_searching = false;
             g_depth = 0;
         }
 
+
         //wait until io has setup a new search
         wait_search_ready_barrier(); 
+
+        g_thread_table.threads[thread_id].b.nodes = 0;
+
+        if (thread_id == 0) {
+            g_currently_searching = true;
+        }
 
         if (g_search_info.quit) {
             break;
@@ -58,6 +63,11 @@ int aquire_reportlock_if_deepest(int depth)
     g_depth = depth;
 
     return true;
+}
+
+void aquire_reportlock()
+{
+    pthread_spin_lock(&report_lock);
 }
 
 void release_reportlock()
@@ -101,6 +111,10 @@ static void destroy_workers()
 
 
     //TODO what barriers should we wait for here?
+    if (g_currently_searching) {
+        wait_search_complete_barrier();
+    }
+
     wait_search_ready_barrier();
 
     for(i = 0; i < g_thread_table.size; i++) {
@@ -131,6 +145,7 @@ void init_threads(int thread_count)
     pthread_spin_init(&report_lock, g_depth);
     init_search_barriers(thread_count);
     create_workers(thread_count);
+    g_currently_searching = true;
 }
 
 void destroy_threads()

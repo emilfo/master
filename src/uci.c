@@ -120,6 +120,8 @@ static void parse_go(char *input, S_SEARCH_SETTINGS *ss, S_BOARD *b)
         time -= 50; //failsafe, don't want to run out
         ss->stoptime = ss->starttime + time + inc;
     }
+    ss->stop = false;
+    ss->quit = false;
 
     printf("time:%"PRIu64" start:%"PRIu64" stop:%"PRIu64" depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 }
@@ -139,24 +141,24 @@ void uci_loop()
 
         if(fgets(input, MAX_INPUT_SIZE, stdin) && !(input[0] == '\n')) {
             if(strncmp(input, "ucinewgame", 10) == 0) {
-                wait_search_complete_barrier();
+                //wait_search_complete_barrier();
                 hard_reset_board(&g_board);
             } else if(strncmp(input, "position", 8) == 0) {
-                wait_search_complete_barrier();
+                //wait_search_complete_barrier();
                 parse_position(input, &g_board);
             }else if(strncmp(input, "isready", 7) == 0) {
                 printf("readyok\n");
             } else if(strncmp(input, "stop", 4) == 0) {
                 g_search_info.stop = true;
             } else if(strncmp(input, "quit", 4) == 0) {
-                g_search_info.stop = true;
-                g_search_info.quit = true;
-                wait_search_complete_barrier();
+                //g_search_info.stop = true;
+                //g_search_info.quit = true;
+                //wait_search_complete_barrier();
                 break;
             } else if(strncmp(input, "uci", 3) == 0) {
                 uci_identify();
             } else if(strncmp(input, "go", 2) == 0) {
-                wait_search_complete_barrier();
+                //wait_search_complete_barrier();
                 parse_go(input, &g_search_info, &g_board);
             } else {
                 printf("error parsing input: %s\n", input);

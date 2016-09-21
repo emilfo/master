@@ -221,10 +221,11 @@ void rating_from_file(const char *filename)
         print_board(&g_board);
         printf("\nMove to find: %s\n", move);
         g_search_info.depth = MAX_PLY;
+        g_search_info.depth_set = false;
         g_search_info.time_set = true;
         g_search_info.stop = false;
         g_search_info.starttime = cur_time_millis();
-        g_search_info.stoptime = g_search_info.starttime + 9000;
+        g_search_info.stoptime = g_search_info.starttime + 900000;
 
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
@@ -248,10 +249,11 @@ void bench_file(const char *filename)
     while (fgets(buf, 1024, fp) != NULL) {
 
         parse_fen(&g_board, buf);
-        g_search_info.depth = 6;
+        g_search_info.depth = 7;
         g_search_info.time_set = false;
         g_search_info.starttime = cur_time_millis();
         g_search_info.stoptime = 0;
+        g_search_info.stop = false;
 
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
@@ -269,4 +271,5 @@ void bench_file(const char *filename)
     printf("|----------------------------\n");
     printf("|time  : %ld\n", cumulative_time);
     printf("|nodes : %ld\n", cumulative_nodes);
+
 }
