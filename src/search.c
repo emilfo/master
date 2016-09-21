@@ -364,7 +364,8 @@ void search_position(S_BOARD *b, int thread_id)
     best_score = quiescence(b, -INFINITE, INFINITE);
 
     while (g_depth < g_search_info.depth) {
-        //Half of the threads search at 1 ply deeper
+
+        //TODO: Here you can change vals for testing
         cur_depth = g_depth + 1 + (thread_id%2); 
 
         //Alpha and beta are set to the aspiration window from previous search
