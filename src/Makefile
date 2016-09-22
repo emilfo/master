@@ -1,5 +1,5 @@
 CC = gcc
-LDFLAGS =-lm -lpthread
+LDFLAGS =-lm -pthread -lpthread
 ################################################################################
 # Options:
 # debug=y

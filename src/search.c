@@ -366,7 +366,8 @@ void search_position(S_BOARD *b, int thread_id)
     while (g_depth < g_search_info.depth) {
 
         //TODO: Here you can change vals for testing
-        cur_depth = g_depth + 1 + (thread_id%2); 
+        //cur_depth = g_depth + 1 + (thread_id%2); 
+	cur_depth = g_depth + 1 + (__builtin_ctz(thread_id));
 
         //Alpha and beta are set to the aspiration window from previous search
         alpha = MAX(-INFINITE, (best_score - aspiration_window[0]));
