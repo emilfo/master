@@ -16,7 +16,7 @@
 static void uci_identify() 
 {
     printf("id name %s\n", NAME);
-    printf("id auhor %s\n", AUTHOR);
+    printf("id author %s\n", AUTHOR);
 
     //UCI-options
     printf("\n");
