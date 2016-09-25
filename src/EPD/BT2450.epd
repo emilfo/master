@@ -12,7 +12,7 @@ r5k1/pp2p1bp/6p1/n1p1P3/2qP1NP1/2PQB3/P5PP/R4K2 b - - bm g5;id "BT2450-09";
 8/pp3k2/2p1qp2/2P5/5P2/1R2p1rp/PP2R3/4K2Q b - - bm Qe4;id "BT2450-12";
 3b2k1/1pp2rpp/r2n1p1B/p2N1q2/3Q4/6R1/PPP2PPP/4R1K1 w - - bm Nb4;id "BT2450-13";
 3r1rk1/1p3pnp/p3pBp1/1qPpP3/1P1P2R1/P2Q3R/6PP/6K1 w - - bm Rxh7;c0 "Mate in 7 moves";id "BT2450-14";
-4k1rr/ppp5/3b1p1p/4pP1P/3pP2N/3P3P/PPP5/2KR2R1 w kq - bm Rg6;id "BT2450-15";
+4k1rr/ppp5/3b1p1p/4pP1P/3pP2N/3P3P/PPP5/2KR2R1 w k - bm Rg6;id "BT2450-15";
 r1b3k1/ppp3pp/2qpp3/2r3N1/2R5/8/P1Q2PPP/2B3K1 b - - bm g6;id "BT2450-16";
 4r1k1/p1qr1p2/2pb1Bp1/1p5p/3P1n1R/3B1P2/PP3PK1/2Q4R w - - bm Qxf4;id "BT2450-17";
 8/4p3/8/3P3p/P2pK3/6P1/7b/3k4 w - - bm d6;id "BT2450-18";

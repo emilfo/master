@@ -68,7 +68,6 @@ static void thread_setup_board(S_BOARD *b)
 
     b->ply = g_board.ply;
     b->search_ply = 0;
-    b->age = g_board.age;
 
     for (i = 0; i < 13; i++) {
         for (j = 0; j < 64; j++) {
@@ -232,6 +231,9 @@ static i16 alpha_beta(S_BOARD *b, int alpha, int beta, int depth, int do_null) /
 
     if (probe_hash(b->hash_key, &entry, &score, alpha, beta, depth)) {
         g_hash_table.cut++;
+        if (score >= alpha) {
+            b->principal_variation[b->search_ply] = entry.move;
+        }
         return score;
     }
 
@@ -367,7 +369,7 @@ void search_position(S_BOARD *b, int thread_id)
 
         //TODO: Here you can change vals for testing
         //cur_depth = g_depth + 1 + (thread_id%2); 
-	cur_depth = g_depth + 1 + (__builtin_ctz(thread_id));
+        cur_depth = g_depth + 1 + (__builtin_ctz(thread_id));
 
         //Alpha and beta are set to the aspiration window from previous search
         alpha = MAX(-INFINITE, (best_score - aspiration_window[0]));
@@ -403,7 +405,7 @@ void search_position(S_BOARD *b, int thread_id)
         //only report the result if the deepest yet
         //printf("aquiring report lock\n");
         if (aquire_reportlock_if_deepest(cur_depth)) {
-            if (cur_depth == g_search_info.depth) {
+            if (cur_depth >= g_search_info.depth) {
                 g_search_info.stop = true;
             }
 

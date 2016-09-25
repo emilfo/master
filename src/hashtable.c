@@ -73,25 +73,42 @@ int hash_get(u64 key, S_HASHENTRY *entry)
         //Only return if checksum is OK
         uint32_t local_checksum = entry->hash_key ^ entry->move ^ entry->eval ^ entry->depth ^ entry->flag_and_age;
         if(entry->checksum == local_checksum) {
-            return 1;
+            return true;
         }
         fail_checksum++;
     }
 
     entry = NULL;
-    return 0;
+    return false;
 }
 
 void hash_put(u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag)
 {
+    int put_score = 0;
     int i = key % g_hash_table.size;
 
+    S_HASHENTRY *prev_entry = &g_hash_table.entries[i];
+
+    /* Replacement strategy:
+     * 1. Always replace older entries
+     * 2. Prefer depth, exca-flag gets 4 points, Beta-flag 2.
+     */
+    put_score = depth - prev_entry->depth;
+
+    put_score += ((age - (prev_entry->flag_and_age & AGE_MASK)) * 2);
+
+    if (flag == EXCA_FLAG) put_score += 4;
+    else if (flag == BETA_FLAG) put_score += 2;
+
+    i16 prev_flag = (prev_entry->flag_and_age & FLAG_MASK);
+    if (prev_flag == EXCA_FLAG) put_score -= 4;
+    else if (prev_flag == BETA_FLAG) put_score -= 2;
+
+    if (put_score < 0) return;
+
+
+
     u16 flag_and_age = (age & AGE_MASK) | (flag & FLAG_MASK);
-    //if(flag & BETA_FLAG) {
-    //    g_hash_table.entries[i].beta= true;
-    //    g_hash_table.entries[i].alpha= false;
-    //    g_hash_table.entries[i].exca = false;
-    //}
 
     //resetting eval to mate-score (ignoring moves to mate)
     if (eval >  ISMATE) {

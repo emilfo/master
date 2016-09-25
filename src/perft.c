@@ -249,7 +249,7 @@ void bench_file(const char *filename)
     while (fgets(buf, 1024, fp) != NULL) {
 
         parse_fen(&g_board, buf);
-        g_search_info.depth = 7;
+        g_search_info.depth = 10;
         g_search_info.time_set = false;
         g_search_info.starttime = cur_time_millis();
         g_search_info.stoptime = 0;
