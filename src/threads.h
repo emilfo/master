@@ -29,6 +29,8 @@ void release_reportlock();
 void wait_search_complete_barrier();
 void wait_search_ready_barrier();
 
+int get_search_id();
+
 /* init and destroy used when starting up and closing the program, reinit is
  * used if the UI asks to change the number of threads */
 void init_threads(int thread_count);

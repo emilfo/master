@@ -13,6 +13,7 @@ static pthread_barrier_t search_ready_barrier;
 
 S_THREADS g_thread_table;
 
+volatile int g_search_id;
 
 static void *thread_work_loop(void *th_id) 
 {
@@ -45,6 +46,24 @@ static void *thread_work_loop(void *th_id)
         search_position(&g_thread_table.threads[thread_id].b, thread_id);
     }
     pthread_exit(NULL);
+}
+
+int get_search_id()
+{
+    //special case for single thread
+    if (g_thread_table.size == 1) {
+        return 0;
+    }
+
+    int tmp;
+    int search_id;
+    do {
+        tmp = g_search_id;
+        search_id = ((tmp+1)%g_thread_table.size);
+
+    } while(__sync_bool_compare_and_swap(&g_search_id, tmp, search_id));
+
+    return search_id;
 }
 
 int aquire_reportlock_if_deepest(int depth)
@@ -146,6 +165,7 @@ void init_threads(int thread_count)
     init_search_barriers(thread_count);
     create_workers(thread_count);
     g_currently_searching = true;
+    g_search_id = 0;
 }
 
 void destroy_threads()
@@ -159,4 +179,5 @@ void reinit_threads(int thread_count)
 {
     destroy_threads();
     init_threads(thread_count);
+    g_search_id = 0;
 }
