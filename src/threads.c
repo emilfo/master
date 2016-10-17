@@ -50,18 +50,12 @@ static void *thread_work_loop(void *th_id)
 
 int get_search_id()
 {
-    //special case for single thread
-    if (g_thread_table.size == 1) {
-        return 0;
-    }
-
-    int tmp;
-    int search_id;
+    volatile int tmp;
+    volatile int search_id;
     do {
         tmp = g_search_id;
-        search_id = ((tmp+1)%g_thread_table.size);
-
-    } while(__sync_bool_compare_and_swap(&g_search_id, tmp, search_id));
+        search_id = (tmp%g_thread_table.size) + 1;
+    } while(!(__sync_bool_compare_and_swap(&g_search_id, tmp, search_id)));
 
     return search_id;
 }
@@ -78,6 +72,8 @@ int aquire_reportlock_if_deepest(int depth)
         pthread_spin_unlock(&report_lock);
         return false;
     }
+
+    //printf(">=== depth %d reached ===<\n", depth);
 
     g_depth = depth;
 

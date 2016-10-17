@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
 
     init_all(thread_count);
 
-    if (argc == 3) {
-        bench_file(argv[2]);
+    if (argc == 4) {
+        bench_file_depth(argv[2], atoi(argv[3]));
     } else {
         engine_shell();
     }

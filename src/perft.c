@@ -237,6 +237,11 @@ void rating_from_file(const char *filename)
 
 void bench_file(const char *filename)
 {
+    bench_file_depth(filename, 6);
+}
+
+void bench_file_depth(const char *filename, int depth)
+{
     FILE *fp = fopen(filename, "r");
 
     char buf[1024];
@@ -249,7 +254,7 @@ void bench_file(const char *filename)
     while (fgets(buf, 1024, fp) != NULL) {
 
         parse_fen(&g_board, buf);
-        g_search_info.depth = 10;
+        g_search_info.depth = depth;
         g_search_info.time_set = false;
         g_search_info.starttime = cur_time_millis();
         g_search_info.stoptime = 0;
@@ -260,6 +265,7 @@ void bench_file(const char *filename)
         start_time = cur_time_millis();
         wait_search_ready_barrier();
 
+        printf("Main thread:");
         wait_search_complete_barrier();
         cumulative_time += cur_time_millis() - start_time;
         cumulative_nodes += count_all_nodes();

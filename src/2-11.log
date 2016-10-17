@@ -1,0 +1,171 @@
+ms1table
+mask
+reset masks and magics
+rank file and diag masks
+gen sliding attacks
+attack bitmaps
+evaluate masks
+init hashtable with 2666666 entries
+Main thread:thread 0 info score cp 8 depth 1 nodes 101 time 0 pv f1f2
+thread 0 info score cp 6 depth 2 nodes 631 time 1 pv f1f2 e5b2
+thread 0 info score cp 8 depth 3 nodes 4569 time 5 pv f1f2 e8e7 f3f7
+thread 1 info score cp 8 depth 4 nodes 28325 time 24 pv f1f2 a8a7 h1d1 b2a3
+thread 0 info score cp 7 depth 5 nodes 162246 time 105 pv f1f2 a8a7 b3b2 e5b2 b1b2
+thread 0 info score cp 7 depth 6 nodes 852926 time 385 pv f1f2 g7h6 h1d1 e8d8 f3e4 g7g6
+thread 1 info score cp 7 depth 7 nodes 2621691 time 1039 pv f1f2 b8b7 f3f7 e5b2 f3f7 e8e4 f1f6
+thread 1 info score cp 7 depth 8 nodes 6892624 time 2629 pv f1f2 b8b7 f5g7 e5h2 f5g7 e5g3 f1f7 g7g6
+thread 1 info score cp 7 depth 9 nodes 33661229 time 12709 pv f1f2 b8b7 h1d1 e5h2 d2b2 e8e4 a4e8 f7g6 g5h6
+thread 0 info score cp 7 depth 10 nodes 269774547 time 102748 pv f1f2 b8b7 f2b2 b8e5 f2b2 e8d8 e3e4 h6g5 f1d1 h6g5
+thread 0 info score cp 12 depth 11 nodes 375133585 time 142540 pv f5g7 e8e7 f3h5 b8d8 g5g6 e8e4 d4f5 g8h7 h1f1 e8e4 h1d1
+bestmove f5g7
+Main thread:thread 0 info score cp -1 depth 1 nodes 65 time 0 pv d4b2
+thread 1 info score cp -2 depth 2 nodes 281 time 0 pv d4b2 f7f5
+thread 0 info score cp 0 depth 3 nodes 991 time 0 pv d4b2 f7f5 h1g1
+thread 0 info score cp -2 depth 4 nodes 3690 time 1 pv d4b2 b6b5 a4a5 c7d6
+thread 1 info score cp -2 depth 5 nodes 8010 time 2 pv d4a1 f7f5 a1b2 b6b5 a4a5
+thread 0 info score cp -2 depth 6 nodes 14751 time 4 pv d4b2 b6b5 a4b5 a6b5 f4e5 a4a3
+thread 0 info score cp -2 depth 7 nodes 46868 time 15 pv d4b2 b6b5 a4b5 a6b5 f4e5 a4a3 g3f4
+thread 1 info score cp -2 depth 8 nodes 154172 time 48 pv d4b2 f7f5 f3f4 b6b5 a4a5 c7d6 e3d2 g8g7
+thread 0 info score cp -1 depth 9 nodes 480363 time 153 pv d4e3 b6b5 a4a5 f7f5 h1g1 c7d6 e3d2 d6e7 f3f4
+thread 0 info score cp 0 depth 10 nodes 1406303 time 450 pv d4c3 b6b5 a4a5 c7b8 a4a5 b6a5 b4a5 d6c5 g1f1 g8g7
+thread 1 info score cp -1 depth 11 nodes 3152640 time 1007 pv d4c3 b6b5 a4a5 f7f5 h1g1 a6b5 g1f1 d3d2 a7a8q g8g7 c6c7
+bestmove d4c3
+Main thread:thread 0 info score cp 0 depth 1 nodes 173 time 0 pv f3f4
+thread 1 info score cp -1 depth 2 nodes 1265 time 1 pv f3f4 h8g8
+thread 1 info score cp -1 depth 3 nodes 9248 time 3 pv f3f4 h8g8 g5f7
+thread 0 info score cp 0 depth 4 nodes 39164 time 13 pv f3f4 h8g8 g5f7 f8f7
+thread 1 info score cp -1 depth 5 nodes 281563 time 97 pv f3f4 c7b7 d3h7 g8h8 g5f7
+thread 1 info score cp 0 depth 6 nodes 1168581 time 413 pv e5e1 f8c8 h5e5 f7e6 h4g5 f8d8
+thread 0 info score cp 0 depth 7 nodes 5049980 time 1807 pv f3f4 h8g8 g5f7 f8f7 e6c7 f7f5 c7e6
+thread 1 info score cp 0 depth 8 nodes 10031645 time 3615 pv h1g1 h8g8 g5f7 f8f7 h5e5 a5c4 c7b5 c6b5
+thread 1 info score cp -2 depth 9 nodes 77385248 time 28258 pv h1g1 a5b7 g5f7 f8f7 e6c7 e5g6 h1g1 f8d8 g1f1
+thread 0 info score cp -1 depth 10 nodes 177446365 time 65589 pv h1g1 a5b7 g5f7 f8f7 e6f8 h8g8 e6c7 h8g8 g6e6 c6e8
+thread 1 info score cp 6 depth 11 nodes 601706281 time 221708 pv e5e6 h8g8 e6h6 c7f7 g5f7 f7f8 a5e5 h8g8 a6b7 c6f3 g4f5
+bestmove e5e6
+Main thread:thread 1 info score cp 23 depth 1 nodes 90 time 0 pv d2e1
+thread 0 info score cp 29 depth 2 nodes 1089 time 1 pv d2e1 a1b2
+thread 1 info score cp 29 depth 3 nodes 4289 time 2 pv d2e1 a1b2 d3d2
+thread 0 info score cp 32 depth 4 nodes 42300 time 15 pv d2e1 a2a4 d3d2 g2f1
+thread 1 info score cp 33 depth 5 nodes 68410 time 24 pv d2e1 a2a7 d3d6 a1b2 e1f2
+thread 0 info score cp 35 depth 6 nodes 375637 time 126 pv d2e1 a2a7 d3b5 b2c1 g3h4 b4b5
+thread 1 info score cp 34 depth 7 nodes 2075741 time 704 pv d2e1 a2a7 d3d6 b2c1 g3h4 h3h4 g7g5
+thread 0 info score cp 37 depth 8 nodes 6385533 time 2183 pv d2e1 a2a7 d3d6 h4h5 g3e1 a5b4 g3f3 e6e7
+thread 1 info score cp 36 depth 9 nodes 25922262 time 8976 pv d2e1 a2a7 d3g3 g2f1 f6e5 b8c7 e5d4 g2h1 d6d2
+thread 0 info score cp 38 depth 10 nodes 140667314 time 49144 pv d2e1 a2a7 d3d2 g2f1 d3e2 g2h3 e5d4 h3g4 h8g8 a2e2
+thread 1 info score cp 40 depth 11 nodes 356870731 time 126403 pv d2e1 a2a7 d3d6 a5c7 g3f4 a1d4 d3g3 a1e5 f8d8 g2f2 h8g8
+bestmove d2e1
+Main thread:thread 1 info score cp 89 depth 1 nodes 38 time 0 pv d8f6
+thread 0 info score cp 89 depth 2 nodes 176 time 0 pv c6f3 d1c1
+thread 0 info score cp 95 depth 3 nodes 1389 time 0 pv b5a4 d1c2 b4b3
+thread 1 info score cp 88 depth 4 nodes 9229 time 2 pv c6f3 d1c2 c6b5 e2d1
+thread 1 info score cp 87 depth 5 nodes 35309 time 8 pv c6d7 d1e2 d7g4 e2f2 d8f6
+thread 1 info score cp 87 depth 6 nodes 242661 time 58 pv c6d7 d1c1 d8a5 e1e2 d8h4 e1d1
+thread 0 info score cp 86 depth 7 nodes 1833538 time 460 pv b5b4 d1e2 c6e4 c2d1 e7h4 f2e2 a8g2
+thread 1 info score cp 86 depth 8 nodes 5344932 time 1334 pv b5a6 d1e2 c6b5 e2f2 d8f6 d1c2 a4b5 e2e3
+thread 1 info score cp 86 depth 9 nodes 12549742 time 3285 pv b5a6 d1e2 c6b5 e2f2 d8b6 d2d1q g5d2 d1c1 e4d5
+thread 0 info score cp 85 depth 10 nodes 32899322 time 8630 pv b5a6 d1e1 d8a5 e1d1 e8h5 d2d1q g4d1 d2d1q g5d2 d1c2
+thread 0 info score cp 85 depth 11 nodes 66203072 time 17429 pv b5a6 d1e2 c6b5 e2f2 e8a4 d3e2 a4b5 e2e1 h4f6 d2d1n h4f6
+bestmove b5a6
+Main thread:thread 0 info score cp 8 depth 1 nodes 246 time 1 pv d8d7
+thread 1 info score cp 5 depth 2 nodes 684 time 1 pv h7h6 h5h6
+thread 1 info score cp 5 depth 3 nodes 5923 time 2 pv d8d7 h5f5 b7c6
+thread 1 info score cp 2 depth 4 nodes 34552 time 13 pv d8d7 h2h3 h8g8 f5d5
+thread 0 info score cp 1 depth 5 nodes 124811 time 44 pv d8d7 h5f5 c6a5 c4a4 b7c6
+thread 1 info score cp 1 depth 6 nodes 451661 time 166 pv d8d7 h2h3 g4f4 c4c5 d5a5 h2h3
+thread 1 info score cp 1 depth 7 nodes 1487294 time 543 pv d8d7 h2h3 g4f4 h5g5 b7c6 h5h4 g4e4
+thread 0 info score cp 0 depth 8 nodes 4904597 time 1819 pv d8d7 h5f5 c6a5 c4a4 a5c4 h5h4 b7c6 h7f7
+thread 1 info score cp 1 depth 9 nodes 8452273 time 3132 pv d8d7 h2h3 b8a7 c4d4 d8d4 c3d4 f2f1q d1d2 f1f4
+thread 1 info score cp 2 depth 10 nodes 36477711 time 13685 pv e4e3 c4g4 d8d1 e1d1 b7c6 h5h6 b8c7 f2g3 f1f4 e3f2
+thread 0 info score cp 3 depth 11 nodes 52245257 time 19652 pv e4e3 c4g4 e4e3 c4g4 a5c4 h5h7 c7c8 h2h3 c7c8 h7h5 e2e1q
+bestmove e4e3
+Main thread:thread 0 info score cp -8 depth 1 nodes 118 time 0 pv c6c2
+thread 1 info score cp -10 depth 2 nodes 955 time 0 pv b6c4 h6g5
+thread 1 info score cp -10 depth 3 nodes 7302 time 3 pv c6c8 h6g5 e7e2
+thread 0 info score cp -10 depth 4 nodes 41436 time 15 pv c6c2 h6g5 e7e3 g1f1
+thread 0 info score cp -9 depth 5 nodes 96032 time 36 pv c6c2 h6g5 e7e2 d4d8 e8c6
+thread 1 info score cp 0 depth 6 nodes 349712 time 132 pv c6d6 d4d6 e7e3 g1f1 e3f3 g3f4
+thread 0 info score cp 0 depth 7 nodes 1430536 time 552 pv c6d6 d4d6 e7e3 g1f1 e3f3 g3f4 b6d5
+thread 1 info score cp 0 depth 8 nodes 2533021 time 979 pv c6d6 d4d6 e7e3 g1f1 e3f3 b1b2 d4d1 g1f2
+thread 1 info score cp 0 depth 9 nodes 3817358 time 1476 pv c6d6 d4d6 e7e3 g1f1 e3f3 h6f4 d6d7 h6f4 e3f3
+thread 1 info score cp 0 depth 11 nodes 19191894 time 7471 pv c6d6 d4d6 e7e3 g1f1 e3f3 d1d8 g8f7 c5c7 g8f7 g6h7 e7b4
+bestmove c6d6
+Main thread:thread 0 info score cp 1 depth 1 nodes 265 time 0 pv c4e6
+thread 1 info score cp 1 depth 2 nodes 970 time 0 pv c4e6 c8c7
+thread 1 info score cp 0 depth 3 nodes 6917 time 2 pv c4e6 c8b8 c4e6
+thread 0 info score cp 0 depth 4 nodes 26629 time 10 pv d6d8 c8d8 e6d7 d8d7
+thread 1 info score cp 1 depth 5 nodes 83157 time 30 pv c4e6 c8c7 d6d8 e8d8 c4e6
+thread 1 info score cp 1 depth 6 nodes 265773 time 98 pv c4e6 c8c7 d6d8 e8d8 c4e6 a4d7
+thread 0 info score cp 1 depth 7 nodes 1018238 time 377 pv c4e6 c8c7 d6d8 e8d8 c4e6 a4d7 a1a4
+thread 1 info score cp 0 depth 8 nodes 1879095 time 695 pv d6e6 e8e6 c4e6 c8c7 a2e6 a4d7 a1a4 e8d8
+thread 1 info score cp 0 depth 9 nodes 7215356 time 2729 pv d6e6 c6e4 g1c5 e4g2 c5b6 g2h3 g1c5 h6g4 a3g3
+thread 0 info score cp 0 depth 10 nodes 30934081 time 11565 pv d6e6 e8e6 c4e6 d8e8 f4g5 e8e4 b2b3 e4e1 c5d4 h6g4
+thread 1 info score cp 0 depth 11 nodes 103679996 time 38725 pv d6e6 e8e6 c4e6 c8c7 c4e6 a4d7 e6d7 d8d7 d4e5 h6g4 e2g4
+bestmove d6e6
+Main thread:thread 1 info score cp -3 depth 1 nodes 402 time 0 pv a8f8
+thread 0 info score cp -2 depth 2 nodes 643 time 0 pv c4d3 f4d3
+thread 1 info score cp -2 depth 3 nodes 5423 time 2 pv c4d3 f4d3 a5c4
+thread 1 info score cp -1 depth 4 nodes 25582 time 10 pv a8f8 d3c4 a5c4 f4d3
+thread 0 info score cp -1 depth 5 nodes 63379 time 25 pv g6g5 d3c4 a5c4 f4d5 a5c4
+thread 1 info score cp -1 depth 6 nodes 235157 time 94 pv g6g5 d3c4 a5c4 f4d5 a8f8 f1e2
+thread 1 info score cp -2 depth 7 nodes 990122 time 374 pv c5d4 c3d4 a5c4 f1e2 c4e3 c1f4 g5f4
+thread 0 info score cp 1 depth 8 nodes 2567029 time 956 pv g6g5 d3c4 a5c4 f4d3 a8f8 f1e2 c5c4 d3c5
+thread 1 info score cp 1 depth 9 nodes 11151226 time 4185 pv g6g5 d3c4 g6g5 e5e6 f7f6 d3e4 h6e3 e4f4 g5e3
+thread 1 info score cp 1 depth 10 nodes 43661121 time 16418 pv g6g5 d3c4 g6g5 e5e6 f7f8 a1d1 g5f4 g6e7 f7e7 a1b1
+thread 0 info score cp 1 depth 11 nodes 135839754 time 51273 pv g6g5 d3c4 g6g5 e5e6 a5c4 f4d5 a5c4 f1e2 a5c4 a1b1 g7e5
+bestmove g6g5
+Main thread:thread 0 info score cp -30 depth 1 nodes 359 time 1 pv c3c4
+thread 1 info score cp -29 depth 2 nodes 1937 time 1 pv e3g5 f6d5
+thread 1 info score cp -29 depth 3 nodes 8700 time 4 pv e3g5 f6d5 g1g7
+thread 0 info score cp -24 depth 4 nodes 153752 time 59 pv e3g5 f6d5 c2b3 c8f8
+thread 1 info score cp -24 depth 5 nodes 214950 time 82 pv e3g5 f6d5 c2g6 e7f6 g1g7
+thread 0 info score cp -22 depth 6 nodes 1531616 time 589 pv e3g5 b5b4 c2g6 e7f6 d2d5 f6d5
+thread 1 info score cp -20 depth 7 nodes 3079853 time 1200 pv e3g5 b7d5 c3c4 d5d2 g5d2 a5c4 d2d1
+thread 0 info score cp -20 depth 8 nodes 5694237 time 2217 pv e3g5 b7d5 c3c4 c7e7 h6g7 g8f7 g7f6 f6d5
+thread 1 info score cp -19 depth 9 nodes 49584828 time 19597 pv e3h6 e7d8 h6g5 b7d5 c3c4 d8f6 b3c4 b5c4 f1f2
+thread 0 info score cp -19 depth 10 nodes 166086037 time 65821 pv e3h6 e7d8 c2f5 c8b8 g1g7 g8h8 d2d5 c8d8 h6g7 h8g8
+thread 1 info score cp 11 depth 11 nodes 625647692 time 246058 pv g1g7 g8f8 g1g7 g8h8 d2g5 f8g7 d5d2 a5b3 e3d2 b3d2 c2b3
+bestmove g1g7
+Main thread:thread 1 info score cp -4 depth 1 nodes 564 time 0 pv h3h5
+thread 0 info score cp -5 depth 2 nodes 1291 time 1 pv h3h5 e1d3
+thread 1 info score cp -4 depth 3 nodes 10638 time 4 pv h3h5 e2a6 e6e4
+thread 1 info score cp -4 depth 4 nodes 42857 time 16 pv h3h5 e2a6 e6e4 g1g2
+thread 0 info score cp -3 depth 5 nodes 196221 time 76 pv h3h5 e1d3 c8e8 d4a7 b8a7
+thread 1 info score cp -2 depth 6 nodes 667162 time 263 pv h3h5 g2e4 f5e4 c2b4 c6c5 d4c5
+thread 0 info score cp 1 depth 8 nodes 1709170 time 678 pv h3h2 g1h2 e4g3 e2d1 e6h6 g2h3 g3e2 f2e2
+thread 0 info score cp 2 depth 9 nodes 5041746 time 1983 pv h3h2 g1h2 e4g3 e2d1 c3e2 g1f2 e2c1 f5g5 h6g6
+thread 1 info score cp 12 depth 10 nodes 31818762 time 12146 pv h3h2 g1h2 c3e2 g1f2 e2c1 g2h3 g4h3 g2h3 g4h3 d4a7
+thread 1 info score cp 18 depth 11 nodes 80163607 time 31293 pv h3h2 g1h2 e4g3 e2b2 g3e2 d4e5 g3f1 g2e4 h6h2 g2e4 e2c1
+bestmove h3h2
+Main thread:thread 1 info score cp -21 depth 1 nodes 461 time 0 pv e6e7
+thread 0 info score cp -21 depth 2 nodes 1034 time 0 pv e6e7 b3c3
+thread 1 info score cp -23 depth 3 nodes 7656 time 2 pv e6e7 h1h2 g3f3
+thread 0 info score cp -23 depth 4 nodes 56354 time 20 pv e6e7 h1h2 g3e3 b3e3
+thread 1 info score cp -23 depth 5 nodes 181577 time 67 pv e6e7 h1h2 e6e3 e2e3 g3e3
+thread 0 info score cp -19 depth 6 nodes 552164 time 207 pv e6f5 b3b7 f7f8 b3b7 e4f4 c5b6
+thread 1 info score cp -9 depth 7 nodes 744288 time 284 pv e6e4 b3b7 f7f8 b7b8 e4b1 e1e2 b7c6
+thread 0 info score cp 0 depth 8 nodes 8779261 time 3393 pv e6e4 b3b7 f7f8 b7b8 f8f7 b7b8 g8f7 b8b7
+thread 1 info score cp 0 depth 9 nodes 13481833 time 5232 pv e6e4 b3b7 f7f8 b7b8 f8f7 b8b7 f7g6 b5b8 f6f5
+thread 1 info score cp 0 depth 10 nodes 51719217 time 19988 pv e6g4 e2e3 f7g6 b7d7 g4f4 e3f3 d5c5 b3b7 f6f5 e3g3
+thread 0 info score cp 12 depth 11 nodes 452121189 time 175015 pv e6f5 e1f1 h3h2 b4b7 f7g6 b7b8 f8g7 h1h3 f7f8 b3b7 c5c6
+bestmove e6f5
+Main thread:thread 0 info score cp 7 depth 1 nodes 421 time 0 pv c2c4
+thread 1 info score cp 6 depth 2 nodes 3059 time 1 pv d5e3 f5e4
+thread 0 info score cp 6 depth 3 nodes 25479 time 9 pv d5e3 f5e4 f3f5
+thread 1 info score cp 4 depth 4 nodes 157998 time 60 pv d5e3 f5e4 g2h3 g7h6
+thread 0 info score cp 2 depth 5 nodes 1073512 time 398 pv d4d1 f7d7 h6f4 f7d7 a2b3
+thread 0 info score cp 2 depth 6 nodes 6712743 time 2603 pv h6d2 f5c2 f4e6 d8e7 a2b3 g7h6
+thread 1 info score cp 2 depth 7 nodes 20123514 time 7851 pv h6d2 f5c2 g3f3 a6c6 h6c1 d6f5 d4d1
+thread 0 info score cp 3 depth 8 nodes 106771567 time 42252 pv d5b4 a5b4 f4e6 c7c5 d4d1 d6f5 d4a4 a6d6
+thread 0 info score cp 2 depth 9 nodes 430727609 time 171142 pv h6d2 f5c2 f4e6 f7g7 h6c1 d6f5 d4d2 b5d4 d4b2
+thread 1 info score cp 7 depth 10 nodes 1272888697 time 506369 pv d5b4 a5b4 d4d6 f5d7 d6d5 f7e7 g3g7 e7g7 h6g5 c8a7
+thread 0 info score cp 9 depth 11 nodes 3029710599 time 1210305 pv d5b4 a5b4 d4d6 f5d7 d6d5 d8e7 g3g7 h7g6 g3d3 d7c8 a5c5
+bestmove d5b4
+Main thread:thread 0 info score cp 13 depth 1 nodes 328 time 0 pv d3b5
+thread 1 info score cp 13 depth 2 nodes 1332 time 0 pv d3b5 a6b5
+thread 0 info score cp 15 depth 3 nodes 3868 time 1 pv f6d8 f8d8 h3f3
+thread 0 info score cp 15 depth 5 nodes 24486 time 9 pv d3b5 a6b5 h3d3 f8d8 f6d8
+thread 1 info score cp 15 depth 6 nodes 144486 time 53 pv f6d8 f8d8 g4f4 g7f5 a3b4 h8g8
+thread 0 info score cp 15 depth 7 nodes 160223 time 59 pv d3b5 a6b5 h3d3 f8d8 f6d8 f8d8 h4f4
+thread 1 info score cp 15 depth 8 nodes 622971 time 233 pv f6d8 f8d8 h3f3 d8c8 f6d8 f8d8 f6d8 f8d8
+thread 0 info score cp 15 depth 9 nodes 6289493 time 2366 pv d3b5 a6b5 a3b4 d8c8 a4b5 h7h5 d4c5 b5a4 b4c5
+thread 1 info score cp 16 depth 10 nodes 22972194 time 8799 pv d3d2 g7f5 g4f4 g8h7 g4h4 g7h5 h4h5 f5g4 d7d8 f5g7

@@ -195,7 +195,7 @@ static i16 quiescence(S_BOARD *b, int alpha, int beta)
 
     return alpha;
 }
-static i16 alpha_beta(S_BOARD *b, int alpha, int beta, int depth, int do_null) //, int window) //TODO: window?
+static i16 alpha_beta(S_BOARD *b, int alpha, int beta, int depth, int do_null, int search_depth) //, int window) //TODO: window?
 {
     int i;
     int legal = 0;
@@ -248,7 +248,7 @@ static i16 alpha_beta(S_BOARD *b, int alpha, int beta, int depth, int do_null) /
             make_null_move(b);
             b->search_ply++;
 
-            null_score = -alpha_beta(b, -beta, -beta+1, depth-4, false);
+            null_score = -alpha_beta(b, -beta, -beta+1, depth-4, false, search_depth);
 
             unmake_null_move(b);
             b->search_ply--;
@@ -279,12 +279,12 @@ static i16 alpha_beta(S_BOARD *b, int alpha, int beta, int depth, int do_null) /
         if (make_move(b, move)) {
             b->search_ply++;
 
-            score = -alpha_beta(b, -beta, -alpha, depth-1, do_null);
+            score = -alpha_beta(b, -beta, -alpha, depth-1, do_null, search_depth);
 
             unmake_move(b);
             b->search_ply--;
 
-            if (g_search_info.stop) {
+            if (g_search_info.stop || g_depth >= search_depth) {
                 return 0;
             }
 
@@ -349,6 +349,26 @@ long count_all_nodes()
     return all_nodes;
 }
 
+static void print_depth(int thread_id, int cur_depth)
+{
+    if (thread_id == 0)
+        printf("%2d|  |  |  |  |  |  |  \n",cur_depth);
+    if (thread_id == 1)
+        printf("  |%2d|  |  |  |  |  |  \n",cur_depth);
+    if (thread_id == 2)
+        printf("  |  |%2d|  |  |  |  |  \n",cur_depth);
+    if (thread_id == 3)
+        printf("  |  |  |%2d|  |  |  |  \n",cur_depth);
+    if (thread_id == 4)
+        printf("  |  |  |  |%2d|  |  |  \n",cur_depth);
+    if (thread_id == 5)
+        printf("  |  |  |  |  |%2d|  |  \n",cur_depth);
+    if (thread_id == 6)
+        printf("  |  |  |  |  |  |%2d|  \n",cur_depth);
+    if (thread_id == 7)
+        printf("  |  |  |  |  |  |  |%2d\n",cur_depth);
+}
+
 void search_position(S_BOARD *b, int thread_id)
 {
     i16 best_score;
@@ -371,16 +391,17 @@ void search_position(S_BOARD *b, int thread_id)
         //cur_depth = g_depth + 1 + (thread_id%2); 
         cur_depth = g_depth + 1 + (__builtin_ctz(get_search_id()));
 
+        //print_depth(thread_id, cur_depth);
+
         //Alpha and beta are set to the aspiration window from previous search
         alpha = MAX(-INFINITE, (best_score - aspiration_window[0]));
         beta  = MIN(INFINITE, (best_score + aspiration_window[0]));
         a_index = b_index = 1;
 
-        //printf("thread:%d depth:%d\n", thread_id, cur_depth);
 
         do {
             //printf("a:%d b:%d\n", alpha, beta);
-            best_score = alpha_beta(b, alpha, beta, cur_depth, true);
+            best_score = alpha_beta(b, alpha, beta, cur_depth, true, cur_depth);
             if (g_search_info.stop) {
                 break;
             }
@@ -411,7 +432,7 @@ void search_position(S_BOARD *b, int thread_id)
 
             total_nodes = count_all_nodes();
 
-            //printf("thread %d ", thread_id);
+            printf("thread %d ", thread_id);
             printf("info score cp %d depth %d nodes %ld time %"PRIu64"", best_score, cur_depth, total_nodes, cur_time_millis() - g_search_info.starttime);
 
             g_best_move = b->principal_variation[0];
