@@ -104,7 +104,11 @@ void hash_put(u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag)
     if (prev_flag == EXCA_FLAG) put_score -= 4;
     else if (prev_flag == BETA_FLAG) put_score -= 2;
 
-    if (put_score < 0) return;
+    //printf ("FALSE: depth:%d - %d:prev_depth\n", age, prev_entry->flag_and_age & AGE_MASK);
+    if (put_score < 0) {
+        return;
+    }
+
 
 
 
