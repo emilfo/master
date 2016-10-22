@@ -3,7 +3,7 @@
 
 #include "defs.h"
 
-#ifdef __GNUC__NO
+#ifdef __GNUC__
 #define lsb1_index(x) (__builtin_ffsll(x)-1)
 #define bit_count(x) (__builtin_popcountll(x))
 #else

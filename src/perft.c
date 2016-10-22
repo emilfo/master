@@ -265,11 +265,11 @@ void bench_file_depth(const char *filename, int depth)
         start_time = cur_time_millis();
         wait_search_ready_barrier();
 
-        printf("Main thread:");
         wait_search_complete_barrier();
         cumulative_time += cur_time_millis() - start_time;
         cumulative_nodes += count_all_nodes();
         clear_hashtable();
+        break;
 
     }
     fclose(fp);

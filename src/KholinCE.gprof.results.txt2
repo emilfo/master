@@ -1,0 +1,597 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 26.79      1.54     1.54  2037245     0.00     0.00  eval_posistion
+ 14.26      2.36     0.82  2451736     0.00     0.00  set_best_move_next
+  7.57      2.80     0.44 10666418     0.00     0.00  add_move
+  5.65      3.12     0.33  2801271     0.00     0.00  make_move
+  4.78      3.40     0.28  2476322     0.00     0.00  is_repetition
+  4.35      3.65     0.25   383703     0.00     0.00  generate_black_rook_moves
+  4.00      3.88     0.23  2666254     0.00     0.00  unmake_move
+  3.74      4.09     0.22  6354064     0.00     0.00  add_piece
+  3.30      4.28     0.19   617269     0.00     0.00  hash_get
+  3.13      4.46     0.18  6502643     0.00     0.00  remove_piece
+  3.04      4.64     0.18  3119442     0.00     0.00  sq_attacked
+  2.78      4.80     0.16   377106     0.00     0.00  generate_black_queen_moves
+  2.44      4.94     0.14       11     0.01     0.52  alpha_beta
+  2.35      5.07     0.14   420203     0.00     0.00  generate_white_rook_moves
+  1.74      5.17     0.10  1385906     0.00     0.00  quiescence
+  1.57      5.26     0.09   418932     0.00     0.00  generate_white_queen_moves
+  1.22      5.33     0.07   421029     0.00     0.00  generate_black_bishop_moves
+  1.04      5.39     0.06   414094     0.00     0.00  generate_white_king_moves
+  1.04      5.45     0.06   369817     0.00     0.00  generate_black_king_moves
+  1.04      5.51     0.06    94666     0.00     0.00  generate_white_pawn_moves
+  0.87      5.56     0.05   241964     0.00     0.00  generate_black_pawn_moves
+  0.70      5.60     0.04   324475     0.00     0.00  generate_white_pawn_captures
+  0.70      5.64     0.04   322707     0.00     0.00  hash_put
+  0.35      5.66     0.02  2022180     0.00     0.00  material_draw
+  0.35      5.68     0.02   429159     0.00     0.00  generate_black_knight_moves
+  0.35      5.70     0.02   410097     0.00     0.00  generate_white_knight_moves
+  0.35      5.72     0.02   195646     0.00     0.00  generate_black_pawn_captures
+  0.17      5.73     0.01   542606     0.00     0.00  generate_all_captures
+  0.09      5.74     0.01   404998     0.00     0.00  generate_white_bishop_moves
+  0.09      5.74     0.01        1     0.01     0.01  bench_file_depth
+  0.09      5.75     0.01                             hard_reset_board
+  0.09      5.75     0.01                             make_move_if_exist
+  0.00      5.75     0.00   406621     0.00     0.00  probe_hash
+  0.00      5.75     0.00   335619     0.00     0.00  generate_all_moves
+  0.00      5.75     0.00    53364     0.00     0.00  store_killer
+  0.00      5.75     0.00    26032     0.00     0.00  valid_file_rank
+  0.00      5.75     0.00     2887     0.00     0.00  update_history
+  0.00      5.75     0.00     2053     0.00     0.00  make_null_move
+  0.00      5.75     0.00     1889     0.00     0.00  unmake_null_move
+  0.00      5.75     0.00     1577     0.00     0.00  rand64
+  0.00      5.75     0.00      589     0.00     0.00  check_search_stop
+  0.00      5.75     0.00       61     0.00     0.00  sq_str
+  0.00      5.75     0.00       32     0.00     0.00  move_str
+  0.00      5.75     0.00        9     0.00     0.00  release_reportlock
+  0.00      5.75     0.00        7     0.00     0.00  aquire_reportlock_if_deepest
+  0.00      5.75     0.00        6     0.00     0.00  count_all_nodes
+  0.00      5.75     0.00        6     0.00     0.00  cur_time_millis
+  0.00      5.75     0.00        6     0.00     0.00  wait_search_complete_barrier
+  0.00      5.75     0.00        6     0.00     0.00  wait_search_ready_barrier
+  0.00      5.75     0.00        2     0.00     0.00  destroy_hashtable
+  0.00      5.75     0.00        2     0.00     0.00  generate_hash
+  0.00      5.75     0.00        2     0.00     0.00  parse_fen
+  0.00      5.75     0.00        2     0.00     2.87  search_position
+  0.00      5.75     0.00        2     0.00     0.00  soft_reset_board
+  0.00      5.75     0.00        2     0.00     0.00  thread_setup_board
+  0.00      5.75     0.00        1     0.00     0.00  clear_hashtable
+  0.00      5.75     0.00        1     0.00     0.00  create_workers
+  0.00      5.75     0.00        1     0.00     0.00  destroy_all
+  0.00      5.75     0.00        1     0.00     0.00  destroy_search_barriers
+  0.00      5.75     0.00        1     0.00     0.00  destroy_threads
+  0.00      5.75     0.00        1     0.00     0.00  destroy_workers
+  0.00      5.75     0.00        1     0.00     0.00  init_all
+  0.00      5.75     0.00        1     0.00     0.00  init_attack_bitmaps
+  0.00      5.75     0.00        1     0.00     0.00  init_bitboard_mask
+  0.00      5.75     0.00        1     0.00     0.00  init_board
+  0.00      5.75     0.00        1     0.00     0.00  init_data
+  0.00      5.75     0.00        1     0.00     0.00  init_evaluate_mask
+  0.00      5.75     0.00        1     0.00     0.00  init_hash
+  0.00      5.75     0.00        1     0.00     0.00  init_hashtable
+  0.00      5.75     0.00        1     0.00     0.00  init_ms1btable
+  0.00      5.75     0.00        1     0.00     0.00  init_search_barriers
+  0.00      5.75     0.00        1     0.00     0.00  init_threads
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+ 
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this 
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) for 0.17% of 5.75 seconds
+
+index % time    self  children    called     name
+                0.00    5.74       2/2           thread_work_loop [2]
+[1]     99.7    0.00    5.74       2         search_position [1]
+                0.14    5.60      11/11          alpha_beta [3]
+                0.00    0.00       2/1385906     quiescence [4]
+                0.00    0.00      32/32          move_str [46]
+                0.00    0.00       9/9           release_reportlock [47]
+                0.00    0.00       7/7           aquire_reportlock_if_deepest [48]
+                0.00    0.00       5/6           count_all_nodes [49]
+                0.00    0.00       3/6           cur_time_millis [50]
+                0.00    0.00       2/2           thread_setup_board [57]
+-----------------------------------------------
+                                                 <spontaneous>
+[2]     99.7    0.00    5.74                 thread_work_loop [2]
+                0.00    5.74       2/2           search_position [1]
+                0.00    0.00       4/6           wait_search_complete_barrier [51]
+                0.00    0.00       4/6           wait_search_ready_barrier [52]
+-----------------------------------------------
+                             1797314             alpha_beta [3]
+                0.14    5.60      11/11          search_position [1]
+[3]     99.7    0.14    5.60      11+1797314 alpha_beta [3]
+                0.10    3.25 1385904/1385906     quiescence [4]
+                0.00    0.62  335619/335619      generate_all_moves [9]
+                0.56    0.00 1670112/2451736     set_best_move_next [7]
+                0.23    0.28 1981904/2801271     make_move [8]
+                0.15    0.13 1703333/2666254     unmake_move [11]
+                0.00    0.12  406621/406621      probe_hash [22]
+                0.07    0.00  214239/617269      hash_get [16]
+                0.04    0.00  390622/2476322     is_repetition [13]
+                0.04    0.00  322707/322707      hash_put [28]
+                0.02    0.00  364631/3119442     sq_attacked [19]
+                0.00    0.00   53364/53364       store_killer [38]
+                0.00    0.00    2887/2887        update_history [40]
+                0.00    0.00    2053/2053        make_null_move [41]
+                0.00    0.00    1889/1889        unmake_null_move [42]
+                0.00    0.00      87/589         check_search_stop [44]
+                             1797314             alpha_beta [3]
+-----------------------------------------------
+                              683946             quiescence [4]
+                0.00    0.00       2/1385906     search_position [1]
+                0.10    3.25 1385904/1385906     alpha_beta [3]
+[4]     58.2    0.10    3.25 1385906+683946  quiescence [4]
+                1.54    0.02 2037245/2037245     eval_posistion [5]
+                0.01    0.86  542606/542606      generate_all_captures [6]
+                0.26    0.00  781624/2451736     set_best_move_next [7]
+                0.23    0.00 2085700/2476322     is_repetition [13]
+                0.10    0.11  819367/2801271     make_move [8]
+                0.06    0.05  704535/2666254     unmake_move [11]
+                0.00    0.00     502/589         check_search_stop [44]
+                              683946             quiescence [4]
+-----------------------------------------------
+                1.54    0.02 2037245/2037245     quiescence [4]
+[5]     27.1    1.54    0.02 2037245         eval_posistion [5]
+                0.02    0.00 2022180/2022180     material_draw [31]
+-----------------------------------------------
+                0.01    0.86  542606/542606      quiescence [4]
+[6]     15.1    0.01    0.86  542606         generate_all_captures [6]
+                0.13    0.05  204734/383703      generate_black_rook_moves [12]
+                0.11    0.04  343057/420203      generate_white_rook_moves [17]
+                0.09    0.04  217024/377106      generate_black_queen_moves [14]
+                0.08    0.04  350247/418932      generate_white_queen_moves [21]
+                0.03    0.03  199524/421029      generate_black_bishop_moves [20]
+                0.05    0.01  352373/414094      generate_white_king_moves [26]
+                0.04    0.01  218512/369817      generate_black_king_moves [24]
+                0.04    0.00  324475/324475      generate_white_pawn_captures [27]
+                0.02    0.01  325676/410097      generate_white_knight_moves [29]
+                0.02    0.00  195646/195646      generate_black_pawn_captures [30]
+                0.01    0.00  202202/429159      generate_black_knight_moves [32]
+                0.00    0.00  327206/404998      generate_white_bishop_moves [33]
+-----------------------------------------------
+                0.26    0.00  781624/2451736     quiescence [4]
+                0.56    0.00 1670112/2451736     alpha_beta [3]
+[7]     14.3    0.82    0.00 2451736         set_best_move_next [7]
+-----------------------------------------------
+                0.10    0.11  819367/2801271     quiescence [4]
+                0.23    0.28 1981904/2801271     alpha_beta [3]
+[8]     12.5    0.33    0.39 2801271         make_move [8]
+                0.15    0.00 2754811/3119442     sq_attacked [19]
+                0.11    0.00 3836372/6502643     remove_piece [18]
+                0.09    0.00 2677130/6354064     add_piece [15]
+                0.02    0.02  258386/2666254     unmake_move [11]
+-----------------------------------------------
+                0.00    0.62  335619/335619      alpha_beta [3]
+[9]     10.7    0.00    0.62  335619         generate_all_moves [9]
+                0.12    0.04  178969/383703      generate_black_rook_moves [12]
+                0.07    0.03  160082/377106      generate_black_queen_moves [14]
+                0.05    0.04  241964/241964      generate_black_pawn_moves [23]
+                0.06    0.02   94666/94666       generate_white_pawn_moves [25]
+                0.04    0.04  221505/421029      generate_black_bishop_moves [20]
+                0.02    0.01  151305/369817      generate_black_king_moves [24]
+                0.02    0.01   77146/420203      generate_white_rook_moves [17]
+                0.01    0.01   68685/418932      generate_white_queen_moves [21]
+                0.01    0.00   61721/414094      generate_white_king_moves [26]
+                0.01    0.00  226957/429159      generate_black_knight_moves [32]
+                0.00    0.00   84421/410097      generate_white_knight_moves [29]
+                0.00    0.00   77792/404998      generate_white_bishop_moves [33]
+-----------------------------------------------
+                0.00    0.00    1372/10666418     generate_white_bishop_moves [33]
+                0.00    0.00   29701/10666418     generate_black_pawn_captures [30]
+                0.00    0.00   58133/10666418     generate_white_pawn_captures [27]
+                0.02    0.00  388726/10666418     generate_white_king_moves [26]
+                0.02    0.00  436726/10666418     generate_white_pawn_moves [25]
+                0.02    0.00  453657/10666418     generate_white_knight_moves [29]
+                0.02    0.00  589652/10666418     generate_black_king_moves [24]
+                0.04    0.00  987049/10666418     generate_black_pawn_moves [23]
+                0.04    0.00 1070008/10666418     generate_white_queen_moves [21]
+                0.05    0.00 1110933/10666418     generate_white_rook_moves [17]
+                0.07    0.00 1634344/10666418     generate_black_bishop_moves [20]
+                0.07    0.00 1820297/10666418     generate_black_queen_moves [14]
+                0.09    0.00 2085820/10666418     generate_black_rook_moves [12]
+[10]     7.6    0.44    0.00 10666418         add_move [10]
+-----------------------------------------------
+                0.02    0.02  258386/2666254     make_move [8]
+                0.06    0.05  704535/2666254     quiescence [4]
+                0.15    0.13 1703333/2666254     alpha_beta [3]
+[11]     7.4    0.23    0.20 2666254         unmake_move [11]
+                0.12    0.00 3676934/6354064     add_piece [15]
+                0.07    0.00 2666271/6502643     remove_piece [18]
+-----------------------------------------------
+                0.12    0.04  178969/383703      generate_all_moves [9]
+                0.13    0.05  204734/383703      generate_all_captures [6]
+[12]     5.8    0.25    0.09  383703         generate_black_rook_moves [12]
+                0.09    0.00 2085820/10666418     add_move [10]
+-----------------------------------------------
+                0.04    0.00  390622/2476322     alpha_beta [3]
+                0.23    0.00 2085700/2476322     quiescence [4]
+[13]     4.8    0.28    0.00 2476322         is_repetition [13]
+-----------------------------------------------
+                0.07    0.03  160082/377106      generate_all_moves [9]
+                0.09    0.04  217024/377106      generate_all_captures [6]
+[14]     4.1    0.16    0.07  377106         generate_black_queen_moves [14]
+                0.07    0.00 1820297/10666418     add_move [10]
+-----------------------------------------------
+                0.09    0.00 2677130/6354064     make_move [8]
+                0.12    0.00 3676934/6354064     unmake_move [11]
+[15]     3.7    0.22    0.00 6354064         add_piece [15]
+-----------------------------------------------
+                0.07    0.00  214239/617269      alpha_beta [3]
+                0.12    0.00  403030/617269      probe_hash [22]
+[16]     3.3    0.19    0.00  617269         hash_get [16]
+-----------------------------------------------
+                0.02    0.01   77146/420203      generate_all_moves [9]
+                0.11    0.04  343057/420203      generate_all_captures [6]
+[17]     3.1    0.14    0.05  420203         generate_white_rook_moves [17]
+                0.05    0.00 1110933/10666418     add_move [10]
+-----------------------------------------------
+                0.07    0.00 2666271/6502643     unmake_move [11]
+                0.11    0.00 3836372/6502643     make_move [8]
+[18]     3.1    0.18    0.00 6502643         remove_piece [18]
+-----------------------------------------------
+                0.02    0.00  364631/3119442     alpha_beta [3]
+                0.15    0.00 2754811/3119442     make_move [8]
+[19]     3.0    0.18    0.00 3119442         sq_attacked [19]
+-----------------------------------------------
+                0.03    0.03  199524/421029      generate_all_captures [6]
+                0.04    0.04  221505/421029      generate_all_moves [9]
+[20]     2.4    0.07    0.07  421029         generate_black_bishop_moves [20]
+                0.07    0.00 1634344/10666418     add_move [10]
+-----------------------------------------------
+                0.01    0.01   68685/418932      generate_all_moves [9]
+                0.08    0.04  350247/418932      generate_all_captures [6]
+[21]     2.3    0.09    0.04  418932         generate_white_queen_moves [21]
+                0.04    0.00 1070008/10666418     add_move [10]
+-----------------------------------------------
+                0.00    0.12  406621/406621      alpha_beta [3]
+[22]     2.2    0.00    0.12  406621         probe_hash [22]
+                0.12    0.00  403030/617269      hash_get [16]
+-----------------------------------------------
+                0.05    0.04  241964/241964      generate_all_moves [9]
+[23]     1.6    0.05    0.04  241964         generate_black_pawn_moves [23]
+                0.04    0.00  987049/10666418     add_move [10]
+-----------------------------------------------
+                0.02    0.01  151305/369817      generate_all_moves [9]
+                0.04    0.01  218512/369817      generate_all_captures [6]
+[24]     1.5    0.06    0.02  369817         generate_black_king_moves [24]
+                0.02    0.00  589652/10666418     add_move [10]
+-----------------------------------------------
+                0.06    0.02   94666/94666       generate_all_moves [9]
+[25]     1.4    0.06    0.02   94666         generate_white_pawn_moves [25]
+                0.02    0.00  436726/10666418     add_move [10]
+-----------------------------------------------
+                0.01    0.00   61721/414094      generate_all_moves [9]
+                0.05    0.01  352373/414094      generate_all_captures [6]
+[26]     1.3    0.06    0.02  414094         generate_white_king_moves [26]
+                0.02    0.00  388726/10666418     add_move [10]
+-----------------------------------------------
+                0.04    0.00  324475/324475      generate_all_captures [6]
+[27]     0.7    0.04    0.00  324475         generate_white_pawn_captures [27]
+                0.00    0.00   58133/10666418     add_move [10]
+-----------------------------------------------
+                0.04    0.00  322707/322707      alpha_beta [3]
+[28]     0.7    0.04    0.00  322707         hash_put [28]
+-----------------------------------------------
+                0.00    0.00   84421/410097      generate_all_moves [9]
+                0.02    0.01  325676/410097      generate_all_captures [6]
+[29]     0.7    0.02    0.02  410097         generate_white_knight_moves [29]
+                0.02    0.00  453657/10666418     add_move [10]
+-----------------------------------------------
+                0.02    0.00  195646/195646      generate_all_captures [6]
+[30]     0.4    0.02    0.00  195646         generate_black_pawn_captures [30]
+                0.00    0.00   29701/10666418     add_move [10]
+-----------------------------------------------
+                0.02    0.00 2022180/2022180     eval_posistion [5]
+[31]     0.3    0.02    0.00 2022180         material_draw [31]
+-----------------------------------------------
+                0.01    0.00  202202/429159      generate_all_captures [6]
+                0.01    0.00  226957/429159      generate_all_moves [9]
+[32]     0.3    0.02    0.00  429159         generate_black_knight_moves [32]
+-----------------------------------------------
+                0.00    0.00   77792/404998      generate_all_moves [9]
+                0.00    0.00  327206/404998      generate_all_captures [6]
+[33]     0.1    0.01    0.00  404998         generate_white_bishop_moves [33]
+                0.00    0.00    1372/10666418     add_move [10]
+-----------------------------------------------
+                0.01    0.00       1/1           main [36]
+[34]     0.1    0.01    0.00       1         bench_file_depth [34]
+                0.00    0.00       3/6           cur_time_millis [50]
+                0.00    0.00       2/6           wait_search_complete_barrier [51]
+                0.00    0.00       1/2           parse_fen [55]
+                0.00    0.00       1/6           wait_search_ready_barrier [52]
+                0.00    0.00       1/6           count_all_nodes [49]
+                0.00    0.00       1/1           clear_hashtable [58]
+-----------------------------------------------
+                                                 <spontaneous>
+[35]     0.1    0.01    0.00                 hard_reset_board [35]
+-----------------------------------------------
+                                                 <spontaneous>
+[36]     0.1    0.00    0.01                 main [36]
+                0.01    0.00       1/1           bench_file_depth [34]
+                0.00    0.00       1/1           init_all [64]
+                0.00    0.00       1/1           destroy_all [60]
+-----------------------------------------------
+                                                 <spontaneous>
+[37]     0.1    0.01    0.00                 make_move_if_exist [37]
+-----------------------------------------------
+                0.00    0.00   53364/53364       alpha_beta [3]
+[38]     0.0    0.00    0.00   53364         store_killer [38]
+-----------------------------------------------
+                0.00    0.00   26032/26032       init_attack_bitmaps [65]
+[39]     0.0    0.00    0.00   26032         valid_file_rank [39]
+-----------------------------------------------
+                0.00    0.00    2887/2887        alpha_beta [3]
+[40]     0.0    0.00    0.00    2887         update_history [40]
+-----------------------------------------------
+                0.00    0.00    2053/2053        alpha_beta [3]
+[41]     0.0    0.00    0.00    2053         make_null_move [41]
+-----------------------------------------------
+                0.00    0.00    1889/1889        alpha_beta [3]
+[42]     0.0    0.00    0.00    1889         unmake_null_move [42]
+-----------------------------------------------
+                0.00    0.00    1577/1577        init_hash [70]
+[43]     0.0    0.00    0.00    1577         rand64 [43]
+-----------------------------------------------
+                0.00    0.00      87/589         alpha_beta [3]
+                0.00    0.00     502/589         quiescence [4]
+[44]     0.0    0.00    0.00     589         check_search_stop [44]
+-----------------------------------------------
+                0.00    0.00      61/61          move_str [46]
+[45]     0.0    0.00    0.00      61         sq_str [45]
+-----------------------------------------------
+                0.00    0.00      32/32          search_position [1]
+[46]     0.0    0.00    0.00      32         move_str [46]
+                0.00    0.00      61/61          sq_str [45]
+-----------------------------------------------
+                0.00    0.00       9/9           search_position [1]
+[47]     0.0    0.00    0.00       9         release_reportlock [47]
+-----------------------------------------------
+                0.00    0.00       7/7           search_position [1]
+[48]     0.0    0.00    0.00       7         aquire_reportlock_if_deepest [48]
+-----------------------------------------------
+                0.00    0.00       1/6           bench_file_depth [34]
+                0.00    0.00       5/6           search_position [1]
+[49]     0.0    0.00    0.00       6         count_all_nodes [49]
+-----------------------------------------------
+                0.00    0.00       3/6           bench_file_depth [34]
+                0.00    0.00       3/6           search_position [1]
+[50]     0.0    0.00    0.00       6         cur_time_millis [50]
+-----------------------------------------------
+                0.00    0.00       2/6           bench_file_depth [34]
+                0.00    0.00       4/6           thread_work_loop [2]
+[51]     0.0    0.00    0.00       6         wait_search_complete_barrier [51]
+-----------------------------------------------
+                0.00    0.00       1/6           bench_file_depth [34]
+                0.00    0.00       1/6           destroy_workers [63]
+                0.00    0.00       4/6           thread_work_loop [2]
+[52]     0.0    0.00    0.00       6         wait_search_ready_barrier [52]
+-----------------------------------------------
+                0.00    0.00       1/2           destroy_all [60]
+                0.00    0.00       1/2           init_hashtable [71]
+[53]     0.0    0.00    0.00       2         destroy_hashtable [53]
+-----------------------------------------------
+                0.00    0.00       2/2           parse_fen [55]
+[54]     0.0    0.00    0.00       2         generate_hash [54]
+-----------------------------------------------
+                0.00    0.00       1/2           init_board [67]
+                0.00    0.00       1/2           bench_file_depth [34]
+[55]     0.0    0.00    0.00       2         parse_fen [55]
+                0.00    0.00       2/2           soft_reset_board [56]
+                0.00    0.00       2/2           generate_hash [54]
+-----------------------------------------------
+                0.00    0.00       2/2           parse_fen [55]
+[56]     0.0    0.00    0.00       2         soft_reset_board [56]
+-----------------------------------------------
+                0.00    0.00       2/2           search_position [1]
+[57]     0.0    0.00    0.00       2         thread_setup_board [57]
+-----------------------------------------------
+                0.00    0.00       1/1           bench_file_depth [34]
+[58]     0.0    0.00    0.00       1         clear_hashtable [58]
+-----------------------------------------------
+                0.00    0.00       1/1           init_threads [74]
+[59]     0.0    0.00    0.00       1         create_workers [59]
+-----------------------------------------------
+                0.00    0.00       1/1           main [36]
+[60]     0.0    0.00    0.00       1         destroy_all [60]
+                0.00    0.00       1/2           destroy_hashtable [53]
+                0.00    0.00       1/1           destroy_threads [62]
+-----------------------------------------------
+                0.00    0.00       1/1           destroy_threads [62]
+[61]     0.0    0.00    0.00       1         destroy_search_barriers [61]
+-----------------------------------------------
+                0.00    0.00       1/1           destroy_all [60]
+[62]     0.0    0.00    0.00       1         destroy_threads [62]
+                0.00    0.00       1/1           destroy_search_barriers [61]
+                0.00    0.00       1/1           destroy_workers [63]
+-----------------------------------------------
+                0.00    0.00       1/1           destroy_threads [62]
+[63]     0.0    0.00    0.00       1         destroy_workers [63]
+                0.00    0.00       1/6           wait_search_ready_barrier [52]
+-----------------------------------------------
+                0.00    0.00       1/1           main [36]
+[64]     0.0    0.00    0.00       1         init_all [64]
+                0.00    0.00       1/1           init_data [68]
+                0.00    0.00       1/1           init_hash [70]
+                0.00    0.00       1/1           init_board [67]
+                0.00    0.00       1/1           init_hashtable [71]
+                0.00    0.00       1/1           init_threads [74]
+-----------------------------------------------
+                0.00    0.00       1/1           init_data [68]
+[65]     0.0    0.00    0.00       1         init_attack_bitmaps [65]
+                0.00    0.00   26032/26032       valid_file_rank [39]
+-----------------------------------------------
+                0.00    0.00       1/1           init_data [68]
+[66]     0.0    0.00    0.00       1         init_bitboard_mask [66]
+-----------------------------------------------
+                0.00    0.00       1/1           init_all [64]
+[67]     0.0    0.00    0.00       1         init_board [67]
+                0.00    0.00       1/2           parse_fen [55]
+-----------------------------------------------
+                0.00    0.00       1/1           init_all [64]
+[68]     0.0    0.00    0.00       1         init_data [68]
+                0.00    0.00       1/1           init_ms1btable [72]
+                0.00    0.00       1/1           init_bitboard_mask [66]
+                0.00    0.00       1/1           init_attack_bitmaps [65]
+                0.00    0.00       1/1           init_evaluate_mask [69]
+-----------------------------------------------
+                0.00    0.00       1/1           init_data [68]
+[69]     0.0    0.00    0.00       1         init_evaluate_mask [69]
+-----------------------------------------------
+                0.00    0.00       1/1           init_all [64]
+[70]     0.0    0.00    0.00       1         init_hash [70]
+                0.00    0.00    1577/1577        rand64 [43]
+-----------------------------------------------
+                0.00    0.00       1/1           init_all [64]
+[71]     0.0    0.00    0.00       1         init_hashtable [71]
+                0.00    0.00       1/2           destroy_hashtable [53]
+-----------------------------------------------
+                0.00    0.00       1/1           init_data [68]
+[72]     0.0    0.00    0.00       1         init_ms1btable [72]
+-----------------------------------------------
+                0.00    0.00       1/1           init_threads [74]
+[73]     0.0    0.00    0.00       1         init_search_barriers [73]
+-----------------------------------------------
+                0.00    0.00       1/1           init_all [64]
+[74]     0.0    0.00    0.00       1         init_threads [74]
+                0.00    0.00       1/1           init_search_barriers [73]
+                0.00    0.00       1/1           create_workers [59]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+
+Index by function name
+
+  [10] add_move               [12] generate_black_rook_moves [8] make_move
+  [15] add_piece              [54] generate_hash          [37] make_move_if_exist
+   [3] alpha_beta             [33] generate_white_bishop_moves [41] make_null_move
+  [48] aquire_reportlock_if_deepest [26] generate_white_king_moves [31] material_draw
+  [34] bench_file_depth       [29] generate_white_knight_moves [46] move_str
+  [44] check_search_stop      [27] generate_white_pawn_captures [55] parse_fen
+  [58] clear_hashtable        [25] generate_white_pawn_moves [22] probe_hash
+  [49] count_all_nodes        [21] generate_white_queen_moves [4] quiescence
+  [59] create_workers         [17] generate_white_rook_moves [43] rand64
+  [50] cur_time_millis        [35] hard_reset_board       [47] release_reportlock
+  [60] destroy_all            [16] hash_get               [18] remove_piece
+  [53] destroy_hashtable      [28] hash_put                [1] search_position
+  [61] destroy_search_barriers [64] init_all               [7] set_best_move_next
+  [62] destroy_threads        [65] init_attack_bitmaps    [56] soft_reset_board
+  [63] destroy_workers        [66] init_bitboard_mask     [19] sq_attacked
+   [5] eval_posistion         [67] init_board             [45] sq_str
+   [6] generate_all_captures  [68] init_data              [38] store_killer
+   [9] generate_all_moves     [69] init_evaluate_mask     [57] thread_setup_board
+  [20] generate_black_bishop_moves [70] init_hash         [11] unmake_move
+  [24] generate_black_king_moves [71] init_hashtable      [42] unmake_null_move
+  [32] generate_black_knight_moves [72] init_ms1btable    [40] update_history
+  [30] generate_black_pawn_captures [73] init_search_barriers [39] valid_file_rank
+  [23] generate_black_pawn_moves [74] init_threads        [51] wait_search_complete_barrier
+  [14] generate_black_queen_moves [13] is_repetition      [52] wait_search_ready_barrier

@@ -57,6 +57,8 @@ int get_search_id()
         search_id = (tmp%g_thread_table.size) + 1;
     } while(!(__sync_bool_compare_and_swap(&g_search_id, tmp, search_id)));
 
+    search_id = (search_id % (g_thread_table.size/2)) + (g_thread_table.size/2);
+
     return search_id;
 }
 

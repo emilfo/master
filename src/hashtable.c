@@ -14,7 +14,7 @@ void clear_hashtable()
     g_hash_table.fail_checksum = 0;
     g_hash_table.cut = 0;
 
-    memset(g_hash_table.entries, 0, g_hash_table.size);
+    memset(g_hash_table.entries, 0, g_hash_table.size * sizeof(S_HASHENTRY));
 }
 
 void init_hashtable(u64 size)
@@ -95,14 +95,14 @@ void hash_put(u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag)
      */
     put_score = depth - prev_entry->depth;
 
-    put_score += ((age - (prev_entry->flag_and_age & AGE_MASK)) * 2);
+    put_score += ((age - (prev_entry->flag_and_age & AGE_MASK)));
 
-    if (flag == EXCA_FLAG) put_score += 4;
-    else if (flag == BETA_FLAG) put_score += 2;
+    if (flag == EXCA_FLAG) put_score += 2;
+    else if (flag == BETA_FLAG) put_score += 1;
 
     i16 prev_flag = (prev_entry->flag_and_age & FLAG_MASK);
-    if (prev_flag == EXCA_FLAG) put_score -= 4;
-    else if (prev_flag == BETA_FLAG) put_score -= 2;
+    if (prev_flag == EXCA_FLAG) put_score -= 2;
+    else if (prev_flag == BETA_FLAG) put_score -= 1;
 
     //printf ("FALSE: depth:%d - %d:prev_depth\n", age, prev_entry->flag_and_age & AGE_MASK);
     if (put_score < 0) {
