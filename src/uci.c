@@ -143,6 +143,7 @@ void uci_loop()
         if(fgets(input, MAX_INPUT_SIZE, stdin) && !(input[0] == '\n')) {
             if(strncmp(input, "ucinewgame", 10) == 0) {
                 stop_threads();
+                clear_hashtable();
                 hard_reset_board(&g_board);
             } else if(strncmp(input, "setoption", 9) == 0) {
                 stop_threads();
