@@ -348,30 +348,6 @@ long count_all_nodes()
     return all_nodes;
 }
 
-#ifdef DDEBUG
-static int print_depth(int thread_id, int cur_depth)
-{
-    if (thread_id == 0)
-        printf("%2d|  |  |  |  |  |  |  \n",cur_depth);
-    if (thread_id == 1)
-        printf("  |%2d|  |  |  |  |  |  \n",cur_depth);
-    if (thread_id == 2)
-        printf("  |  |%2d|  |  |  |  |  \n",cur_depth);
-    if (thread_id == 3)
-        printf("  |  |  |%2d|  |  |  |  \n",cur_depth);
-    if (thread_id == 4)
-        printf("  |  |  |  |%2d|  |  |  \n",cur_depth);
-    if (thread_id == 5)
-        printf("  |  |  |  |  |%2d|  |  \n",cur_depth);
-    if (thread_id == 6)
-        printf("  |  |  |  |  |  |%2d|  \n",cur_depth);
-    if (thread_id == 7)
-        printf("  |  |  |  |  |  |  |%2d\n",cur_depth);
-
-    return 1;
-}
-#endif
-
 void search_position(S_BOARD *b, int thread_id)
 {
     i16 best_score;
