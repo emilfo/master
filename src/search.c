@@ -444,7 +444,7 @@ void search_position(S_BOARD *b, int thread_id)
 
             total_nodes = count_all_nodes();
 
-            printf("thread %d ", thread_id);
+            //printf("thread %d ", thread_id);
             pv_move_count = hash_get_pv_line(b, best_moves, cur_depth);
             printf("info score cp %d depth %d nodes %ld time %"PRIu64"", best_score, cur_depth, total_nodes, cur_time_millis() - g_search_info.starttime);
 
