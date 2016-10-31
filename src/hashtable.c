@@ -89,28 +89,30 @@ void hash_put(u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag)
 
     S_HASHENTRY *prev_entry = &g_hash_table.entries[i];
 
-    /* Replacement strategy:
-     * 1. Always replace older entries
-     * 2. Prefer depth, exca-flag gets 4 points, Beta-flag 2.
-     */
-    put_score = depth - prev_entry->depth;
+    uint32_t local_checksum = prev_entry->hash_key ^ prev_entry->move ^ prev_entry->eval ^ prev_entry->depth ^ prev_entry->flag_and_age;
+    if(prev_entry->checksum == local_checksum) {
+        /* Replacement strategy:
+         * 1. Always replace older entries
+         * 2. Prefer depth, exca-flag gets 4 points, Beta-flag 2.
+         */
+        put_score = depth - prev_entry->depth;
 
-    put_score += ((age - (prev_entry->flag_and_age & AGE_MASK)));
+        put_score += ((age - (prev_entry->flag_and_age & AGE_MASK)));
 
-    if (flag == EXCA_FLAG) put_score += 2;
-    else if (flag == BETA_FLAG) put_score += 1;
+        if (flag == EXCA_FLAG) put_score += 2;
+        else if (flag == BETA_FLAG) put_score += 1;
 
-    i16 prev_flag = (prev_entry->flag_and_age & FLAG_MASK);
-    if (prev_flag == EXCA_FLAG) put_score -= 2;
-    else if (prev_flag == BETA_FLAG) put_score -= 1;
+        i16 prev_flag = (prev_entry->flag_and_age & FLAG_MASK);
+        if (prev_flag == EXCA_FLAG) put_score -= 2;
+        else if (prev_flag == BETA_FLAG) put_score -= 1;
 
-    //printf ("FALSE: depth:%d - %d:prev_depth\n", age, prev_entry->flag_and_age & AGE_MASK);
-    if (put_score < 0) {
-        return;
+        //printf ("FALSE: depth:%d - %d:prev_depth\n", age, prev_entry->flag_and_age & AGE_MASK);
+        if (put_score < 0) {
+            return;
+        }
+    } else {
+        fail_checksum++;
     }
-
-
-
 
     u16 flag_and_age = (age & AGE_MASK) | (flag & FLAG_MASK);
 
@@ -137,6 +139,11 @@ int hash_get_pv_line(S_BOARD *b, u32 *moves, int depth)
     int j = 0;
 
     S_HASHENTRY entry;
+
+    moves[i++] = b->principal_variation[0];
+    if (!make_move_if_exist(b, moves[0])) {
+        printf("ERROR, first move doesn't exist, hash_get_pv_line");
+    }
 
     while(i < depth && hash_get(b->hash_key, &entry)) {
         if(make_move_if_exist(b, entry.move)) {
