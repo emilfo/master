@@ -127,6 +127,20 @@ static void parse_go(char *input, S_SEARCH_SETTINGS *ss, S_BOARD *b)
     printf("time:%"PRIu64" start:%"PRIu64" stop:%"PRIu64" depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 }
 
+static void parse_option(char *input)
+{
+    char *buf_ptr = NULL;
+    if ((buf_ptr = strstr(input, "Hash value"))) {
+	printf("%s: %d", buf_ptr, atoi(buf_ptr+11));
+        init_hashtable(atoi(buf_ptr+11));
+    }
+
+    if ((buf_ptr = strstr(input, "Threads value"))) {
+	printf("%s: %d", buf_ptr, atoi(buf_ptr+14));
+        reinit_threads(atoi(buf_ptr+14));
+    }
+}
+
 void uci_loop() 
 {
     setbuf(stdin, NULL);
@@ -147,7 +161,7 @@ void uci_loop()
                 hard_reset_board(&g_board);
             } else if(strncmp(input, "setoption", 9) == 0) {
                 stop_threads();
-                //TODO
+                parse_option(input);
             } else if(strncmp(input, "position", 8) == 0) {
                 stop_threads();
                 parse_position(input, &g_board);

@@ -20,8 +20,10 @@ void clear_hashtable()
 void init_hashtable(u64 size)
 {
     if (size == 0) {
-        size = HASH_DEF * 1000000;
+        size = HASH_DEF;
     }
+
+    size = size * 1000000; //size in MB
 
     g_hash_table.size = size / sizeof(S_HASHENTRY);
     g_hash_table.cut = 0;
