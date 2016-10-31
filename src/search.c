@@ -375,6 +375,8 @@ static int print_depth(int thread_id, int cur_depth)
 void search_position(S_BOARD *b, int thread_id)
 {
     i16 best_score;
+    u32 best_moves[MAX_PLY];
+    int pv_move_count;
     int cur_depth;
     int i;
     int a_index;
@@ -443,13 +445,14 @@ void search_position(S_BOARD *b, int thread_id)
             total_nodes = count_all_nodes();
 
             printf("thread %d ", thread_id);
+            pv_move_count = hash_get_pv_line(b, best_moves, cur_depth);
             printf("info score cp %d depth %d nodes %ld time %"PRIu64"", best_score, cur_depth, total_nodes, cur_time_millis() - g_search_info.starttime);
 
-            g_best_move = b->principal_variation[0];
+            g_best_move = best_moves[0];
 
             printf(" pv");
-            for(i=0; i < cur_depth; i++) {
-                printf(" %s", move_str(b->principal_variation[i]));
+            for(i=0; i < pv_move_count; i++) {
+                printf(" %s", move_str(best_moves[i]));
             }
             printf("\n");
 
