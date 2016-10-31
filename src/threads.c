@@ -50,6 +50,8 @@ static void *thread_work_loop(void *th_id)
 
 int get_search_id()
 {
+    if (g_thread_table.size == 1) return 1;
+
     volatile int tmp;
     volatile int search_id;
     do {

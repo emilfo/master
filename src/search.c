@@ -391,10 +391,12 @@ void search_position(S_BOARD *b, int thread_id)
         //TODO: Here you can change vals for testing
         //cur_depth = g_depth + 1 + (thread_id%2); 
 
-        if (first)
+        if (first) {
             cur_depth = g_depth + 1 + (__builtin_ctz(thread_id+1));
-        else
+	    first = false;
+	} else {
             cur_depth = g_depth + 1 + (__builtin_ctz(get_search_id()));
+	}
 
         //print_depth(thread_id, cur_depth);
 

@@ -105,7 +105,7 @@ void engine_shell()
         if(strncmp(input, "file-perft", 10) == 0) {
             perft_from_file("EPD/perftsuite.epd", false);
         } else if(strncmp(input, "ratingtest", 10) == 0) {
-            rating_from_file("EPD/BT2450.epd");
+            rating_from_file("EPD/bs2830.epd");
         } else if(strncmp(input, "file-eval", 9) == 0) {
             eval_from_file("EPD/ecm98.epd");
         } else if(strncmp(input, "divide", 6) == 0) {

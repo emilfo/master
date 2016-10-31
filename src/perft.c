@@ -249,6 +249,7 @@ void bench_file_depth(const char *filename, int depth)
     unsigned long cumulative_time = 0;
     long cumulative_nodes = 0L;
     unsigned long start_time;
+    int position = 1;
 
     wait_search_complete_barrier();
     while (fgets(buf, 1024, fp) != NULL) {
@@ -262,6 +263,7 @@ void bench_file_depth(const char *filename, int depth)
 
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
+	printf("positin %d\n", position++);
         start_time = cur_time_millis();
         wait_search_ready_barrier();
 
@@ -269,7 +271,6 @@ void bench_file_depth(const char *filename, int depth)
         cumulative_time += cur_time_millis() - start_time;
         cumulative_nodes += count_all_nodes();
         clear_hashtable();
-        break;
 
     }
     fclose(fp);
