@@ -139,9 +139,4 @@ void engine_shell()
             printf("h for help\n");
         }
     }
-
-    //g_search_info.stop = true;
-    //g_search_info.quit = true;
-    //wait_search_complete_barrier();
-    //wait_search_ready_barrier();
 }

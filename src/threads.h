@@ -28,6 +28,8 @@ void release_reportlock();
  * setting up a new search before workers can start a new search */
 void wait_search_complete_barrier();
 void wait_search_ready_barrier();
+void start_threads();
+void stop_threads();
 
 int get_search_id();
 
@@ -36,5 +38,7 @@ int get_search_id();
 void init_threads(int thread_count);
 void destroy_threads();
 void reinit_threads(int thread_count);
+
+extern int threads_currently_searching;
 
 #endif /* THREADS_H */

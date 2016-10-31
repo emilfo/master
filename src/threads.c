@@ -12,6 +12,7 @@ static pthread_barrier_t search_complete_barrier;
 static pthread_barrier_t search_ready_barrier;
 
 S_THREADS g_thread_table;
+int threads_currently_searching;
 
 volatile int g_search_id;
 
@@ -25,7 +26,6 @@ static void *thread_work_loop(void *th_id)
         wait_search_complete_barrier();
 
         if (thread_id == 0) {
-            g_currently_searching = false;
             g_depth = 0;
         }
 
@@ -34,10 +34,6 @@ static void *thread_work_loop(void *th_id)
         wait_search_ready_barrier(); 
 
         g_thread_table.threads[thread_id].b.nodes = 0;
-
-        if (thread_id == 0) {
-            g_currently_searching = true;
-        }
 
         if (g_search_info.quit) {
             break;
@@ -104,6 +100,22 @@ void wait_search_ready_barrier()
     pthread_barrier_wait(&search_ready_barrier);
 }
 
+void start_threads()
+{
+    stop_threads();
+    wait_search_ready_barrier();
+    threads_currently_searching = true;
+}
+
+void stop_threads()
+{
+    if (threads_currently_searching) {
+        g_search_info.stop = true;
+        wait_search_complete_barrier();
+        threads_currently_searching = false;
+    }
+}
+
 static void create_workers(int size) 
 {
     int i;
@@ -125,16 +137,9 @@ static void destroy_workers()
 {
     int i;
 
+    stop_threads();
     g_search_info.quit = true;
-    g_search_info.stop = true;
-
-
-    //TODO what barriers should we wait for here?
-    if (g_currently_searching) {
-        wait_search_complete_barrier();
-    }
-
-    wait_search_ready_barrier();
+    start_threads();
 
     for(i = 0; i < g_thread_table.size; i++) {
         pthread_join(g_thread_table.threads[i].thread, NULL);
@@ -164,7 +169,7 @@ void init_threads(int thread_count)
     pthread_spin_init(&report_lock, g_depth);
     init_search_barriers(thread_count);
     create_workers(thread_count);
-    g_currently_searching = true;
+    threads_currently_searching = true;
     g_search_id = 0;
 }
 

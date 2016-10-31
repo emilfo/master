@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "io.h"
 #include "search.h"
+#include "threads.h"
 #include "globals.h"
 
 #define MAX_INPUT_SIZE 4096
@@ -141,75 +142,30 @@ void uci_loop()
 
         if(fgets(input, MAX_INPUT_SIZE, stdin) && !(input[0] == '\n')) {
             if(strncmp(input, "ucinewgame", 10) == 0) {
-                //wait_search_complete_barrier();
+                stop_threads();
                 hard_reset_board(&g_board);
+            } else if(strncmp(input, "setoption", 9) == 0) {
+                stop_threads();
+                //TODO
             } else if(strncmp(input, "position", 8) == 0) {
-                //wait_search_complete_barrier();
+                stop_threads();
                 parse_position(input, &g_board);
             }else if(strncmp(input, "isready", 7) == 0) {
                 printf("readyok\n");
             } else if(strncmp(input, "stop", 4) == 0) {
-                g_search_info.stop = true;
+                stop_threads();
             } else if(strncmp(input, "quit", 4) == 0) {
-                //g_search_info.stop = true;
-                //g_search_info.quit = true;
-                //wait_search_complete_barrier();
                 break;
             } else if(strncmp(input, "uci", 3) == 0) {
                 uci_identify();
             } else if(strncmp(input, "go", 2) == 0) {
-                //wait_search_complete_barrier();
+                stop_threads();
                 parse_go(input, &g_search_info, &g_board);
+                start_threads();
             } else {
                 printf("error parsing input: %s\n", input);
             }
         }
-
-        //if(g_search_info.quit) {
-        //    wait_search_ready_barrier();
-        //    break;
-        //}
     }
 }
 
-//void move_string(uint32_t move, char *mv_str)
-//{
-//    mv_str = "";
-//    if (mv_piece(move) == W_KING && mv_castle(move)) {
-//        if (mv_to(move) == G1) {
-//            strcat(mv_str, "O-O");
-//        } else {
-//            strcat(mv_str, "O-O-O");
-//        }
-//        return;
-//    }
-//
-//    if (mv_piece(move) == B_KING && mv_castle(move)) {
-//        if (mv_to(move) == G8) {
-//            strcat(mv_str, "O-O");
-//        } else {
-//            strcat(mv_str, "O-O-O");
-//        }
-//        return;
-//    }
-//
-//    //algebraic notation special for pawns
-//    if (mv_piece(move) == W_PAWN || mv_piece(move) == B_PAWN) {
-//        if (mv_cap(move)) {
-//            strcat(mv_str, FILE_STR[mv_from(move)]);
-//        }
-//    } else {
-//        strcat(mv_str, PIECE_STR[mv_piece(move)]);
-//    }
-//
-//    if (mv_cap(move)) {
-//        strcat(mv_str, "x");
-//    }
-//
-//    strcat(mv_str, SQ_STR[mv_to(move)]);
-//
-//    if (mv_prom(move)) {
-//        strcat(mv_str, "=");
-//        strcat(mv_str, PIECE_STR[mv_prom(move)]);
-//    }
-//}

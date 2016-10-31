@@ -204,6 +204,7 @@ void rating_from_file(const char *filename)
 
     while (fgets(buf, 1024, fp) != NULL) {
         wait_search_complete_barrier();
+        threads_currently_searching = false;
 
         parse_fen(&g_board, buf);
 
@@ -229,7 +230,7 @@ void rating_from_file(const char *filename)
 
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
-        wait_search_ready_barrier();
+        start_threads();
     }
 
     fclose(fp);
@@ -251,7 +252,7 @@ void bench_file_depth(const char *filename, int depth)
     unsigned long start_time;
     int position = 1;
 
-    wait_search_complete_barrier();
+    stop_threads();
     while (fgets(buf, 1024, fp) != NULL) {
 
         parse_fen(&g_board, buf);
@@ -263,11 +264,12 @@ void bench_file_depth(const char *filename, int depth)
 
         //printf("time:%d start:%d stop:%d depth:%d timeset:%d\n", time, ss->starttime, ss->stoptime, ss->depth, ss->time_set);
 
-	printf("positin %d\n", position++);
+	printf("position %d\n", position++);
         start_time = cur_time_millis();
-        wait_search_ready_barrier();
+        start_threads();
 
         wait_search_complete_barrier();
+        threads_currently_searching = false;
         cumulative_time += cur_time_millis() - start_time;
         cumulative_nodes += count_all_nodes();
         clear_hashtable();

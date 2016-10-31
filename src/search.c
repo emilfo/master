@@ -18,7 +18,6 @@ S_SEARCH_SETTINGS g_search_info;
 u32 g_best_move;
 
 volatile int g_depth;
-volatile int g_currently_searching;
 
 static int is_repetition(S_BOARD *b) 
 {
@@ -349,7 +348,8 @@ long count_all_nodes()
     return all_nodes;
 }
 
-static void print_depth(int thread_id, int cur_depth)
+#ifdef DDEBUG
+static int print_depth(int thread_id, int cur_depth)
 {
     if (thread_id == 0)
         printf("%2d|  |  |  |  |  |  |  \n",cur_depth);
@@ -367,7 +367,10 @@ static void print_depth(int thread_id, int cur_depth)
         printf("  |  |  |  |  |  |%2d|  \n",cur_depth);
     if (thread_id == 7)
         printf("  |  |  |  |  |  |  |%2d\n",cur_depth);
+
+    return 1;
 }
+#endif
 
 void search_position(S_BOARD *b, int thread_id)
 {
@@ -398,7 +401,7 @@ void search_position(S_BOARD *b, int thread_id)
             cur_depth = g_depth + 1 + (__builtin_ctz(get_search_id()));
 	}
 
-        //print_depth(thread_id, cur_depth);
+        assert(print_depth(thread_id, cur_depth));
 
         //Alpha and beta are set to the aspiration window from previous search
         alpha = MAX(-INFINITE, (best_score - aspiration_window[0]));
