@@ -116,12 +116,12 @@ void hash_put(u64 key, u32 move, i16 eval, u8 depth, i16 age, i16 flag)
 
     u16 flag_and_age = (age & AGE_MASK) | (flag & FLAG_MASK);
 
-    //resetting eval to mate-score (ignoring moves to mate)
-    if (eval >  ISMATE) {
-        eval = MATE;
-    } else if (eval < -ISMATE) {
-        eval = -MATE;
-    }
+//    //resetting eval to mate-score (ignoring moves to mate)
+//    if (eval >  ISMATE) {
+//        eval = MATE;
+//    } else if (eval < -ISMATE) {
+//        eval = -MATE;
+//    }
 
     int32_t checksum = key ^ move ^ eval ^ depth ^ flag_and_age;
 
