@@ -131,12 +131,10 @@ static void parse_option(char *input)
 {
     char *buf_ptr = NULL;
     if ((buf_ptr = strstr(input, "Hash value"))) {
-	printf("%s: %d", buf_ptr, atoi(buf_ptr+11));
         init_hashtable(atoi(buf_ptr+11));
     }
 
     if ((buf_ptr = strstr(input, "Threads value"))) {
-	printf("%s: %d", buf_ptr, atoi(buf_ptr+14));
         reinit_threads(atoi(buf_ptr+14));
     }
 }
